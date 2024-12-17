@@ -14,8 +14,8 @@
     "checkJs": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "types": ["node"],
-    "moduleResolution": "bundler"
+    "types": ["node", "@taquito/taquito"],
+    "moduleResolution": "node"
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
   "references": [{ "path": "./tsconfig.node.json" }]
