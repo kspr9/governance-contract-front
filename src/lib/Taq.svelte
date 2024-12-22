@@ -5,6 +5,7 @@
     import { TempleWallet } from '@temple-wallet/dapp';
 
 
+
     const tezSym: string ='ꜩ'
     /**
      
@@ -33,40 +34,24 @@
         amount: 1 // Number of tickets to send
     };
 
-    let balance: string = 'Loading...';
+ 
     let walletDataAvailable: boolean = false;
     let userAddress: string;
-
     let wbalance: string;
 
+    let contractAddress: string = '';
+    let contractInstance: any = null;
+    let storageData: any = null;
+    let contractScript: any = null;
+    let contractEntrypoints: any = null;
+
+
+    let amount = '';
+    let destination = '';
+    let share = '';
+
+
     let Tezos: TezosToolkit = new TezosToolkit('https://ghostnet.smartpy.io');
-    
-    /**
-    
-     TempleWallet.isAvailable()
-     .then(async () => {
-         const templeWallet = new TempleWallet('TokenShare');
-         
-         templeWallet
-         .connect('ghostnet')
-         .then(() => {
-             //Tezos.setWalletProvider(templeWallet);
-             return templeWallet.getPKH();
-         })
-         .then((pkh) => {
-             console.log(`Your address: ${pkh}`);
-             
-            });
-            
-            const Tezos = templeWallet.toTezos();
-            userAddress = await templeWallet.getPKH();
-            
-            
-            
-        })
-        */
-    //const Tezos = new TezosToolkit('https://ghostnet.smartpy.io');
-    
 
     
     
@@ -122,26 +107,94 @@
         }
      }
 
+     async function loadContract() {
+        if (!contractAddress) {
+        console.error('No contract address provided');
+        return;
+        }
+        contractInstance = await Tezos.wallet.at(contractAddress);
+        // Get and display the contract's storage
+        storageData = await contractInstance.storage();
 
-    
+        // Get and display the contract's script
+        contractScript = contractInstance.script;
+
+        // Get and display the contract's entrypoints
+        contractEntrypoints = contractInstance.entrypoints;
+    }
+
+    async function transferShares() {
+        if (!contractAddress) {
+            console.error('No contract address provided');
+            return;
+        }
+        const contractInstance = await Tezos.wallet.at(contractAddress);
+        const operation = await contractInstance.methods.transfer_shares({
+            amount: Number(amount),
+            destination,
+            share
+        }).send();
+        await operation.confirmation();
+    }
 
 </script>
 
 <div id="taq">
-    
+    <h2 class="text-2xl font-bold text-primary">Wallet data</h2>
     {#if walletDataAvailable}
+    <div class="card">
         <h3>Wallet Address: {userAddress} </h3>
         <h3>Wallet Balance: {wbalance} {tezSym} </h3>
+    </div>
+
+    <input bind:value={contractAddress} placeholder="Enter contract address" />
+    <button on:click={loadContract}>Load Contract</button>
     {:else}
+    <div>
         <h3>Loading...</h3>
+    </div>
+    {/if}
+    {#if contractInstance}
+        <div>
+            <form on:submit|preventDefault={transferShares}>
+                <label>
+                Amount:
+                <input type="number" bind:value={amount} />
+                </label>
+                <label>
+                Destination:
+                <input type="text" bind:value={destination} />
+                </label>
+                <label>
+                Share:
+                <input type="text" bind:value={share} />
+                </label>
+                <button type="submit">Transfer Shares</button>
+            </form>
+        </div>
+        {#if storageData}
+            <h2>Storage Data</h2>
+            <pre>{JSON.stringify(storageData, null, 2)}</pre>
+        {/if}
+
+        {#if contractScript}
+            <h2>Contract Script</h2>
+            <pre>{JSON.stringify(contractScript, null, 2)}</pre>
+        {/if}
+
+        {#if contractEntrypoints}
+            <h2>Contract Entrypoints</h2>
+            <pre>{JSON.stringify(contractEntrypoints, null, 2)}</pre>
+        {/if}
     {/if}
 </div>
 
 <style>
     
     #taq {
-        display: grid;
-        grid-template-columns: 250px 1fr;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         
     }
     @media screen and (max-height: 700px) {
