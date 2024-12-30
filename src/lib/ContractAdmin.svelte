@@ -1,0 +1,289 @@
+<script lang="ts">
+    import { onMount } from "svelte";
+   
+    import { TezosToolkit } from '@taquito/taquito';
+    import { TempleWallet } from '@temple-wallet/dapp';
+    import { MichelsonMap } from '@taquito/taquito';
+
+    import contractCode2Originate from '../assets/walletContract.json';
+
+
+
+    const tezSym: string ='ꜩ'
+
+        // Props and state
+    export let contractAddress: string = '';
+    let userAddress: string;
+    let wbalance: string;
+    let walletDataAvailable: boolean = false;
+    let contractInstance: any = null;
+    let storageData: any = null;
+    let Tezos: TezosToolkit = new TezosToolkit('https://ghostnet.smartpy.io');
+
+
+    
+    let contractScript: any = null;
+    let contractCode: any = null;
+    let contractStorageStructure: any = null;
+
+
+    const wallet = new TempleWallet('TokenShare');
+
+    onMount(async () => {
+        try {
+            const available = await TempleWallet.isAvailable();
+            if (!available) throw new Error('Temple Wallet not installed');
+            
+            await wallet.connect('ghostnet');
+            Tezos = wallet.toTezos();
+            userAddress = await wallet.getPKH();
+            
+            const balance = await getWalletBalance(userAddress);
+            wbalance = balance.toFixed(2);
+            walletDataAvailable = true;
+        } catch (err) {
+            console.error(err);
+            walletDataAvailable = false;
+        }
+    });
+
+    async function connectWallet() {
+        try {
+        await wallet.connect('ghostnet');
+        userAddress = await wallet.getPKH();
+        const balance = await getWalletBalance(userAddress);
+        wbalance = balance.toFixed(2);
+        walletDataAvailable = true;
+        } catch (err) {
+        console.error(err);
+        walletDataAvailable = false;
+        }
+    }
+
+    async function getWalletBalance(address: string): Promise<number> {
+        try {
+            const balance = await Tezos.tz.getBalance(address);
+            return balance.toNumber() / 1000000;
+        } catch (error) {
+            console.error("Failed to fetch balance:", error);
+            return 0;
+        }
+    }
+
+    async function loadContract() {
+        try {
+            contractInstance = await Tezos.wallet.at(contractAddress);
+            storageData = await contractInstance.storage();
+            console.log(storageData.issued_unclaimed_shares2);
+            for (const [address, ticket] of storageData.share_balances.entries()) {
+                console.log(`Address: ${address}, Shares owned: ${ticket.amount}`);
+            }
+
+            for (const [key, ticket] of storageData.issued_unclaimed_shares2.entries()) {
+                console.log(`Key: ${key},  Ticketer: ${ticket.ticketer}, Value: ${ticket.value}, Amount: ${ticket.amount}`)
+            }
+
+            //const unclaimedArray = Array.from(storageData.issued_unclaimed_shares2.entries());
+            
+
+            contractCode = contractInstance.script.code;
+            contractStorageStructure = contractInstance.script.storage;
+            //contractScript = contractInstance.script;
+            //console.log(contractScript);
+            //console.log(contractCode);
+            //console.log(contractStorageStructure);
+
+        } catch (error) {
+            console.error("Failed to load contract:", error);
+        }
+    }
+
+    function extractStorageDataIntoVariables() {
+        storageData
+    }
+
+    
+</script>
+
+<div class="container mx-auto p-4">
+    <!-- Wallet Info -->
+    <div class="mb-8 p-4 bg-gray-100 rounded-lg">
+        <h2 class="text-2xl font-bold mb-4">Wallet Information</h2>
+        {#if walletDataAvailable}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <span class="font-semibold">Address:</span> 
+                    <span class="font-mono">{userAddress}</span>
+                </div>
+                <div>
+                    <span class="font-semibold">Balance:</span> 
+                    <span>{wbalance} {tezSym}</span>
+                </div>
+            </div>
+        {:else}
+            <p>Loading wallet data...</p>
+        {/if}
+    </div>
+
+    <!-- Contract Loading -->
+    <div class="mb-8">
+        <div class="flex gap-4">
+            <input 
+                class="flex-1 p-2 border rounded" 
+                bind:value={contractAddress} 
+                placeholder="Enter contract address" 
+            />
+            <button 
+                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                on:click={loadContract}
+            >
+                Load Contract
+            </button>
+        </div>
+    </div>
+    <div>
+
+        {#if contractInstance && storageData}
+        <!-- Contract Storage Display -->
+        <div class="mb-8 p-4 bg-gray-100 rounded-lg">
+            <h2 class="text-2xl font-bold mb-4">Contract Storage</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <span class="font-semibold">Registry Number:</span> 
+                    <span>{storageData.registry_number?.Some || 'Not set'}</span>
+                </div>
+                <div>
+                    <span class="font-semibold">Max Shares:</span> 
+                    <span>{storageData.max_shares?.Some || 'Not set'}</span>
+                </div>
+                <div>
+                    <span class="font-semibold">Issued Shares:</span> 
+                    <span>{storageData.issued_shares}</span>
+                </div>
+                <div>
+                    <span class="font-semibold">Allocated Shares:</span> 
+                    <span>{storageData.allocated_shares}</span>
+                </div>
+                <div>
+                    <span class="font-semibold">All Shares Issued:</span> 
+                    <span>{storageData.all_shares_issued ? 'Yes' : 'No'}</span>
+                </div>
+                <div>
+                    <span class="font-semibold">Contract admin:</span> 
+                    <span>{storageData.admin_address}</span>
+                </div>
+            </div>
+
+             <!-- Share Owners (Entitled to Claim) -->
+            <div class="mt-4">
+                <h3 class="text-xl font-semibold mb-2">Share Owners (Entitled to Claim)</h3>
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="text-left p-2 bg-gray-200">Address</th>
+                            <th class="text-right p-2 bg-gray-200">Entitled Shares</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#if storageData?.owners_map && storageData.owners_map.size > 0}
+                            {#each storageData.owners_map.entries() as [address, shares]}
+                                <tr class="border-t">
+                                    <td class="font-mono p-2">{address}</td>
+                                    <td class="text-right p-2">{shares}</td>
+                                </tr>
+                            {/each}
+                        {:else}
+                            <tr class="border-t">
+                                <td class="text-center p-2 text-gray-500" colspan="2">No share owners registered</td>
+                            </tr>
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Issued Unclaimed Shares -->
+            <div class="mt-4">
+                <h3 class="text-xl font-semibold mb-2">Issued Unclaimed Shares</h3>
+                {#if storageData?.issued_unclaimed_shares2}
+                    
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="text-left p-2 bg-gray-200">Registry Number</th>
+                            <th class="text-center p-2 bg-gray-200">Issuer</th>
+                            <th class="text-right p-2 bg-gray-200">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#if storageData?.issued_unclaimed_shares2 && storageData.issued_unclaimed_shares2.size > 0}
+                            {#each Array.from((storageData!.issued_unclaimed_shares2 as MichelsonMap<any, any>).entries()) as [_, ticket]}
+                            <tr class="border-t">
+                                <td class="font-mono p-2">
+                                    {ticket.value}
+                                </td>
+                                <td class="text-center p-2">
+                                    {ticket.ticketer}
+                                </td>
+                                <td class="text-right p-2">
+                                    {ticket.amount}
+                                </td>
+                            </tr>    
+                                
+                            {/each}
+                        {:else}
+                        <tr class="border-t">
+                            <td class="text-center p-2 text-gray-500" colspan="3">No unclaimed shares</td>
+                        </tr>
+                        {/if}
+                    </tbody>
+                </table>
+                {/if}
+            </div>
+
+            <!-- Share Balances (Owned Company Shares) -->
+            <div class="mt-4">
+                <h3 class="text-xl font-semibold mb-2">Share Balances (Owned Company Shares)</h3>
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="text-left p-2 bg-gray-200">Contract Address</th>
+                            <th class="text-right p-2 bg-gray-200">Shares Owned</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#if storageData?.share_balances && storageData?.share_balances.size > 0}
+                            {#each Array.from((storageData.share_balances as MichelsonMap<any, any>).entries()) as [_, ticket]}
+                                <tr class="border-t">
+                                    <td class="font-mono p-2">
+                                        {ticket.ticketer}
+                                    </td>
+                                    <td class="text-right p-2">
+                                        {ticket.amount}
+                                    </td>
+                                </tr>
+                            {/each}
+                        {:else}
+                            <tr class="border-t">
+                                <td class="text-center p-2 text-gray-500" colspan="2">No shares owned from other companies</td>
+                            </tr>
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+
+            
+        </div>
+        {/if}
+
+    </div>
+
+
+    
+
+
+    
+</div>
+
+<style>
+    
+</style>

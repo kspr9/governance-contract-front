@@ -2,6 +2,7 @@
 
   import TestGlobal from './lib/TestGlobal.svelte'
   import Taq from './lib/Taq.svelte'
+  import ContractAdmin from '$lib/ContractAdmin.svelte';
 
 </script>
 
@@ -10,10 +11,11 @@
 
     <h1 class="text-3xl font-bold text-blue-600">TokenShare</h1>
 
-
     <div class="card">
-      <Taq />
+      <ContractAdmin />
     </div>
+
+
     
   </div>
   

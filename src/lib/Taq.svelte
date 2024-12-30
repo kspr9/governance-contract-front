@@ -110,19 +110,19 @@
             
             // Process owners map
             ownersMapEntries = [];
-            storageData.owners_map.forEach((value, key) => {
+            storageData.owners_map.forEach((value: number, key: string) => {
                 ownersMapEntries.push([key, value]);
             });
 
             // Process unclaimed shares
             unclaimedSharesEntries = [];
-            storageData.issued_unclaimed_shares2.forEach((value, key) => {
+            storageData.issued_unclaimed_shares2.forEach((value: any, key: string) => {
                 unclaimedSharesEntries.push([key, value]);
             });
 
             // Process share balances
             shareBalancesEntries = [];
-            storageData.share_balances.forEach((value, key) => {
+            storageData.share_balances.forEach((value: any, key: string) => {
                 shareBalancesEntries.push([key, value]);
             });
 

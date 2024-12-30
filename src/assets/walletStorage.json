@@ -1,0 +1,82 @@
+{
+    "prim": "Pair",
+    "args": [
+      {
+        "string": "tz1RuTC6e6FxWLTPPjAG3tesiBwwkK1bBkqR"
+      },
+      {
+        "prim": "False"
+      },
+      {
+        "int": "2580"
+      },
+      {
+        "int": "2580"
+      },
+      [
+        {
+          "prim": "Elt",
+          "args": [
+            {
+              "int": "0"
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "string": "KT1SP3hazeQKE1Sk8MKaCED86GPGhyX2Jyu3"
+                },
+                {
+                  "int": "123456"
+                },
+                {
+                  "int": "1500"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      {
+        "prim": "Some",
+        "args": [
+          {
+            "int": "2580"
+          }
+        ]
+      },
+      [
+        {
+          "prim": "Elt",
+          "args": [
+            {
+              "string": "tz1QSURdw5fx5E24q2LGcPmiekyP38L3GpXf"
+            },
+            {
+              "int": "1500"
+            }
+          ]
+        },
+        {
+          "prim": "Elt",
+          "args": [
+            {
+              "string": "KT1SJjCTroZ3NgZJSqZp48EXWknGntFWVSKC"
+            },
+            {
+              "int": "1080"
+            }
+          ]
+        }
+      ],
+      {
+        "prim": "Some",
+        "args": [
+          {
+            "int": "123456"
+          }
+        ]
+      },
+      []
+    ]
+  }

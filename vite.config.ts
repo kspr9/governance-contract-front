@@ -11,6 +11,10 @@ export default defineConfig({
   resolve: {
     alias: {
       $lib: path.resolve("./src/lib"),
+      buffer: 'buffer/'  // Added buffer alias
     },
   },
+  optimizeDeps: {
+    include: ['buffer']  // Added buffer to optimizeDeps
+  }
 })
