@@ -4,9 +4,9 @@
     import { TezosToolkit } from '@taquito/taquito';
     import { TempleWallet } from '@temple-wallet/dapp';
 
+    let Tezos: TezosToolkit = new TezosToolkit('https://ghostnet.smartpy.io');
 
 
-    const tezSym: string ='ꜩ'
 
         // Props and state
     export let contractAddress: string = '';
@@ -15,7 +15,7 @@
     let walletDataAvailable: boolean = false;
     let contractInstance: any = null;
     let storageData: any = null;
-    let Tezos: TezosToolkit = new TezosToolkit('https://ghostnet.smartpy.io');
+
 
     let ownersMapEntries: [string, number][] = [];
     let unclaimedSharesEntries: [string, any][] = [];
@@ -75,21 +75,12 @@
     };
 
     onMount(async () => {
-        const wallet = new TempleWallet('TokenShare');
+       
         try {
-            const available = await TempleWallet.isAvailable();
-            if (!available) throw new Error('Temple Wallet not installed');
             
-            await wallet.connect('ghostnet');
-            Tezos = wallet.toTezos();
-            userAddress = await wallet.getPKH();
-            
-            const balance = await getWalletBalance(userAddress);
-            wbalance = balance.toFixed(2);
-            walletDataAvailable = true;
         } catch (err) {
             console.error(err);
-            walletDataAvailable = false;
+            
         }
     });
 
@@ -200,24 +191,6 @@
 </script>
 
 <div class="container mx-auto p-4">
-    <!-- Wallet Info -->
-    <div class="mb-8 p-4 bg-gray-100 rounded-lg">
-        <h2 class="text-2xl font-bold mb-4">Wallet Information</h2>
-        {#if walletDataAvailable}
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <span class="font-semibold">Address:</span> 
-                    <span class="font-mono">{userAddress}</span>
-                </div>
-                <div>
-                    <span class="font-semibold">Balance:</span> 
-                    <span>{wbalance} {tezSym}</span>
-                </div>
-            </div>
-        {:else}
-            <p>Loading wallet data...</p>
-        {/if}
-    </div>
 
     <!-- Contract Loading -->
     <div class="mb-8">

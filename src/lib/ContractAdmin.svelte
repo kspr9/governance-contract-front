@@ -35,71 +35,47 @@
     let contractInstance: any = null;
     let storageData: any = null;
     let tzktStorageData: TzktStorageData | null = null;
-    
+
     let Tezos: TezosToolkit = new TezosToolkit('https://ghostnet.smartpy.io');
+    
+
+    let tzktOwnersMapEntries: [string, string][] = [];
+    let tzktUnclaimedSharesEntries: [string, any][] = [];
+    let tzktShareBalancesEntries: [string, any][] = [];
 
     let contractScript: any = null;
     let contractCode: any = null;
     let contractStorageStructure: any = null;
 
-    const wallet = new TempleWallet('TokenShare');
 
     onMount(async () => {
         try {
-            const available = await TempleWallet.isAvailable();
-            if (!available) throw new Error('Temple Wallet not installed');
             
-            await wallet.connect('ghostnet');
-            Tezos = wallet.toTezos();
-            userAddress = await wallet.getPKH();
-            
-            const balance = await getWalletBalance(userAddress);
-            wbalance = balance.toFixed(2);
-            walletDataAvailable = true;
         } catch (err) {
             console.error(err);
-            walletDataAvailable = false;
+
         }
     });
 
-    async function connectWallet() {
-        try {
-        await wallet.connect('ghostnet');
-        userAddress = await wallet.getPKH();
-        const balance = await getWalletBalance(userAddress);
-        wbalance = balance.toFixed(2);
-        walletDataAvailable = true;
-        } catch (err) {
-        console.error(err);
-        walletDataAvailable = false;
-        }
-    }
-
-    async function getWalletBalance(address: string): Promise<number> {
-        try {
-            const balance = await Tezos.tz.getBalance(address);
-            return balance.toNumber() / 1000000;
-        } catch (error) {
-            console.error("Failed to fetch balance:", error);
-            return 0;
-        }
-    }
 
     async function loadContract() {
         try {
             contractInstance = await Tezos.wallet.at(contractAddress);
             storageData = await contractInstance.storage();
-            console.log(storageData.issued_unclaimed_shares2);
+            //console.log(storageData.issued_unclaimed_shares2);
             for (const [address, ticket] of storageData.share_balances.entries()) {
                 console.log(`Address: ${address}, Shares owned: ${ticket.amount}`);
             }
 
             for (const [key, ticket] of storageData.issued_unclaimed_shares2.entries()) {
+                console.log('Issued unclaimed shares')
                 console.log(`Key: ${key},  Ticketer: ${ticket.ticketer}, Value: ${ticket.value}, Amount: ${ticket.amount}`)
             }
 
             contractCode = contractInstance.script.code;
             contractStorageStructure = contractInstance.script.storage;
+            console.log('contractStorageStructure')
+            console.log(contractStorageStructure)
         } catch (error) {
             console.error("Failed to load contract:", error);
         }
@@ -109,7 +85,22 @@
         try {
             const response = await fetch(`https://api.ghostnet.tzkt.io/v1/contracts/${contractAddress}/storage`);
             tzktStorageData = await response.json();
-            console.log(tzktStorageData);
+            
+            // Process owners map
+            tzktOwnersMapEntries = Object.entries(tzktStorageData?.owners_map ?? {});
+
+            // Process unclaimed shares
+            tzktUnclaimedSharesEntries = Object.entries(tzktStorageData?.issued_unclaimed_shares2 ?? {});
+
+            // Process share balances
+            tzktShareBalancesEntries = Object.entries(tzktStorageData?.share_balances ?? {});
+
+            console.log('TzKT Storage Data:', tzktStorageData);
+            console.log('Processed Entries:', {
+                owners: tzktOwnersMapEntries,
+                unclaimed: tzktUnclaimedSharesEntries,
+                balances: tzktShareBalancesEntries
+            });
         } catch (error) {
             console.error("Failed to load contract from TzKT API:", error);
         }
@@ -122,24 +113,6 @@
 </script>
 
 <div class="container mx-auto p-4">
-    <!-- Wallet Info -->
-    <div class="mb-8 p-4 bg-gray-100 rounded-lg">
-        <h2 class="text-2xl font-bold mb-4">Wallet Information</h2>
-        {#if walletDataAvailable}
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <span class="font-semibold">Address:</span> 
-                    <span class="font-mono">{userAddress}</span>
-                </div>
-                <div>
-                    <span class="font-semibold">Balance:</span> 
-                    <span>{wbalance} {tezSym}</span>
-                </div>
-            </div>
-        {:else}
-            <p>Loading wallet data...</p>
-        {/if}
-    </div>
 
     <!-- Contract Loading -->
     <div class="mb-8">
@@ -327,8 +300,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {#if tzktStorageData?.owners_map && Object.keys(tzktStorageData.owners_map).length > 0}
-                                {#each Object.entries(tzktStorageData.owners_map) as [address, shares]}
+                            {#if tzktOwnersMapEntries.length > 0}
+                                {#each tzktOwnersMapEntries as [address, shares]}
                                     <tr class="border-t">
                                         <td class="font-mono p-2">{address}</td>
                                         <td class="text-right p-2">{shares}</td>
@@ -355,18 +328,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {#if tzktStorageData?.issued_unclaimed_shares2 && Object.keys(tzktStorageData.issued_unclaimed_shares2).length > 0}
-                                {#each Object.values(tzktStorageData.issued_unclaimed_shares2) as ticket}
-                                <tr class="border-t">
-                                    <td class="font-mono p-2">{ticket.data}</td>
-                                    <td class="text-center p-2">{ticket.address}</td>
-                                    <td class="text-right p-2">{ticket.amount}</td>
-                                </tr>    
+                            {#if tzktUnclaimedSharesEntries.length > 0}
+                                {#each tzktUnclaimedSharesEntries as [_, ticket]}
+                                    <tr class="border-t">
+                                        <td class="font-mono p-2">{ticket.data}</td>
+                                        <td class="text-center p-2">{ticket.address}</td>
+                                        <td class="text-right p-2">{ticket.amount}</td>
+                                    </tr>
                                 {/each}
                             {:else}
-                            <tr class="border-t">
-                                <td class="text-center p-2 text-gray-500" colspan="3">No unclaimed shares</td>
-                            </tr>
+                                <tr class="border-t">
+                                    <td class="text-center p-2 text-gray-500" colspan="3">No unclaimed shares</td>
+                                </tr>
                             {/if}
                         </tbody>
                     </table>
@@ -383,8 +356,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {#if tzktStorageData?.share_balances && Object.keys(tzktStorageData.share_balances).length > 0}
-                                {#each Object.values(tzktStorageData.share_balances) as shares}
+                            {#if tzktShareBalancesEntries.length > 0}
+                                {#each tzktShareBalancesEntries as [_, shares]}
                                     <tr class="border-t">
                                         <td class="font-mono p-2">{shares.address}</td>
                                         <td class="text-right p-2">{shares.amount}</td>
