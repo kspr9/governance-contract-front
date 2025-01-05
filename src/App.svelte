@@ -1,10 +1,10 @@
 <script lang="ts">
 
   import TestGlobal from './lib/TestGlobal.svelte'
-  import Taq from './lib/Taq.svelte'
-  import ContractAdmin from '$lib/ContractAdmin.svelte';
-  import WalletConnector from '$lib/WalletConnector.svelte';
-    import ContractLoader from '$lib/ContractLoader.svelte';
+
+  import WalletConnectorBeacon from './lib/WalletConnectorBeacon.svelte'
+
+  import ContractLoader from '$lib/ContractLoader.svelte';
 
 </script>
 
@@ -13,22 +13,18 @@
 
     <h1 class="text-3xl font-bold text-blue-600">TokenShare</h1>
 
-    <div>
-      <WalletConnector />
+
+
+    <div class="mt-4">
+      <WalletConnectorBeacon />
     </div>
 
     <div>
       <ContractLoader />
     </div>
-    
-    <div class="card">
-      <ContractAdmin />
-    </div>
 
-    <div>
-      <Taq />
-    </div>
-    
+
+     
   </div>
   
   <div class="mt-auto">

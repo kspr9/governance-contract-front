@@ -11,10 +11,17 @@ export default defineConfig({
   resolve: {
     alias: {
       $lib: path.resolve("./src/lib"),
-      buffer: 'buffer/'  // Added buffer alias
+      buffer: 'buffer/',
+      stream: 'stream-browserify',
+      util: 'util/',
+      events: 'events',
     },
   },
   optimizeDeps: {
-    include: ['buffer']  // Added buffer to optimizeDeps
+    include: ['buffer', 'events', 'util', 'stream-browserify']
+  },
+  define: {
+    'process.env': {},
+    global: {},
   }
 })

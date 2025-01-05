@@ -44,7 +44,11 @@
     let tzktUnclaimedSharesEntries = $state<[string, TzktTicket][]>([]);
     let tzktShareBalancesEntries = $state<[string, TzktTicket][]>([]);
 
-
+    /**
+     * Test contracts
+     * KT1SP3hazeQKE1Sk8MKaCED86GPGhyX2Jyu3
+     * KT1SJjCTroZ3NgZJSqZp48EXWknGntFWVSKC
+    */
 
     onMount(async () => {
         try {
@@ -61,8 +65,12 @@
             const response = await fetch(`https://api.ghostnet.tzkt.io/v1/contracts/${$contractState.contractAddress}/storage`);
             const data = await response.json();
             
+            // Update all properties
+            Object.assign(tzktStorageData, data);
+            
             // Update individual properties
-            tzktStorageData.max_shares = data.max_shares;
+            /*
+            *tzktStorageData.max_shares = data.max_shares;
             tzktStorageData.owners_map = data.owners_map;
             tzktStorageData.admin_address = data.admin_address;
             tzktStorageData.issued_shares = data.issued_shares;
@@ -71,6 +79,8 @@
             tzktStorageData.allocated_shares = data.allocated_shares;
             tzktStorageData.all_shares_issued = data.all_shares_issued;
             tzktStorageData.issued_unclaimed_shares2 = data.issued_unclaimed_shares2;
+            */
+            
 
             // Process owners map
             tzktOwnersMapEntries = Object.entries(tzktStorageData.owners_map ?? {});
