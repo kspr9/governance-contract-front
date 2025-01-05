@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DAppClient, type DAppClientOptions, NetworkType } from '@airgap/beacon-dapp';
+    import { DAppClient, type DAppClientOptions, NetworkType, BeaconEvent } from '@airgap/beacon-dapp';
     import { onMount, onDestroy } from 'svelte';
     import { TezosToolkit } from '@taquito/taquito';
 
@@ -20,8 +20,29 @@
         enableMetrics: true,
     };
 
-    let wallet: DAppClient;
+    let wallet = new DAppClient(options);
     let Tezos: TezosToolkit = new TezosToolkit('https://ghostnet.smartpy.io');
+
+    // Set up the event subscription immediately after creating the DAppClient
+    wallet.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, async (account) => {
+        console.log(
+            `${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `,
+            account,
+            account?.address,
+        );
+        if (!account) {
+            return;
+        }
+
+        try {
+            await wallet.requestSignPayload({
+                payload: "05010000004254657a6f73205369676e6564204d6573736167653a207465737455726c20323032332d30322d30385431303a33363a31382e3435345a2048656c6c6f20576f726c64",
+            });
+        } catch (err: any) {
+            // The request was rejected
+            disconnectWallet();
+        }
+    });
 
     async function checkExistingConnection() {
         try {
@@ -33,7 +54,7 @@
                 const balance = await Tezos.tz.getBalance(activeAccount.address);
                 walletState.wbalance = balance.toNumber() / 1000000;
                 return true;
-            }
+            } 
         } catch (error) {
             console.error("Error checking existing connection:", error);
             walletState.error = error instanceof Error ? error.message : "Failed to check wallet connection";
@@ -45,9 +66,18 @@
         try {
             walletState.error = null;
             console.log("Requesting permissions...");
+            
+            if (walletState.isConnected) {
+                return;
+            }
+            
             const permissions = await wallet.requestPermissions(options);
+            const balance = await Tezos.tz.getBalance(permissions.address);
+            
+            walletState.wbalance = balance.toNumber() / 1000000;
             walletState.address = permissions.address;
             walletState.isConnected = true;
+
             console.log("Connected to wallet:", permissions.address);
         } catch (error) {
             console.error("Connection error:", error);
@@ -58,11 +88,15 @@
 
     async function disconnectWallet() {
         try {
-            await wallet.clearActiveAccount();
-            walletState.address = null;
-            walletState.isConnected = false;
-            walletState.error = null;
-            console.log("Wallet disconnected");
+            wallet.disconnect()
+            .then(() => {
+                console.log("Wallet disconnected");
+                walletState.address = null;
+                walletState.isConnected = false;
+                walletState.error = null;
+            })
+            .catch((err) => console.error(err.message));;
+            
         } catch (error) {
             console.error("Disconnection error:", error);
             walletState.error = error instanceof Error ? error.message : "Failed to disconnect wallet";
@@ -70,7 +104,6 @@
     }
 
     onMount(async () => {
-        wallet = new DAppClient(options);
         // Check for existing connection first, don't prompt if already connected
         await checkExistingConnection();
     });
