@@ -173,7 +173,21 @@
                             {#if tzktOwnersMapEntries.length > 0}
                                 {#each tzktOwnersMapEntries as [address, shares]}
                                     <tr class="border-t">
-                                        <td class="font-mono p-2">{address}</td>
+                                        <td class="font-mono p-2">
+                                            {#if address.startsWith('KT1')}
+                                                <button 
+                                                    class="text-blue-600 hover:text-blue-800 hover:underline text-left"
+                                                    onclick={() => {
+                                                        $contractState.contractAddress = address;
+                                                        loadContractTzkt();
+                                                    }}
+                                                >
+                                                    {address}
+                                                </button>
+                                            {:else}
+                                                {address}
+                                            {/if}
+                                        </td>
                                         <td class="text-right p-2">{shares}</td>
                                     </tr>
                                 {/each}
@@ -229,7 +243,17 @@
                             {#if tzktShareBalancesEntries.length > 0}
                                 {#each tzktShareBalancesEntries as [_, shares]}
                                     <tr class="border-t">
-                                        <td class="font-mono p-2">{shares.address}</td>
+                                        <td class="font-mono p-2">
+                                            <button 
+                                                class="text-blue-600 hover:text-blue-800 hover:underline text-left"
+                                                onclick={() => {
+                                                    $contractState.contractAddress = shares.address;
+                                                    loadContractTzkt();
+                                                }}
+                                            >
+                                                {shares.address}
+                                            </button>
+                                        </td>
                                         <td class="text-right p-2">{shares.amount}</td>
                                     </tr>
                                 {/each}
