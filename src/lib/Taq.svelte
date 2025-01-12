@@ -28,7 +28,7 @@
         'kspr': {'address': 'tz1RuTC6e6FxWLTPPjAG3tesiBwwkK1bBkqR', 'balance': 0}
     }
     tz1QSURdw5fx5E24q2LGcPmiekyP38L3GpXf
-    tz1QSUqRdw5fx5E24q2LGcPmiekyP38L3GpXf
+    tz1QSURdw5fx5E24q2LGcPmiekyP38L3GpXf
     tz1QSURdw5fx5E24q2LGcPmiekyP38L3GpXf
     tz1QSURdw5fx5E24q2LGcPmiekyP38L3GpXf
     */

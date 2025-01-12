@@ -20,11 +20,11 @@
         enableMetrics: true,
     };
 
-    let wallet = new DAppClient(options);
+    let dAppClient = new DAppClient(options);
     let Tezos: TezosToolkit = new TezosToolkit('https://ghostnet.smartpy.io');
 
     // Set up the event subscription immediately after creating the DAppClient
-    wallet.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, async (account) => {
+    dAppClient.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, async (account) => {
         console.log(
             `${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `,
             account,
@@ -35,7 +35,7 @@
         }
 
         try {
-            await wallet.requestSignPayload({
+            await dAppClient.requestSignPayload({
                 payload: "05010000004254657a6f73205369676e6564204d6573736167653a207465737455726c20323032332d30322d30385431303a33363a31382e3435345a2048656c6c6f20576f726c64",
             });
         } catch (err: any) {
@@ -46,7 +46,7 @@
 
     async function checkExistingConnection() {
         try {
-            const activeAccount = await wallet.getActiveAccount();
+            const activeAccount = await dAppClient.getActiveAccount();
             if (activeAccount) {
                 walletState.address = activeAccount.address;
                 walletState.isConnected = true;
@@ -57,7 +57,7 @@
             } 
         } catch (error) {
             console.error("Error checking existing connection:", error);
-            walletState.error = error instanceof Error ? error.message : "Failed to check wallet connection";
+            walletState.error = error instanceof Error ? error.message : "Failed to check dAppClient connection";
         }
         return false;
     }
@@ -71,24 +71,24 @@
                 return;
             }
             
-            const permissions = await wallet.requestPermissions(options);
+            const permissions = await dAppClient.requestPermissions(options);
             const balance = await Tezos.tz.getBalance(permissions.address);
             
             walletState.wbalance = balance.toNumber() / 1000000;
             walletState.address = permissions.address;
             walletState.isConnected = true;
 
-            console.log("Connected to wallet:", permissions.address);
+            console.log("Connected to dAppClient:", permissions.address);
         } catch (error) {
             console.error("Connection error:", error);
-            walletState.error = error instanceof Error ? error.message : "Failed to connect wallet";
+            walletState.error = error instanceof Error ? error.message : "Failed to connect dAppClient";
             walletState.isConnected = false;
         }
     }
 
     async function disconnectWallet() {
         try {
-            wallet.disconnect()
+            dAppClient.disconnect()
             .then(() => {
                 console.log("Wallet disconnected");
                 walletState.address = null;
@@ -99,7 +99,7 @@
             
         } catch (error) {
             console.error("Disconnection error:", error);
-            walletState.error = error instanceof Error ? error.message : "Failed to disconnect wallet";
+            walletState.error = error instanceof Error ? error.message : "Failed to disconnect dAppClient";
         }
     }
 
