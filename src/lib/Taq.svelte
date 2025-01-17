@@ -187,7 +187,7 @@
         }
     }
 
-    $: isAdmin = storageData?.admin_address === userAddress;
+    //$: isAdmin = storageData?.admin_address === userAddress;
 </script>
 
 <div class="container mx-auto p-4">
@@ -322,7 +322,7 @@
             </div>
         </div>
         <!-- Admin Functions -->
-        {#if isAdmin}
+        {#if storageData?.admin_address }
             <div class="mb-8 p-4 bg-blue-50 rounded-lg">
                 <h2 class="text-2xl font-bold mb-4">Admin Functions</h2>
                 

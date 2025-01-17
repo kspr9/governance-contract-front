@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { contractState } from './stores/contract';
+    import { contractState } from './stores/contractStore.svelte';
     import { tzktStorageData } from './stores/tzktStorage.svelte';
     import { TezosToolkit } from '@taquito/taquito';
     import { writable } from 'svelte/store';
