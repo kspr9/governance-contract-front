@@ -1,5 +1,11 @@
 import { DAppClient, type DAppClientOptions, NetworkType } from '@airgap/beacon-sdk';
 import { TezosToolkit } from '@taquito/taquito';
+import { BeaconWallet } from '@taquito/beacon-wallet';
+import { get, writable } from 'svelte/store';
+import { getBeaconClient, getTezosToolkit } from '$lib/config/beaconConfig';
+
+export const walletStore = writable<BeaconWallet | null>(null);
+
 
 interface BeaconState {
     address: string | null;
@@ -18,17 +24,20 @@ export const beaconState = $state<BeaconState>({
 });
 
 const options: DAppClientOptions = {
-    name: 'Tokensharebeacon',
+    name: 'TokenshareBeaconDApp',
     iconUrl: 'https://taquito.io/img/favicon.svg',
     network: { type: beaconState.network },
     enableMetrics: true,
 };
 
-// Create a single instance of DAppClient
-export const beaconClient = new DAppClient(options);
+const rpcUrl_teztnets = "https://rpc.ghostnet.teztnets.com";
+const rpcUrl_smartpy = "https://ghostnet.smartpy.io";
+const rpcUrl_tzkt = " https://rpc.tzkt.io/ghostnet";
 
-// Create a single instance of TezosToolkit
-export const Tezos = new TezosToolkit('https://ghostnet.smartpy.io');
+
+export const beaconClient = getBeaconClient();
+export const Tezos = getTezosToolkit();
+
 
 export async function connectWallet() {
     try {
@@ -38,15 +47,29 @@ export async function connectWallet() {
         if (beaconState.isConnected) {
             return;
         }
-        
-        const permissions = await beaconClient.requestPermissions(options);
-        const balance = await Tezos.tz.getBalance(permissions.address);
-        
-        beaconState.wbalance = balance.toNumber() / 1000000;
-        beaconState.address = permissions.address;
-        beaconState.isConnected = true;
+        console.log("Creating a new BeaconWallet instance");
+        const newWallet = new BeaconWallet({ 
+            name: "TokenShare Beacon Wallet", 
+            preferredNetwork: beaconState.network 
+        });
 
-        console.log("Connected to wallet:", permissions.address);
+        await newWallet.requestPermissions();
+        beaconState.address = await newWallet.getPKH();
+
+        // NOTE: Trying out Wallet instance VS DAppClient instance
+        // NOTE: Might still need to request permissions using DAppClient instance
+        //const permissions = await beaconClient.requestPermissions(options);
+
+        const balance = await Tezos.tz.getBalance(beaconState.address);
+        
+        //beaconState.wbalance = balance.toNumber() / 1000000;
+        beaconState.wbalance = Number(balance.div(1000000).toFormat(2));
+        //beaconState.address = permissions.address;
+        beaconState.isConnected = true;
+        walletStore.set(newWallet);
+        
+
+        console.log("Connected to wallet:", beaconState.address);
     } catch (error) {
         console.error("Connection error:", error);
         beaconState.error = error instanceof Error ? error.message : "Failed to connect wallet";
@@ -57,10 +80,18 @@ export async function connectWallet() {
 export async function disconnectWallet() {
     try {
         await beaconClient.disconnect();
+
+        const wallet = get(walletStore);
+        if (wallet) {
+            await wallet.clearActiveAccount();
+        }
+        //await walletStore.client.clearActiveAccount();
         console.log("Wallet disconnected");
         beaconState.address = null;
         beaconState.isConnected = false;
         beaconState.error = null;
+        
+        
     } catch (error) {
         console.error("Disconnection error:", error);
         beaconState.error = error instanceof Error ? error.message : "Failed to disconnect wallet";
@@ -74,9 +105,12 @@ export async function checkExistingConnection() {
             beaconState.address = activeAccount.address;
             beaconState.isConnected = true;
             console.log("Found existing connection:", activeAccount.address);
-            const balance = await Tezos.tz.getBalance(activeAccount.address);
+            const balance = await Tezos.tz.getBalance(beaconState.address);
             beaconState.wbalance = balance.toNumber() / 1000000;
+
             return true;
+        } else {
+            return false;
         }
     } catch (error) {
         console.error("Error checking existing connection:", error);

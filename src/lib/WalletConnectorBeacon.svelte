@@ -28,12 +28,18 @@
 
     onMount(async () => {
         // Check for existing connection first, don't prompt if already connected
-        await checkExistingConnection();
+        if (await checkExistingConnection()) {
+            return;
+        } else {
+            beaconState.isConnected = false;
+        }
     });
 
     onDestroy(() => {
-        if (beaconState.isConnected) {
-            disconnectWallet().catch(console.error);
+        try {
+            disconnectWallet();
+        } catch (error) {
+            console.error("Failed to disconnect wallet:", error);
         }
     });
 </script>

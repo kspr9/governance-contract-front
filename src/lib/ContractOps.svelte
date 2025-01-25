@@ -2,9 +2,8 @@
     import { onMount } from "svelte";
     import { contractState, contractInstance } from './stores/contractStore.svelte';
     import { tzktStorageData } from './stores/tzktStorage.svelte';
-    import { beaconState, Tezos } from './stores/beaconStore.svelte';
-    import type { TezosBlockchain } from "@airgap/beacon-sdk";
-    import { writable } from "svelte/store";
+    import { beaconState, Tezos, walletStore } from './stores/beaconStore.svelte';
+    import { get, writable } from "svelte/store";
 
 
 
@@ -51,11 +50,20 @@
     async function handleAddShareOwner(event: Event) {
         event.preventDefault();
         try {
+            const wallet = get(walletStore);
+            console.log("Wallet:", wallet?.getPKH());
+        
+            if (wallet) {
+                Tezos.setProvider({wallet});
+            }
             const operation = await $contractInstance.methods.add_share_owner(
                 adminForms.addShareOwner.amount,
                 adminForms.addShareOwner.ownerAddress
             ).send();
-            await operation.confirmation();
+            await operation.confirmation()
+            .then((op: any) => {
+                console.log("Share owner added successfully", op);
+            });
         } catch (error) {
             console.error("Failed to add share owner:", error);
         }
@@ -68,8 +76,11 @@
                 adminForms.changeMaxShares.newMax
             ).send();
             await operation.confirmation();
+            console.log("Max shares updated successfully");
+            adminForms.changeMaxShares.newMax = '';
         } catch (error) {
             console.error("Failed to change max shares:", error);
+            throw error;
         }
     }
 
@@ -80,8 +91,11 @@
                 adminForms.issueShares.amount
             ).send();
             await operation.confirmation();
+            console.log("Shares issued successfully");
+            adminForms.issueShares.amount = '';
         } catch (error) {
             console.error("Failed to issue shares:", error);
+            throw error;
         }
     }
 
@@ -95,8 +109,11 @@
                 userForms.transferShares.share
             ).send();
             await operation.confirmation();
+            console.log("Shares transferred successfully");
+            userForms.transferShares = { amount: '', destination: '', share: '' };
         } catch (error) {
             console.error("Failed to transfer shares:", error);
+            throw error;
         }
     }
 
@@ -107,12 +124,15 @@
                 userForms.claimShares.address
             ).send();
             await operation.confirmation();
+            console.log("Shares claimed successfully");
+            userForms.claimShares.address = '';
         } catch (error) {
             console.error("Failed to claim shares:", error);
+            throw error;
         }
     }
 
-    
+
 
 
     // Debug effect to help track state changes
