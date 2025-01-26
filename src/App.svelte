@@ -5,6 +5,7 @@
   import WalletConnectorBeacon from './lib/WalletConnectorBeacon.svelte'
 
   import ContractLoader from '$lib/ContractLoader.svelte';
+    import NewContract from '$lib/NewContract.svelte';
 
 </script>
 
@@ -19,7 +20,11 @@
       <WalletConnectorBeacon />
     </div>
 
-    <div>
+    <div class="mt-4">
+      <NewContract />
+    </div>
+
+    <div class="mt-4">
       <ContractLoader />
     </div>
 

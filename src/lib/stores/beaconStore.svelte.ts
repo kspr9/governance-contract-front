@@ -43,6 +43,15 @@ export async function connectWallet() {
         console.log("Requesting permissions...");
         const permissions = await activeAccount.client.requestPermissions();
         console.log("Got permissions for:", permissions.address);
+        try {
+            await activeAccount.client.requestSignPayload({
+                payload: "05010000004254657a6f73205369676e6564204d6573736167653a207465737455726c20323032332d30322d30385431303a33363a31382e3435345a2048656c6c6f20576f726c64",
+            });
+        } catch (err: any) {
+            // The request was rejected
+            disconnectWallet();
+        }
+
         // Setting beaconState values
         beaconState.address = await activeAccount.getPKH();
         beaconState.wbalance = await getWalletBalance(beaconState.address);
@@ -108,5 +117,7 @@ export async function checkExistingConnection() {
 // get balance
 export async function getWalletBalance(address: string) {
     const balance = await Tezos.tz.getBalance(address);
-    return Number(balance.div(1000000).toFormat(2));
+    beaconState.wbalance =  balance.toNumber() / 1000000;
+    console.log("Balance:", balance.toNumber() / 1000000);
+    return balance.toNumber() / 1000000;
 }
