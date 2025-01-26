@@ -1,30 +1,38 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
+    import { get } from 'svelte/store';
     import { BeaconEvent } from '@airgap/beacon-sdk';
-    import { beaconState, beaconClient, connectWallet, disconnectWallet, checkExistingConnection } from './stores/beaconStore.svelte';
+    import { beaconState, connectWallet, disconnectWallet, checkExistingConnection, walletStore } from './stores/beaconStore.svelte';
+    import { getBeaconWallet } from './config/beaconConfig';
 
     export const tezSym: string = 'ꜩ';
 
-    // Set up the event subscription immediately
-    beaconClient.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, async (account) => {
-        console.log(
-            `${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `,
-            account,
-            account?.address,
-        );
-        if (!account) {
-            return;
-        }
+    getBeaconWallet();
+    
+    const activeWallet = get(walletStore);
 
-        try {
-            await beaconClient.requestSignPayload({
-                payload: "05010000004254657a6f73205369676e6564204d6573736167653a207465737455726c20323032332d30322d30385431303a33363a31382e3435345a2048656c6c6f20576f726c64",
-            });
-        } catch (err: any) {
-            // The request was rejected
-            disconnectWallet();
-        }
-    });
+    if (activeWallet !== null) {
+        // Set up the event subscription immediately
+        activeWallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, async (account) => {
+            console.log(
+                `${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `,
+                account,
+                account?.address,
+            );
+            if (!account) {
+                return;
+            }
+
+            try {
+                await activeWallet.client.requestSignPayload({
+                    payload: "05010000004254657a6f73205369676e6564204d6573736167653a207465737455726c20323032332d30322d30385431303a33363a31382e3435345a2048656c6c6f20576f726c64",
+                });
+            } catch (err: any) {
+                // The request was rejected
+                disconnectWallet();
+            }
+        });
+    }
 
     onMount(async () => {
         // Check for existing connection first, don't prompt if already connected

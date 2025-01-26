@@ -36,7 +36,7 @@
                 throw new Error("Wallet not connected");
             }
             
-            contractInstance.set(await Tezos.wallet.at($contractState.contractAddress));
+            contractInstance.set(await Tezos.contract.at($contractState.contractAddress));
             console.log("Contract connected successfully");
         } catch (error) {
             console.error("Failed to load contract:", error);
@@ -72,11 +72,19 @@
     async function handleChangeMaxShares(event: Event) {
         event.preventDefault();
         try {
+            const wallet = get(walletStore);
+            console.log("Wallet:", wallet?.getPKH());
+        
+            if (wallet) {
+                Tezos.setProvider({wallet});
+            }
             const operation = await $contractInstance.methods.change_max_shares(
                 adminForms.changeMaxShares.newMax
             ).send();
-            await operation.confirmation();
-            console.log("Max shares updated successfully");
+            await operation.confirmation()
+            .then((op: any) => {
+                console.log("Max shares updated successfully", op);
+            });
             adminForms.changeMaxShares.newMax = '';
         } catch (error) {
             console.error("Failed to change max shares:", error);
@@ -87,11 +95,19 @@
     async function handleIssueShares(event: Event) {
         event.preventDefault();
         try {
+            const wallet = get(walletStore);
+            console.log("Wallet:", wallet?.getPKH());
+        
+            if (wallet) {
+                Tezos.setProvider({wallet});
+            }
             const operation = await $contractInstance.methods.issue_shares_unclaimed2(
                 adminForms.issueShares.amount
             ).send();
-            await operation.confirmation();
-            console.log("Shares issued successfully");
+            await operation.confirmation()
+            .then((op: any) => {
+                console.log("Shares issued successfully", op);
+            });
             adminForms.issueShares.amount = '';
         } catch (error) {
             console.error("Failed to issue shares:", error);
@@ -103,13 +119,21 @@
     async function handleTransferShares(event: Event) {
         event.preventDefault();
         try {
+            const wallet = get(walletStore);
+            console.log("Wallet:", wallet?.getPKH());
+        
+            if (wallet) {
+                Tezos.setProvider({wallet});
+            }
             const operation = await $contractInstance.methods.transfer_shares(
                 userForms.transferShares.amount,
                 userForms.transferShares.destination,
                 userForms.transferShares.share
             ).send();
-            await operation.confirmation();
-            console.log("Shares transferred successfully");
+            await operation.confirmation()
+            .then((op: any) => {
+                console.log("Shares transferred successfully", op);
+            });
             userForms.transferShares = { amount: '', destination: '', share: '' };
         } catch (error) {
             console.error("Failed to transfer shares:", error);
@@ -120,11 +144,19 @@
     async function handleClaimShares(event: Event) {
         event.preventDefault();
         try {
+            const wallet = get(walletStore);
+            console.log("Wallet:", wallet?.getPKH());
+        
+            if (wallet) {
+                Tezos.setProvider({wallet});
+            }
             const operation = await $contractInstance.methods.claim_shares(
                 userForms.claimShares.address
             ).send();
-            await operation.confirmation();
-            console.log("Shares claimed successfully");
+            await operation.confirmation()
+            .then((op: any) => {
+                console.log("Shares claimed successfully", op);
+            });
             userForms.claimShares.address = '';
         } catch (error) {
             console.error("Failed to claim shares:", error);
