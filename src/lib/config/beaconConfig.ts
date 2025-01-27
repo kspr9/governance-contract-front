@@ -1,6 +1,7 @@
 import { type AccountInfo, DAppClient, type DAppClientOptions, NetworkType } from '@airgap/beacon-sdk';
 import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
+import { BeaconEvent } from "@airgap/beacon-sdk";
 
 let tezosToolkitInstance: TezosToolkit | null = null;
 let beaconWalletInstance: BeaconWallet | null = null;
@@ -16,7 +17,7 @@ let beaconDAppClientInstance: DAppClient | null = null;
 
 const rpcUrl_teztnets = "https://rpc.ghostnet.teztnets.com";
 const rpcUrl_smartpy = "https://ghostnet.smartpy.io";
-const rpcUrl_tzkt = " https://rpc.tzkt.io/ghostnet";
+const rpcUrl_tzkt = "https://rpc.tzkt.io/ghostnet";
 
 export function getBeaconDAppClient(): DAppClient {
     if (beaconDAppClientInstance === null) {
@@ -53,4 +54,23 @@ export async function getActiveAccount(): Promise<AccountInfo | undefined> {
         console.error("No active account found");
         return undefined;
     }
+}
+
+export const Tezos = getTezosToolkit();
+export const wallet = getBeaconWallet();
+
+
+if (wallet) {
+    wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, async (account) => {
+        console.log(
+            `${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `,
+            account,
+            account?.address,
+        );
+
+        if (!account) {
+            return;
+        }
+
+    });
 }

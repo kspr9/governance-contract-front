@@ -2,10 +2,9 @@
     import { onMount } from "svelte";
     import { contractState, contractInstance } from './stores/contractStore.svelte';
     import { tzktStorageData } from './stores/tzktStorage.svelte';
-    import { beaconState, Tezos, walletStore } from './stores/beaconStore.svelte';
+    import { beaconState, walletStore } from './stores/beaconStore.svelte';
     import { get, writable } from "svelte/store";
-    import { getBeaconWallet } from "./config/beaconConfig";
-
+    import { Tezos, wallet } from "./config/beaconConfig";
 
 
     const isAdmin = $derived(
@@ -14,7 +13,6 @@
         beaconState.address === tzktStorageData.admin_address
     );
  
-    
 
     // Form states
     let adminForms = $state({
@@ -28,12 +26,13 @@
         claimShares: { address: '' }
     });
 
+
     async function connectContract() {
         try {
-            const wallet = getBeaconWallet();
-            console.log("Wallet:", wallet?.getPKH());
+            
+            console.log("Wallet ready for contract:", await wallet.getPKH());
         
-            Tezos.setProvider({wallet});
+            Tezos.setWalletProvider(wallet);
 
             if (!$contractState.contractAddress) {
                 throw new Error("Contract address not set");
@@ -41,9 +40,12 @@
             if (!beaconState.isConnected) {
                 throw new Error("Wallet not connected");
             }
+            await Tezos.contract.at($contractState.contractAddress)
+            .then((contract: any) => {
+                console.log("Contract connected successfully", contract);
+                contractInstance.set(contract);
+            });
             
-            contractInstance.set(await Tezos.contract.at($contractState.contractAddress));
-            console.log("Contract connected successfully");
         } catch (error) {
             console.error("Failed to load contract:", error);
             throw error;
@@ -56,7 +58,8 @@
     async function handleAddShareOwner(event: Event) {
         event.preventDefault();
         try {
-            
+            await wallet.client.requestPermissions();
+            Tezos.setProvider({wallet});   
             const operation = await $contractInstance.methods.add_share_owner(
                 adminForms.addShareOwner.amount,
                 adminForms.addShareOwner.ownerAddress
@@ -73,7 +76,9 @@
     async function handleChangeMaxShares(event: Event) {
         event.preventDefault();
         try {
-                        
+            console.log("Try block");
+
+            Tezos.setWalletProvider(wallet);           
             const operation = await $contractInstance.methods.change_max_shares(
                 adminForms.changeMaxShares.newMax
             ).send();
@@ -91,10 +96,9 @@
     async function handleIssueShares(event: Event) {
         event.preventDefault();
         try {
-            const wallet = getBeaconWallet();
-            console.log("Wallet:", wallet?.getPKH());
-        
-            Tezos.setProvider({wallet});
+            
+            
+            Tezos.setWalletProvider(wallet);
             const operation = await $contractInstance.methods.issue_shares_unclaimed2(
                 adminForms.issueShares.amount
             ).send();
@@ -113,7 +117,7 @@
     async function handleTransferShares(event: Event) {
         event.preventDefault();
         try {
-            const wallet = getBeaconWallet();
+            
             console.log("Wallet:", wallet?.getPKH());
         
             Tezos.setProvider({wallet});
@@ -137,7 +141,7 @@
     async function handleClaimShares(event: Event) {
         event.preventDefault();
         try {
-            const wallet = getBeaconWallet();
+            
             console.log("Wallet:", wallet?.getPKH());
         
             Tezos.setProvider({wallet});
