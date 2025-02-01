@@ -5,6 +5,7 @@
     import { beaconState, walletStore } from './stores/beaconStore.svelte';
     import { get, writable } from "svelte/store";
     import { Tezos, wallet } from "./config/beaconConfig";
+    import { BeaconEvent, SigningType } from "@airgap/beacon-sdk";
 
 
     const isAdmin = $derived(
@@ -26,6 +27,7 @@
         claimShares: { address: '' }
     });
 
+    let signature: string | null;
 
     async function connectContract() {
         try {
@@ -58,9 +60,10 @@
     async function handleAddShareOwner(event: Event) {
         event.preventDefault();
         try {
+
             await wallet.client.requestPermissions();
             Tezos.setProvider({wallet});   
-            const operation = await $contractInstance.methods.add_share_owner(
+            const operation = await $contractInstance.methodsObject.add_share_owner(
                 adminForms.addShareOwner.amount,
                 adminForms.addShareOwner.ownerAddress
             ).send();
@@ -77,16 +80,56 @@
         event.preventDefault();
         try {
             console.log("Try block");
+            Tezos.setProvider({wallet});
+            wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, (account) => {
+                // An active account has been set
+                console.log(`${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `, account);
+                
+                if (!account) {
+                    return;
+                }
+                
+                beaconState.address = account.address;
+                beaconState.isConnected = true;
+                console.log("Connecting to wallet...");
+                const activeAccount = wallet
+                
+                console.log("Requesting permissions...");
+                const permissions = async () => {
+                    await activeAccount.client.requestPermissions()
+                    .then((permissions) => {
+                        console.log("Got permissions for:", permissions.address);
+                    })
+                    .then(async () => {
+                        console.log("Requesting signature...");
+                        await activeAccount.client.requestSignPayload({
+                            signingType: SigningType.RAW,
+                            payload: "This is SPARTA",
+                        })
+                        .then((response) => {
+                            console.log("Signature:", response.signature);
+                            signature = response.signature;
+                        });
+                    })
+                    .then((permissions: any) => {
+                        console.log("Permissions:", permissions);
+                    });
 
-            Tezos.setWalletProvider(wallet);           
-            const operation = await $contractInstance.methods.change_max_shares(
-                adminForms.changeMaxShares.newMax
-            ).send();
-            await operation.confirmation()
-            .then((op: any) => {
-                console.log("Max shares updated successfully", op);
+                    Tezos.setProvider({wallet});
+                    
+                    const operation = await $contractInstance.methods.change_max_shares(
+                        adminForms.changeMaxShares.newMax
+                    ).send();
+                    await operation.confirmation()
+                    .then((op: any) => {
+                        console.log("Max shares updated successfully", op);
+                    });
+                    adminForms.changeMaxShares.newMax = '';
+                }
             });
-            adminForms.changeMaxShares.newMax = '';
+
+
+    
         } catch (error) {
             console.error("Failed to change max shares:", error);
             throw error;
