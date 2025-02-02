@@ -1,8 +1,7 @@
-import { DAppClient, type DAppClientOptions, NetworkType } from '@airgap/beacon-sdk';
-import { TezosToolkit } from '@taquito/taquito';
+import { NetworkType } from '@airgap/beacon-sdk';
 import { BeaconWallet } from '@taquito/beacon-wallet';
-import { get, writable } from 'svelte/store';
-import { getBeaconDAppClient, getTezosToolkit, getBeaconWallet } from '$lib/config/beaconConfig';
+import { writable } from 'svelte/store';
+
 
 export const walletStore = writable<BeaconWallet | null>(null);
 

@@ -2,9 +2,8 @@
     import { onMount } from "svelte";
     import { contractState } from './stores/contractStore.svelte';
     import { tzktStorageData } from './stores/tzktStorage.svelte';
-    import { TezosToolkit } from '@taquito/taquito';
-    import { writable } from 'svelte/store';
     import ContractOps from "./ContractOps.svelte";
+    import { loadContractTzkt } from './utils/contractLoader';
     
     interface TzktTicket {
         data: string;
@@ -12,41 +11,6 @@
         address: string;
     }
 
-
-/**
- * 
-
- interface TzktStorageData {
-     max_shares: string | null;
-     owners_map: Record<string, string> | null;
-     admin_address: string | null;
-     issued_shares: string | null;
-     share_balances: Record<string, TzktTicket> | null;
-     registry_number: string | null;
-     allocated_shares: string | null;
-     all_shares_issued: boolean;
-     issued_unclaimed_shares2: Record<string, TzktTicket> | null;
- }
-
-
-
- export const tzktStorageData = $state<TzktStorageData>({
-     max_shares: null,
-     owners_map: null,
-     admin_address: null,
-     issued_shares: null,
-     share_balances: null,
-     registry_number: null,
-     allocated_shares: null,
-     all_shares_issued: false,
-     issued_unclaimed_shares2: null
- });
- */
-
-
-   
-
-    
 
     let tzktOwnersMapEntries = $state<[string, string][]>([]);
     let tzktUnclaimedSharesEntries = $state<[string, TzktTicket][]>([]);
@@ -67,53 +31,12 @@
         }
     });
 
-
-    async function loadContractTzkt() {
-        try {
-            const response = await fetch(`https://api.ghostnet.tzkt.io/v1/contracts/${$contractState.contractAddress}/storage`);
-            const data = await response.json();
-            
-            // Update all properties
-            Object.assign(tzktStorageData, data);
-            
-            // Update individual properties
-            /*
-            *tzktStorageData.max_shares = data.max_shares;
-            tzktStorageData.owners_map = data.owners_map;
-            tzktStorageData.admin_address = data.admin_address;
-            tzktStorageData.issued_shares = data.issued_shares;
-            tzktStorageData.share_balances = data.share_balances;
-            tzktStorageData.registry_number = data.registry_number;
-            tzktStorageData.allocated_shares = data.allocated_shares;
-            tzktStorageData.all_shares_issued = data.all_shares_issued;
-            tzktStorageData.issued_unclaimed_shares2 = data.issued_unclaimed_shares2;
-            */
-            
-
-            // Process owners map
-            tzktOwnersMapEntries = Object.entries(tzktStorageData.owners_map ?? {});
-
-            // Process unclaimed shares
-            tzktUnclaimedSharesEntries = Object.entries(tzktStorageData.issued_unclaimed_shares2 ?? {});
-
-            // Process share balances
-            tzktShareBalancesEntries = Object.entries(tzktStorageData.share_balances ?? {});
-
-            // Log just the data we care about
-            console.log('TzKT Storage Data:', {
-                max_shares: tzktStorageData.max_shares,
-                admin_address: tzktStorageData.admin_address,
-                issued_shares: tzktStorageData.issued_shares,
-                owners_map: tzktOwnersMapEntries,
-                unclaimed: tzktUnclaimedSharesEntries,
-                balances: tzktShareBalancesEntries
-            });
-        } catch (error) {
-            console.error("Failed to load contract from TzKT API:", error);
-        }
+    async function handleLoadContract() {
+        const entries = await loadContractTzkt();
+        tzktOwnersMapEntries = entries.ownersMapEntries;
+        tzktUnclaimedSharesEntries = entries.unclaimedSharesEntries;
+        tzktShareBalancesEntries = entries.shareBalancesEntries;
     }
-
-
 
 </script>
 
@@ -128,7 +51,7 @@
             />
             <button 
                 class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                onclick={loadContractTzkt}
+                onclick={handleLoadContract}
             >
                 Load Contract (TzKT 2)
             </button>
@@ -186,7 +109,7 @@
                                                 class="text-blue-600 hover:text-blue-800 hover:underline text-left"
                                                 onclick={() => {
                                                     $contractState.contractAddress = address;
-                                                    loadContractTzkt();
+                                                    handleLoadContract();
                                                 }}
                                             >
                                                 {address}
@@ -255,7 +178,7 @@
                                             class="text-blue-600 hover:text-blue-800 hover:underline text-left"
                                             onclick={() => {
                                                 $contractState.contractAddress = shares.address;
-                                                loadContractTzkt();
+                                                handleLoadContract();
                                             }}
                                         >
                                             {shares.address}

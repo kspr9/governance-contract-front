@@ -4,11 +4,9 @@
     import { get } from "svelte/store";
     import contractCode from '../assets/walletContract.json';
     import initialStorage from '../assets/walletStorage.json';
-    import { getTezosToolkit, getBeaconWallet } from "./config/beaconConfig";
+    import { Tezos, wallet } from "./config/beaconConfig";
     import { MichelsonMap } from '@taquito/michelson-encoder';
 
-    const wallet = getBeaconWallet();
-    const Tezos = getTezosToolkit();
     
     const storage = {
         admin_address : "tz1PfKWpMH8bJ3p5WRetGTZZM7idGP7kKW9M",

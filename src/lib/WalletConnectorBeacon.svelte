@@ -3,7 +3,7 @@
     import { get } from 'svelte/store';
     import { BeaconEvent, SigningType } from '@airgap/beacon-sdk';
     import { beaconState, walletStore } from './stores/beaconStore.svelte';
-    import { getBeaconWallet, Tezos, wallet } from './config/beaconConfig';
+    import { Tezos, wallet } from './config/beaconConfig';
 
     export const tezSym: string = 'ꜩ';
 
@@ -117,7 +117,7 @@
     export async function checkExistingConnection() {
         try {
             console.log("Checking existing connection...");
-            const activeAccount = await getBeaconWallet().client.getActiveAccount();
+            const activeAccount = await wallet.client.getActiveAccount();
             if (activeAccount) {
                 beaconState.address = activeAccount.address;
                 beaconState.isConnected = true;
