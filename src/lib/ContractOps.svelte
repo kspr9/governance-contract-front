@@ -32,10 +32,8 @@
     async function connectContract() {
         try {
             
-            console.log("Wallet ready for contract:", await wallet.getPKH());
+            console.log("Wallet ready for contract:", wallet?.getPKH());
         
-            Tezos.setWalletProvider(wallet);
-
             if (!$contractState.contractAddress) {
                 throw new Error("Contract address not set");
             }
@@ -60,9 +58,13 @@
     async function handleAddShareOwner(event: Event) {
         event.preventDefault();
         try {
+            const wallet = get(walletStore);
+            console.log("Wallet:", await wallet?.getPKH());
 
-            await wallet.client.requestPermissions();
-            Tezos.setProvider({wallet});   
+            if (wallet) {
+                Tezos.setProvider({wallet});
+            }
+  
             const operation = await $contractInstance.methodsObject.add_share_owner(
                 adminForms.addShareOwner.amount,
                 adminForms.addShareOwner.ownerAddress
@@ -79,57 +81,21 @@
     async function handleChangeMaxShares(event: Event) {
         event.preventDefault();
         try {
-            console.log("Try block");
-            Tezos.setProvider({wallet});
-            wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, (account) => {
-                // An active account has been set
-                console.log(`${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `, account);
-                
-                if (!account) {
-                    return;
-                }
-                
-                beaconState.address = account.address;
-                beaconState.isConnected = true;
-                console.log("Connecting to wallet...");
-                const activeAccount = wallet
-                
-                console.log("Requesting permissions...");
-                const permissions = async () => {
-                    await activeAccount.client.requestPermissions()
-                    .then((permissions) => {
-                        console.log("Got permissions for:", permissions.address);
-                    })
-                    .then(async () => {
-                        console.log("Requesting signature...");
-                        await activeAccount.client.requestSignPayload({
-                            signingType: SigningType.RAW,
-                            payload: "This is SPARTA",
-                        })
-                        .then((response) => {
-                            console.log("Signature:", response.signature);
-                            signature = response.signature;
-                        });
-                    })
-                    .then((permissions: any) => {
-                        console.log("Permissions:", permissions);
-                    });
+            const wallet = get(walletStore);
+            console.log("Wallet:", await wallet?.getPKH());
 
-                    Tezos.setProvider({wallet});
-                    
-                    const operation = await $contractInstance.methods.change_max_shares(
-                        adminForms.changeMaxShares.newMax
-                    ).send();
-                    await operation.confirmation()
-                    .then((op: any) => {
-                        console.log("Max shares updated successfully", op);
-                    });
-                    adminForms.changeMaxShares.newMax = '';
-                }
+            if (wallet) {
+                Tezos.setProvider({wallet});
+            }
+
+            const operation = await $contractInstance.methods.change_max_shares(
+                adminForms.changeMaxShares.newMax
+            ).send();
+            await operation.confirmation()
+            .then((op: any) => {
+                console.log("Max shares updated successfully", op);
             });
-
-
-    
+            adminForms.changeMaxShares.newMax = '';
         } catch (error) {
             console.error("Failed to change max shares:", error);
             throw error;
@@ -139,9 +105,13 @@
     async function handleIssueShares(event: Event) {
         event.preventDefault();
         try {
-            
-            
-            Tezos.setWalletProvider(wallet);
+            const wallet = get(walletStore);
+            console.log("Wallet:", await wallet?.getPKH());
+
+            if (wallet) {
+                Tezos.setProvider({wallet});
+            }
+
             const operation = await $contractInstance.methods.issue_shares_unclaimed2(
                 adminForms.issueShares.amount
             ).send();
@@ -160,10 +130,12 @@
     async function handleTransferShares(event: Event) {
         event.preventDefault();
         try {
-            
-            console.log("Wallet:", wallet?.getPKH());
-        
-            Tezos.setProvider({wallet});
+            const wallet = get(walletStore);
+            console.log("Wallet:", await wallet?.getPKH());
+
+            if (wallet) {
+                Tezos.setProvider({wallet});
+            }
 
             const operation = await $contractInstance.methods.transfer_shares(
                 userForms.transferShares.amount,
@@ -185,9 +157,12 @@
         event.preventDefault();
         try {
             
-            console.log("Wallet:", wallet?.getPKH());
-        
-            Tezos.setProvider({wallet});
+            const wallet = get(walletStore);
+            console.log("Wallet:", await wallet?.getPKH());
+
+            if (wallet) {
+                Tezos.setProvider({wallet});
+            }
 
             const operation = await $contractInstance.methods.claim_shares(
                 userForms.claimShares.address

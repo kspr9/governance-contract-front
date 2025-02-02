@@ -2,6 +2,7 @@ import { type AccountInfo, DAppClient, type DAppClientOptions, NetworkType } fro
 import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { BeaconEvent } from "@airgap/beacon-sdk";
+import { walletStore } from '$lib/stores/beaconStore.svelte';
 
 let tezosToolkitInstance: TezosToolkit | null = null;
 let beaconWalletInstance: BeaconWallet | null = null;
@@ -41,6 +42,7 @@ export function getBeaconWallet(): BeaconWallet {
             name: "Tokenshare Beacon Wallet", 
             preferredNetwork: NetworkType.GHOSTNET });
         console.log("Creating a new BeaconWallet instance");
+        walletStore.set(beaconWalletInstance);
     }
     return beaconWalletInstance;
 }

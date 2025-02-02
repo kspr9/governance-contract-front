@@ -41,7 +41,7 @@
 
         wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, (account) => {
             // An active account has been set
-            console.log(`${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `, account);
+            //console.log(`${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `, account);
             
             if (!account) {
                 return;
@@ -116,6 +116,7 @@
 
     export async function checkExistingConnection() {
         try {
+            console.log("Checking existing connection...");
             const activeAccount = await getBeaconWallet().client.getActiveAccount();
             if (activeAccount) {
                 beaconState.address = activeAccount.address;
@@ -125,6 +126,7 @@
 
                 return true;
             } else {
+                console.log("No existing connection found during onMount");
                 return false;
             }
         } catch (error) {
