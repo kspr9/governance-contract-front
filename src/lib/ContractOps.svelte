@@ -16,13 +16,16 @@
 
     // Form states
     let adminForms = $state({
-        addShareOwner: { amount: '', ownerAddress: '' },
-        changeMaxShares: { newMax: '' },
-        issueShares: { amount: '' },
+        addShareOwner: { 
+            amount: '' as string | number,
+            ownerAddress: '' 
+        },
+        changeMaxShares: { newMax: null as number | null },
+        issueShares: { amount: null as number | null },
         addCompanyData: {
             allSharesIssued: false,
-            issuedShares: '',
-            maxShares: '',
+            issuedShares: null as number | null,
+            maxShares: null as number | null,
             registryNumber: ''
         },
         changeAdmin: { newAdminAddress: '' },
@@ -30,11 +33,36 @@
     });
     
     let userForms = $state({
-        transferShares: { amount: '', destination: '', share: '' },
-        claimShares: { address: '' }
+        transferShares: { amount: null as number | null, destination: '', share: '' },
+        claimShares: { address: '' },
+        claimSharesDirect: { destination_address: '' }
     });
 
+    // Add loading states
+    let loadingStates = $state({
+        addShareOwner: false,
+        changeMaxShares: false,
+        issueShares: false,
+        addCompanyData: false,
+        changeAdmin: false,
+        removeShareOwner: false,
+        transferShares: false,
+        claimShares: false,
+        claimSharesDirect: false
+    });
 
+    // Add error states
+    let errorStates = $state({
+        addShareOwner: null as string | null,
+        changeMaxShares: null as string | null,
+        issueShares: null as string | null,
+        addCompanyData: null as string | null,
+        changeAdmin: null as string | null,
+        removeShareOwner: null as string | null,
+        transferShares: null as string | null,
+        claimShares: null as string | null,
+        claimSharesDirect: null as string | null
+    });
 
     async function connectContract() {
         try {
@@ -67,27 +95,36 @@
     // Admin Functions
     async function handleAddShareOwner(event: Event) {
         event.preventDefault();
+        loadingStates.addShareOwner = true;
+        errorStates.addShareOwner = null;
+        
         try {
-            
+            // Validate amount is a number
+            const amount = Number(adminForms.addShareOwner.amount);
+            if (isNaN(amount)) {
+                throw new Error("Amount must be a valid number");
+            }
+
             await resetProvider();
   
-            const operation = await $contractInstance.methodsObject.add_share_owner(
-                adminForms.addShareOwner.amount,
-                adminForms.addShareOwner.ownerAddress
-            ).send();
+            const operation = await $contractInstance.methodsObject.add_share_owner({
+                amount: amount,
+                owner_address: adminForms.addShareOwner.ownerAddress
+            }).send();
 
-            await operation.confirmation(2)
-            .then((op: any) => {
-                console.log("Share owner added successfully", op);
-            });
-
-            adminForms.addShareOwner.amount = '';
-            adminForms.addShareOwner.ownerAddress = '';
+            await operation.confirmation(2);
+            console.log("Share owner added successfully");
+            
+            // Reset form
+            adminForms.addShareOwner = { amount: '', ownerAddress: '' };
             await new Promise(resolve => setTimeout(resolve, 2500));
             await loadContractTzkt();
-
+            
         } catch (error) {
             console.error("Failed to add share owner:", error);
+            errorStates.addShareOwner = error instanceof Error ? error.message : "Failed to add share owner";
+        } finally {
+            loadingStates.addShareOwner = false;
         }
     }
 
@@ -108,7 +145,7 @@
             await new Promise(resolve => setTimeout(resolve, 2500));
             await loadContractTzkt();
 
-            adminForms.changeMaxShares.newMax = '';
+            adminForms.changeMaxShares.newMax = null;
             
         } catch (error) {
             console.error("Failed to change max shares:", error);
@@ -130,7 +167,7 @@
                 console.log("Shares issued successfully", op);
             });
 
-            adminForms.issueShares.amount = '';
+            adminForms.issueShares.amount = null;
             await new Promise(resolve => setTimeout(resolve, 2500));
             await loadContractTzkt();
         } catch (error) {
@@ -156,7 +193,7 @@
                 console.log("Shares transferred successfully", op);
             });
 
-            userForms.transferShares = { amount: '', destination: '', share: '' };
+            userForms.transferShares = { amount: null, destination: '', share: '' };
             await new Promise(resolve => setTimeout(resolve, 2500));
             await loadContractTzkt();
         } catch (error) {
@@ -188,6 +225,30 @@
         }
     }
 
+    // New User Function: Direct Claim Shares
+    async function handleClaimSharesDirect(event: Event) {
+        event.preventDefault();
+        try {
+            await resetProvider();
+
+            const operation = await $contractInstance.methods.claim_shares_direct({
+                destination_address: userForms.claimSharesDirect.destination_address
+            }).send();
+
+            await operation.confirmation(2).then((op: any) => {
+                console.log("Direct claim of shares successful", op);
+            });
+
+            // Reset the direct claim form
+            userForms.claimSharesDirect.destination_address = '';
+            await new Promise(resolve => setTimeout(resolve, 2500));
+            await loadContractTzkt();
+        } catch (error) {
+            console.error("Failed to claim shares directly:", error);
+            throw error;
+        }
+    }
+
     // New admin functions
     async function handleAddCompanyData(event: Event) {
         event.preventDefault();
@@ -209,8 +270,8 @@
 
             adminForms.addCompanyData = {
                 allSharesIssued: false,
-                issuedShares: '',
-                maxShares: '',
+                issuedShares: null,
+                maxShares: null,
                 registryNumber: ''
             };
         } catch (error) {
@@ -274,7 +335,30 @@
 </script>
 
 <div>
-    {#if $contractInstance}
+    <!-- Always visible Connect to Contract section -->
+    <div class="p-4">
+        <button 
+            onclick={connectContract}
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+            { $contractInstance ? "Reconnect to Contract" : "Connect to Contract" }
+        </button>
+        {#if $contractState.contractAddress}
+            <div class="mt-2 text-sm">
+                Contract Address: {$contractState.contractAddress}
+            </div>
+        {/if}
+    </div>
+
+    <!-- Provide user feedback if wallet is not connected -->
+    {#if !beaconState.isConnected}
+        <div class="p-4 text-gray-600">
+            Please connect your wallet first to interact with the contract.
+        </div>
+    {/if}
+
+    <!-- Display operations forms if a contract is connected and wallet is connected -->
+    {#if $contractInstance && beaconState.isConnected}
         <div class="p-4 space-y-6">
             {#if isAdmin}
                 <div class="bg-blue-50 p-4 rounded-lg">
@@ -289,19 +373,25 @@
                                 bind:value={adminForms.addShareOwner.amount}
                                 placeholder="Amount"
                                 class="p-2 border rounded"
+                                disabled={loadingStates.addShareOwner}
                             />
                             <input 
                                 type="text" 
                                 bind:value={adminForms.addShareOwner.ownerAddress}
                                 placeholder="Owner Address"
                                 class="p-2 border rounded"
+                                disabled={loadingStates.addShareOwner}
                             />
                         </div>
+                        {#if errorStates.addShareOwner}
+                            <div class="text-red-500 text-sm">{errorStates.addShareOwner}</div>
+                        {/if}
                         <button 
                             type="submit"
-                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
+                            disabled={loadingStates.addShareOwner}
                         >
-                            Add Owner
+                            {loadingStates.addShareOwner ? 'Adding...' : 'Add Owner'}
                         </button>
                     </form>
 
@@ -454,20 +544,24 @@
                         Claim Shares
                     </button>
                 </form>
+
+                <!-- Direct Claim Shares Form -->
+                <form class="space-y-4" onsubmit={handleClaimSharesDirect}>
+                    <h3 class="text-xl font-semibold">Direct Claim Shares</h3>
+                    <input 
+                        type="text" 
+                        bind:value={userForms.claimSharesDirect.destination_address}
+                        placeholder="Destination Address"
+                        class="p-2 border rounded"
+                    />
+                    <button 
+                        type="submit"
+                        class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    >
+                        Direct Claim Shares
+                    </button>
+                </form>
             </div>
-        </div>
-    {:else if beaconState.isConnected}
-        <div class="p-4">
-            <button 
-                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onclick={connectContract}
-            >
-                Connect to Contract
-            </button>
-        </div>
-    {:else}
-        <div class="p-4 text-gray-600">
-            Please connect your wallet first to interact with the contract.
         </div>
     {/if}
 </div>

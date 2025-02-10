@@ -4,6 +4,7 @@
     import { tzktStorageData } from './stores/tzktStorage.svelte';
     import ContractOps from "./ContractOps.svelte";
     import { loadContractTzkt } from './utils/contractLoader';
+    import CreateCompany from "./CreateCompany.svelte";
     
     interface TzktTicket {
         data: string;
@@ -11,10 +12,10 @@
         address: string;
     }
 
-
     let tzktOwnersMapEntries = $state<[string, string][]>([]);
     let tzktUnclaimedSharesEntries = $state<[string, TzktTicket][]>([]);
     let tzktShareBalancesEntries = $state<[string, TzktTicket][]>([]);
+    let tzktActiveLedgerEntries = $state<[string, string][]>([]);
 
     /**
      * Test contracts
@@ -36,11 +37,14 @@
         tzktOwnersMapEntries = entries.ownersMapEntries;
         tzktUnclaimedSharesEntries = entries.unclaimedSharesEntries;
         tzktShareBalancesEntries = entries.shareBalancesEntries;
+        tzktActiveLedgerEntries = entries.activeLedgerEntries;
     }
 
 </script>
 
 <div class="container mx-auto p-4">
+    <CreateCompany />
+    
     <!-- Contract Loading -->
     <div class="mb-8">
         <div class="flex gap-4">
@@ -72,23 +76,50 @@
                     <span>{tzktStorageData.max_shares || 'Not set'}</span>
                 </div>
                 <div>
-                    <span class="font-semibold">Issued Shares:</span> 
-                    <span>{tzktStorageData.issued_shares}</span>
+                    <span class="font-semibold">Contract admin:</span> 
+                    <span>{tzktStorageData.admin_address}</span>
                 </div>
                 <div>
-                    <span class="font-semibold">Allocated Shares:</span> 
-                    <span>{tzktStorageData.allocated_shares}</span>
+                    <span class="font-semibold">Issued Shares:</span> 
+                    <span>{tzktStorageData.issued_shares}</span>
                 </div>
                 <div>
                     <span class="font-semibold">All Shares Issued:</span> 
                     <span>{tzktStorageData.all_shares_issued ? 'Yes' : 'No'}</span>
                 </div>
                 <div>
-                    <span class="font-semibold">Contract admin:</span> 
-                    <span>{tzktStorageData.admin_address}</span>
+                    <span class="font-semibold">Allocated Shares:</span> 
+                    <span>{tzktStorageData.allocated_shares}</span>
                 </div>
             </div>
 
+            <!-- Issued Unclaimed Shares -->
+            <div class="mt-4">
+                <h3 class="text-xl font-semibold mb-2">Issued Unclaimed Shares</h3>
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="text-left p-2 bg-gray-200">Issuer</th>
+                            <th class="text-right p-2 bg-gray-200">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#if tzktUnclaimedSharesEntries.length > 0}
+                            {#each tzktUnclaimedSharesEntries as [_, ticket]}
+                                <tr class="border-t">
+                                    <td class="text-left p-2">{ticket.address}</td>
+                                    <td class="text-right p-2">{ticket.amount}</td>
+                                </tr>
+                            {/each}
+                        {:else}
+                            <tr class="border-t">
+                                <td class="text-center p-2 text-gray-500" colspan="3">No unclaimed shares</td>
+                            </tr>
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+            
             <!-- Share Owners (Entitled to Claim) -->
             <div class="mt-4">
                 <h3 class="text-xl font-semibold mb-2">Share Owners (Entitled to Claim)</h3>
@@ -130,29 +161,41 @@
                 </table>
             </div>
 
-            <!-- Issued Unclaimed Shares -->
+            <!-- Active Share Ledger -->
             <div class="mt-4">
-                <h3 class="text-xl font-semibold mb-2">Issued Unclaimed Shares</h3>
+                <h3 class="text-xl font-semibold mb-2">Active Share Ledger</h3>
                 <table class="w-full border-collapse">
                     <thead>
                         <tr>
-                            <th class="text-left p-2 bg-gray-200">Registry Number</th>
-                            <th class="text-center p-2 bg-gray-200">Issuer</th>
-                            <th class="text-right p-2 bg-gray-200">Amount</th>
+                            <th class="text-left p-2 bg-gray-200">Address</th>
+                            <th class="text-right p-2 bg-gray-200">Owned Shares</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {#if tzktUnclaimedSharesEntries.length > 0}
-                            {#each tzktUnclaimedSharesEntries as [_, ticket]}
+                        {#if tzktActiveLedgerEntries.length > 0}
+                            {#each tzktActiveLedgerEntries as [address, claimedShares]}
                                 <tr class="border-t">
-                                    <td class="font-mono p-2">{ticket.data}</td>
-                                    <td class="text-center p-2">{ticket.address}</td>
-                                    <td class="text-right p-2">{ticket.amount}</td>
+                                    <td class="font-mono p-2">
+                                        {#if address.startsWith("KT1")}
+                                            <button 
+                                                class="text-blue-600 hover:text-blue-800 hover:underline text-left"
+                                                onclick={() => {
+                                                    $contractState.contractAddress = address;
+                                                    handleLoadContract();
+                                                }}
+                                            >
+                                                {address}
+                                            </button>
+                                        {:else}
+                                            {address}
+                                        {/if}
+                                    </td>
+                                    <td class="text-right p-2">{claimedShares}</td>
                                 </tr>
                             {/each}
                         {:else}
                             <tr class="border-t">
-                                <td class="text-center p-2 text-gray-500" colspan="3">No unclaimed shares</td>
+                                <td class="text-center p-2 text-gray-500" colspan="2">No active share ledger entries</td>
                             </tr>
                         {/if}
                     </tbody>
@@ -195,6 +238,8 @@
                     </tbody>
                 </table>
             </div>
+
+
         </div>
     {/if}
 
