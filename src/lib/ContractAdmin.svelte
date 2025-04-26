@@ -2,7 +2,8 @@
     import { onMount } from "svelte";
    
     import { TezosToolkit } from '@taquito/taquito';
-    import { TempleWallet } from '@temple-wallet/dapp';
+    import { BeaconWallet } from '@taquito/beacon-wallet';
+    import { NetworkType } from '@airgap/beacon-sdk';
     import { MichelsonMap } from '@taquito/taquito';
 
     import contractCode2Originate from '../assets/walletContract.json';

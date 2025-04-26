@@ -1,10 +1,10 @@
 
 import { TezosToolkit } from '@taquito/taquito';
-import { TempleWallet } from '@temple-wallet/dapp';
+import { BeaconWallet } from '@taquito/beacon-wallet';
 
 
 export interface WalletData {
-    wallet: TempleWallet | null;
+    wallet: BeaconWallet | null;
     Tezos: TezosToolkit | null;
     userAddress: string | null;
     wbalance: string | null;

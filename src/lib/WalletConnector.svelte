@@ -1,12 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { TezosToolkit } from '@taquito/taquito';
-    import { TempleWallet } from '@temple-wallet/dapp';
+    import { BeaconWallet } from '@taquito/beacon-wallet';
+    import { NetworkType } from '@airgap/beacon-sdk';
 
     export const tezSym: string ='ꜩ';
 
     interface WalletData {
-        wallet: TempleWallet | null;
+        wallet: BeaconWallet | null;
         Tezos: TezosToolkit | null;
         userAddress: string | null;
         wbalance: string | null;
@@ -22,22 +23,32 @@
     });
     
     let Tezos: TezosToolkit = new TezosToolkit('https://ghostnet.smartpy.io');
-    const wallet = new TempleWallet('TokenShare');
+    const wallet = new BeaconWallet({ 
+        name: "TokenShare Beacon Wallet", 
+        preferredNetwork: NetworkType.GHOSTNET 
+    });
 
     onMount(async () => {
       try {
-        const available = await TempleWallet.isAvailable();
-        if (!available) throw new Error('Temple Wallet not installed');
+        const activeAccount = await wallet.client.getActiveAccount();
+        if (!activeAccount) {
+            const permissions = await wallet.client.requestPermissions({
+                network: {
+                    type: NetworkType.GHOSTNET,
+                    rpcUrl: "https://ghostnet.smartpy.io"
+                }
+            });
+            walletState.userAddress = permissions.address;
+        } else {
+            walletState.userAddress = activeAccount.address;
+        }
         
-        await wallet.connect('ghostnet');
-        let userAddress = await wallet.getPKH();
-        let balance = await getWalletBalance(userAddress);
-      
+        let balance = await getWalletBalance(walletState.userAddress);
         
+        Tezos.setWalletProvider(wallet);
         walletState.wallet = wallet;
-        walletState.Tezos = wallet.toTezos();
-        walletState.userAddress = userAddress;
-        walletState.wbalance = balance.toFixed(2);;
+        walletState.Tezos = Tezos;
+        walletState.wbalance = balance.toFixed(2);
         walletState.walletDataAvailable = true;
 
       } catch (err) {

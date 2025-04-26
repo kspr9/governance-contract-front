@@ -28,14 +28,13 @@
     "vite": "^6.0.6"
   },
   "dependencies": {
-    "@airgap/beacon-dapp": "^4.3.1",
-    "@airgap/beacon-sdk": "^4.3.1",
+    "@airgap/beacon-dapp": "^4.5.0",
+    "@airgap/beacon-sdk": "^4.5.0",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.9",
     "@tailwindcss/typography": "^0.5.15",
-    "@taquito/beacon-wallet": "^20.1.2",
-    "@taquito/taquito": "^17.5.2",
-    "@temple-wallet/dapp": "^8.0.0",
+    "@taquito/beacon-wallet": "^21.0.5",
+    "@taquito/taquito": "^21.0.5",
     "buffer": "^6.0.3"
   }
 }
