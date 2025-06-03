@@ -8,12 +8,14 @@ import { walletStore } from '$lib/stores/beaconStore.svelte';
 const rpcUrl_teztnets = "https://rpc.ghostnet.teztnets.com";
 const rpcUrl_smartpy = "https://ghostnet.smartpy.io";
 const rpcUrl_tzkt = "https://rpc.tzkt.io/ghostnet";
+const rpcUrl_mainnet = "https://rpc.tzkt.io/mainnet";
 
+const SELECTED_RPC_URL = rpcUrl_mainnet;
 
-let tezosToolkitInstance = new TezosToolkit(rpcUrl_teztnets);
+let tezosToolkitInstance = new TezosToolkit(SELECTED_RPC_URL);
 let beaconWalletInstance = new BeaconWallet({ 
     name: "Tokenshare Beacon Wallet", 
-    preferredNetwork: NetworkType.GHOSTNET 
+    preferredNetwork: NetworkType.MAINNET 
 });
 
 
@@ -106,7 +108,7 @@ export async function getActiveAccount(): Promise<AccountInfo | undefined> {
 
 export async function resetProvider() {
     // First disconnect existing provider if any
-    Tezos.setProvider({ rpc: rpcUrl_teztnets });
+    Tezos.setProvider({ rpc: SELECTED_RPC_URL });
     // Then set wallet provider again
     Tezos.setWalletProvider(wallet);
 }

@@ -12,10 +12,10 @@
         address: string;
     }
 
-    let tzktOwnersMapEntries = $state<[string, string][]>([]);
-    let tzktUnclaimedSharesEntries = $state<[string, TzktTicket][]>([]);
-    let tzktShareBalancesEntries = $state<[string, TzktTicket][]>([]);
-    let tzktActiveLedgerEntries = $state<[string, string][]>([]);
+    let tzktEligibleClaimantsEntries = $state<[string, string][]>([]);
+    let tzktUnclaimedSharePoolEntries = $state<[string, TzktTicket][]>([]);
+    let tzktHeldExternalSharesEntries = $state<[string, TzktTicket][]>([]);
+    let tzktShareLedgerEntries = $state<[string, string][]>([]);
 
     /**
      * Test contracts
@@ -34,10 +34,10 @@
 
     async function handleLoadContract() {
         const entries = await loadContractTzkt();
-        tzktOwnersMapEntries = entries.ownersMapEntries;
-        tzktUnclaimedSharesEntries = entries.unclaimedSharesEntries;
-        tzktShareBalancesEntries = entries.shareBalancesEntries;
-        tzktActiveLedgerEntries = entries.activeLedgerEntries;
+        tzktEligibleClaimantsEntries = entries.eligibleClaimantsEntries;
+        tzktUnclaimedSharePoolEntries = entries.unclaimedSharePoolEntries;
+        tzktHeldExternalSharesEntries = entries.heldExternalSharesEntries;
+        tzktShareLedgerEntries = entries.shareLedgerEntries;
     }
 
 </script>
@@ -84,18 +84,14 @@
                     <span>{tzktStorageData.issued_shares}</span>
                 </div>
                 <div>
-                    <span class="font-semibold">All Shares Issued:</span> 
-                    <span>{tzktStorageData.all_shares_issued ? 'Yes' : 'No'}</span>
-                </div>
-                <div>
-                    <span class="font-semibold">Allocated Shares:</span> 
-                    <span>{tzktStorageData.allocated_shares}</span>
+                    <span class="font-semibold">Total Allocated Shares:</span> 
+                    <span>{tzktStorageData.total_allocated_shares}</span>
                 </div>
             </div>
 
             <!-- Issued Unclaimed Shares -->
             <div class="mt-4">
-                <h3 class="text-xl font-semibold mb-2">Issued Unclaimed Shares</h3>
+                <h3 class="text-xl font-semibold mb-2">Unclaimed Share Pool</h3>
                 <table class="w-full border-collapse">
                     <thead>
                         <tr>
@@ -104,8 +100,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {#if tzktUnclaimedSharesEntries.length > 0}
-                            {#each tzktUnclaimedSharesEntries as [_, ticket]}
+                        {#if tzktUnclaimedSharePoolEntries.length > 0}
+                            {#each tzktUnclaimedSharePoolEntries as [_, ticket]}
                                 <tr class="border-t">
                                     <td class="text-left p-2">{ticket.address}</td>
                                     <td class="text-right p-2">{ticket.amount}</td>
@@ -120,9 +116,9 @@
                 </table>
             </div>
             
-            <!-- Share Owners (Entitled to Claim) -->
+            <!-- Eligible Claimants -->
             <div class="mt-4">
-                <h3 class="text-xl font-semibold mb-2">Share Owners (Entitled to Claim)</h3>
+                <h3 class="text-xl font-semibold mb-2">Eligible Claimants</h3>
                 <table class="w-full border-collapse">
                     <thead>
                         <tr>
@@ -131,8 +127,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {#if tzktOwnersMapEntries.length > 0}
-                            {#each tzktOwnersMapEntries as [address, shares]}
+                        {#if tzktEligibleClaimantsEntries.length > 0}
+                            {#each tzktEligibleClaimantsEntries as [address, shares]}
                                 <tr class="border-t">
                                     <td class="font-mono p-2">
                                         {#if address.startsWith('KT1')}
@@ -154,16 +150,16 @@
                             {/each}
                         {:else}
                             <tr class="border-t">
-                                <td class="text-center p-2 text-gray-500" colspan="2">No share owners registered</td>
+                                <td class="text-center p-2 text-gray-500" colspan="2">No eligible claimants registered</td>
                             </tr>
                         {/if}
                     </tbody>
                 </table>
             </div>
 
-            <!-- Active Share Ledger -->
+            <!-- Share Ledger -->
             <div class="mt-4">
-                <h3 class="text-xl font-semibold mb-2">Active Share Ledger</h3>
+                <h3 class="text-xl font-semibold mb-2">Share Ledger</h3>
                 <table class="w-full border-collapse">
                     <thead>
                         <tr>
@@ -172,8 +168,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {#if tzktActiveLedgerEntries.length > 0}
-                            {#each tzktActiveLedgerEntries as [address, claimedShares]}
+                        {#if tzktShareLedgerEntries.length > 0}
+                            {#each tzktShareLedgerEntries as [address, claimedShares]}
                                 <tr class="border-t">
                                     <td class="font-mono p-2">
                                         {#if address.startsWith("KT1")}
@@ -195,26 +191,26 @@
                             {/each}
                         {:else}
                             <tr class="border-t">
-                                <td class="text-center p-2 text-gray-500" colspan="2">No active share ledger entries</td>
+                                <td class="text-center p-2 text-gray-500" colspan="2">No share ledger entries</td>
                             </tr>
                         {/if}
                     </tbody>
                 </table>
             </div>
 
-            <!-- Share Balances (Owned Company Shares) -->
+            <!-- Held External Shares -->
             <div class="mt-4">
-                <h3 class="text-xl font-semibold mb-2">Owned Company Shares</h3>
+                <h3 class="text-xl font-semibold mb-2">Held External Shares</h3>
                 <table class="w-full border-collapse">
                     <thead>
                         <tr>
                             <th class="text-left p-2 bg-gray-200">Address</th>
-                            <th class="text-right p-2 bg-gray-200">Shares owned</th>
+                            <th class="text-right p-2 bg-gray-200">Shares held</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {#if tzktShareBalancesEntries.length > 0}
-                            {#each tzktShareBalancesEntries as [_, shares]}
+                        {#if tzktHeldExternalSharesEntries.length > 0}
+                            {#each tzktHeldExternalSharesEntries as [_, shares]}
                                 <tr class="border-t">
                                     <td class="font-mono p-2">
                                         <button 
@@ -232,7 +228,7 @@
                             {/each}
                         {:else}
                             <tr class="border-t">
-                                <td class="text-center p-2 text-gray-500" colspan="2">No shares owned</td>
+                                <td class="text-center p-2 text-gray-500" colspan="2">No external shares held</td>
                             </tr>
                         {/if}
                     </tbody>

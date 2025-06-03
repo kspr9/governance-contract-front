@@ -16,50 +16,48 @@
 
     // Form states
     let adminForms = $state({
-        addShareOwner: { 
+        allocateShares: { 
             amount: '' as string | number,
             ownerAddress: '' 
         },
         changeMaxShares: { newMax: null as number | null },
-        issueShares: { amount: null as number | null },
+        mintShares: { amount: null as number | null },
         addCompanyData: {
-            allSharesIssued: false,
-            issuedShares: null as number | null,
             maxShares: null as number | null,
-            registryNumber: ''
+            registryNumber: null as number | null
         },
         changeAdmin: { newAdminAddress: '' },
-        removeShareOwner: { ownerAddress: '' }
+        deallocateShares: { ownerAddress: '' }
     });
     
     let userForms = $state({
-        transferShares: { amount: null as number | null, destination: '', share: '' },
+        transferHeldShares: { amount: null as number | null, destination: '', share: '' },
         claimShares: { address: '' },
         claimSharesDirect: { destination_address: '' }
     });
 
     // Add loading states
     let loadingStates = $state({
-        addShareOwner: false,
+        allocateShares: false,
         changeMaxShares: false,
-        issueShares: false,
+        mintShares: false,
         addCompanyData: false,
         changeAdmin: false,
-        removeShareOwner: false,
-        transferShares: false,
+        deallocateShares: false,
+        transferHeldShares: false,
         claimShares: false,
         claimSharesDirect: false
     });
 
     // Add error states
     let errorStates = $state({
-        addShareOwner: null as string | null,
+        allocateShares: null as string | null,
         changeMaxShares: null as string | null,
-        issueShares: null as string | null,
+        mintShares: null as string | null,
         addCompanyData: null as string | null,
         changeAdmin: null as string | null,
-        removeShareOwner: null as string | null,
-        transferShares: null as string | null,
+        deallocateShares: null as string | null,
+        transferHeldShares: null as string | null,
         claimShares: null as string | null,
         claimSharesDirect: null as string | null
     });
@@ -93,38 +91,38 @@
 
 
     // Admin Functions
-    async function handleAddShareOwner(event: Event) {
+    async function handleAllocateShares(event: Event) {
         event.preventDefault();
-        loadingStates.addShareOwner = true;
-        errorStates.addShareOwner = null;
+        loadingStates.allocateShares = true;
+        errorStates.allocateShares = null;
         
         try {
             // Validate amount is a number
-            const amount = Number(adminForms.addShareOwner.amount);
+            const amount = Number(adminForms.allocateShares.amount);
             if (isNaN(amount)) {
                 throw new Error("Amount must be a valid number");
             }
 
             await resetProvider();
   
-            const operation = await $contractInstance.methodsObject.add_share_owner({
+            const operation = await $contractInstance.methodsObject.allocate_shares_to_claimants({
                 amount: amount,
-                owner_address: adminForms.addShareOwner.ownerAddress
+                owner_address: adminForms.allocateShares.ownerAddress
             }).send();
 
             await operation.confirmation(2);
-            console.log("Share owner added successfully");
+            console.log("Shares allocated successfully");
             
             // Reset form
-            adminForms.addShareOwner = { amount: '', ownerAddress: '' };
+            adminForms.allocateShares = { amount: '', ownerAddress: '' };
             await new Promise(resolve => setTimeout(resolve, 2500));
             await loadContractTzkt();
             
         } catch (error) {
-            console.error("Failed to add share owner:", error);
-            errorStates.addShareOwner = error instanceof Error ? error.message : "Failed to add share owner";
+            console.error("Failed to allocate shares:", error);
+            errorStates.allocateShares = error instanceof Error ? error.message : "Failed to allocate shares";
         } finally {
-            loadingStates.addShareOwner = false;
+            loadingStates.allocateShares = false;
         }
     }
 
@@ -153,51 +151,51 @@
         }
     }
 
-    async function handleIssueShares(event: Event) {
+    async function handleMintShares(event: Event) {
         event.preventDefault();
         try {
             await resetProvider();
 
-            const operation = await $contractInstance.methods.issue_shares_unclaimed2(
-                adminForms.issueShares.amount
+            const operation = await $contractInstance.methods.mint_shares_to_pool(
+                adminForms.mintShares.amount
             ).send();
 
             await operation.confirmation(2)
             .then((op: any) => {
-                console.log("Shares issued successfully", op);
+                console.log("Shares minted successfully", op);
             });
 
-            adminForms.issueShares.amount = null;
+            adminForms.mintShares.amount = null;
             await new Promise(resolve => setTimeout(resolve, 2500));
             await loadContractTzkt();
         } catch (error) {
-            console.error("Failed to issue shares:", error);
+            console.error("Failed to mint shares:", error);
             throw error;
         }
     }
 
     // User Functions
-    async function handleTransferShares(event: Event) {
+    async function handleTransferHeldShares(event: Event) {
         event.preventDefault();
         try {
             await resetProvider();
 
-            const operation = await $contractInstance.methods.transfer_shares(
-                userForms.transferShares.amount,
-                userForms.transferShares.destination,
-                userForms.transferShares.share
-            ).send();
+            const operation = await $contractInstance.methodsObject.transfer_held_shares({
+                amount: userForms.transferHeldShares.amount,
+                destination: userForms.transferHeldShares.destination,
+                share: userForms.transferHeldShares.share
+            }).send();
 
             await operation.confirmation(2)
             .then((op: any) => {
-                console.log("Shares transferred successfully", op);
+                console.log("Held shares transferred successfully", op);
             });
 
-            userForms.transferShares = { amount: null, destination: '', share: '' };
+            userForms.transferHeldShares = { amount: null, destination: '', share: '' };
             await new Promise(resolve => setTimeout(resolve, 2500));
             await loadContractTzkt();
         } catch (error) {
-            console.error("Failed to transfer shares:", error);
+            console.error("Failed to transfer held shares:", error);
             throw error;
         }
     }
@@ -256,8 +254,6 @@
             await resetProvider();
 
             const operation = await $contractInstance.methodsObject.add_company_data({
-                all_shares_issued: adminForms.addCompanyData.allSharesIssued,
-                issued_shares: adminForms.addCompanyData.issuedShares,
                 max_shares: adminForms.addCompanyData.maxShares,
                 registry_number: adminForms.addCompanyData.registryNumber
             }).send();
@@ -269,10 +265,8 @@
             await loadContractTzkt();
 
             adminForms.addCompanyData = {
-                allSharesIssued: false,
-                issuedShares: null,
                 maxShares: null,
-                registryNumber: ''
+                registryNumber: null
             };
         } catch (error) {
             console.error("Failed to add company data:", error);
@@ -302,24 +296,24 @@
         }
     }
 
-    async function handleRemoveShareOwner(event: Event) {
+    async function handleDeallocateShares(event: Event) {
         event.preventDefault();
         try {
             await resetProvider();
 
-            const operation = await $contractInstance.methods.remove_share_owner(
-                adminForms.removeShareOwner.ownerAddress
+            const operation = await $contractInstance.methods.deallocate_shares_from_claimants(
+                adminForms.deallocateShares.ownerAddress
             ).send();
 
             await operation.confirmation(2);
-            console.log("Share owner removed successfully", operation);
+            console.log("Shares deallocated successfully", operation);
             
             await new Promise(resolve => setTimeout(resolve, 2500));
             await loadContractTzkt();
 
-            adminForms.removeShareOwner.ownerAddress = '';
+            adminForms.deallocateShares.ownerAddress = '';
         } catch (error) {
-            console.error("Failed to remove share owner:", error);
+            console.error("Failed to deallocate shares:", error);
             throw error;
         }
     }
@@ -365,33 +359,33 @@
                     <h2 class="text-2xl font-bold mb-4">Admin Functions</h2>
                     
                     <!-- Add Share Owner Form -->
-                    <form class="mb-4 space-y-4" onsubmit={handleAddShareOwner}>
-                        <h3 class="text-xl font-semibold">Add Share Owner</h3>
+                    <form class="mb-4 space-y-4" onsubmit={handleAllocateShares}>
+                        <h3 class="text-xl font-semibold">Allocate Shares to Claimant</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <input 
                                 type="number" 
-                                bind:value={adminForms.addShareOwner.amount}
+                                bind:value={adminForms.allocateShares.amount}
                                 placeholder="Amount"
                                 class="p-2 border rounded"
-                                disabled={loadingStates.addShareOwner}
+                                disabled={loadingStates.allocateShares}
                             />
                             <input 
                                 type="text" 
-                                bind:value={adminForms.addShareOwner.ownerAddress}
+                                bind:value={adminForms.allocateShares.ownerAddress}
                                 placeholder="Owner Address"
                                 class="p-2 border rounded"
-                                disabled={loadingStates.addShareOwner}
+                                disabled={loadingStates.allocateShares}
                             />
                         </div>
-                        {#if errorStates.addShareOwner}
-                            <div class="text-red-500 text-sm">{errorStates.addShareOwner}</div>
+                        {#if errorStates.allocateShares}
+                            <div class="text-red-500 text-sm">{errorStates.allocateShares}</div>
                         {/if}
                         <button 
                             type="submit"
                             class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
-                            disabled={loadingStates.addShareOwner}
+                            disabled={loadingStates.allocateShares}
                         >
-                            {loadingStates.addShareOwner ? 'Adding...' : 'Add Owner'}
+                            {loadingStates.allocateShares ? 'Allocating...' : 'Allocate Shares'}
                         </button>
                     </form>
 
@@ -413,19 +407,19 @@
                     </form>
 
                     <!-- Issue Shares Form -->
-                    <form class="space-y-4" onsubmit={handleIssueShares}>
-                        <h3 class="text-xl font-semibold">Issue Shares</h3>
+                    <form class="space-y-4" onsubmit={handleMintShares}>
+                        <h3 class="text-xl font-semibold">Mint Shares to Pool</h3>
                         <input 
                             type="number" 
-                            bind:value={adminForms.issueShares.amount}
-                            placeholder="Amount to Issue"
+                            bind:value={adminForms.mintShares.amount}
+                            placeholder="Amount to Mint"
                             class="p-2 border rounded"
                         />
                         <button 
                             type="submit"
                             class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                         >
-                            Issue Shares
+                            Mint Shares
                         </button>
                     </form>
 
@@ -433,19 +427,13 @@
                     <form class="mb-4 space-y-4" onsubmit={handleAddCompanyData}>
                         <h3 class="text-xl font-semibold">Add Company Data</h3>
                         <input 
-                            type="text" 
-                            bind:value={adminForms.addCompanyData.issuedShares}
-                            placeholder="Issued Shares"
-                            class="p-2 border rounded"
-                        />
-                        <input 
-                            type="text" 
+                            type="number" 
                             bind:value={adminForms.addCompanyData.maxShares}
                             placeholder="Max Shares"
                             class="p-2 border rounded"
                         />
                         <input 
-                            type="text" 
+                            type="number" 
                             bind:value={adminForms.addCompanyData.registryNumber}
                             placeholder="Registry Number"
                             class="p-2 border rounded"
@@ -476,11 +464,11 @@
                     </form>
 
                     <!-- Remove Share Owner Form -->
-                    <form class="space-y-4" onsubmit={handleRemoveShareOwner}>
-                        <h3 class="text-xl font-semibold">Remove Share Owner</h3>
+                    <form class="space-y-4" onsubmit={handleDeallocateShares}>
+                        <h3 class="text-xl font-semibold">Deallocate Shares</h3>
                         <input 
                             type="text" 
-                            bind:value={adminForms.removeShareOwner.ownerAddress}
+                            bind:value={adminForms.deallocateShares.ownerAddress}
                             placeholder="Owner Address"
                             class="p-2 border rounded"
                         />
@@ -488,7 +476,7 @@
                             type="submit"
                             class="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                         >
-                            Remove Share Owner
+                            Deallocate Shares
                         </button>
                     </form>
                 </div>
@@ -498,24 +486,24 @@
                 <h2 class="text-2xl font-bold mb-4">User Functions</h2>
                 
                 <!-- Transfer Shares Form -->
-                <form class="mb-4 space-y-4" onsubmit={handleTransferShares}>
-                    <h3 class="text-xl font-semibold">Transfer Shares</h3>
+                <form class="mb-4 space-y-4" onsubmit={handleTransferHeldShares}>
+                    <h3 class="text-xl font-semibold">Transfer Held Shares</h3>
                     <div class="grid grid-cols-3 gap-4">
                         <input 
                             type="number" 
-                            bind:value={userForms.transferShares.amount}
+                            bind:value={userForms.transferHeldShares.amount}
                             placeholder="Amount"
                             class="p-2 border rounded"
                         />
                         <input 
                             type="text" 
-                            bind:value={userForms.transferShares.destination}
+                            bind:value={userForms.transferHeldShares.destination}
                             placeholder="Destination Address"
                             class="p-2 border rounded"
                         />
                         <input 
                             type="text" 
-                            bind:value={userForms.transferShares.share}
+                            bind:value={userForms.transferHeldShares.share}
                             placeholder="Share Address"
                             class="p-2 border rounded"
                         />
@@ -524,7 +512,7 @@
                         type="submit"
                         class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                     >
-                        Transfer Shares
+                        Transfer Held Shares
                     </button>
                 </form>
 
