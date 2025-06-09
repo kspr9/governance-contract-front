@@ -146,38 +146,20 @@
 
 </script>
 
-<div class="container mx-auto p-4 bg-gray-100 rounded-md">
-    <h2 class="text-2xl font-bold mb-4">Wallet Information</h2>
-    {#if beaconState.error}
-        <div class="p-4 mb-4 bg-red-100 text-red-700 rounded-lg">
-            {beaconState.error}
-        </div>
-    {/if}
-
-    {#if beaconState.isConnected}
-        <div class="grid grid-cols-5 gap-4">
-            <div class="col-span-4">
-                <span class="font-semibold">Address:</span>
-                <span class="font-mono">{beaconState.address}</span> 
-            </div>
-            <div class="flex justify-end">
-                <span class="font-semibold">Balance:</span>
-                <span>{beaconState.wbalance} {tezSym}</span>
-            </div>
-            
-            <button 
-                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onclick={disconnectWallet}
-            >
-                Disconnect
-            </button>
-        </div>
-    {:else}
-        <button 
-            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            onclick={connectWallet}
-        >
-            Connect Wallet
-        </button>
-    {/if}
+<div class="w-full max-w-xl mx-auto bg-white rounded-lg shadow p-4 mb-4 border border-solid border-indigo-600">
+  <h2 class="text-lg font-semibold mb-2">Connected wallet</h2>
+  {#if beaconState.error}
+    <div class="p-2 mb-2 bg-red-100 text-red-700 rounded">
+      {beaconState.error}
+    </div>
+  {/if}
+  {#if beaconState.isConnected}
+    <div class="flex items-center justify-between mb-2">
+      <span class="font-mono text-sm truncate">{beaconState.address}</span>
+      <button class="px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 border border-indigo-600 ml-2" onclick={disconnectWallet}>Disconnect</button>
+    </div>
+    <div class="text-xs text-gray-500">Balance: {beaconState.wbalance} {tezSym}</div>
+  {:else}
+    <button class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 w-full" onclick={connectWallet}>Connect Wallet</button>
+  {/if}
 </div>

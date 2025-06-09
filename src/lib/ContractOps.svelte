@@ -6,7 +6,10 @@
     import { Tezos, wallet, resetProvider } from './config/beaconConfig';
     import { loadContractTzkt } from './utils/contractLoader';
 
-
+    // TODO: add a loading visual to appear each time when an entrypoint is called but result is not yet received
+    // clearly indicate that process is ongoing.
+    // notify the user with the result - e.g. "Shares allocated successfully" or "Shares minted successfully"
+    
     const isAdmin = $derived(
         beaconState.address !== null && 
         tzktStorageData.admin_address !== null && 

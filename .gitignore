@@ -3,3 +3,4 @@ repomix-output.xml
 dist/
 .vscode/
 package-lock.json
+lovable-conf.txt
