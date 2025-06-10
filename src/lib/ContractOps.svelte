@@ -376,12 +376,12 @@
     <div class="p-4">
         <button 
             onclick={connectContract}
-            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            class="btn-primary"
         >
             { $contractInstance ? "Reconnect to Contract" : "Connect to Contract" }
         </button>
         {#if $contractState.contractAddress}
-            <div class="mt-2 text-sm">
+            <div class="mt-2 text-sm text-[color:var(--foreground)]">
                 Contract Address: {$contractState.contractAddress}
             </div>
         {/if}
@@ -389,7 +389,7 @@
 
     <!-- Provide user feedback if wallet is not connected -->
     {#if !beaconState.isConnected}
-        <div class="p-4 text-gray-600">
+        <div class="p-4 text-[color:var(--muted-foreground)]">
             Please connect your wallet first to interact with the contract.
         </div>
     {/if}
@@ -399,31 +399,31 @@
         <div class="p-4 space-y-6">
             {#if isAdmin}
                 <button type="button" class="flex items-center justify-between w-full mb-4 cursor-pointer" onclick={toggleAdminFunctions}>
-                    <div class="font-semibold text-lg">Admin Functions</div>
-                    <svg class="h-5 w-5 transition-transform" style="transform: rotate({showAdminFunctions ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <div class="section-header">Admin Functions</div>
+                    <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showAdminFunctions ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
                 {#if showAdminFunctions}
-                    <div class="bg-blue-50 p-4 rounded-lg space-y-6">
+                    <div class="bg-[color:var(--background)] p-4 rounded-lg space-y-6 border border-[color:var(--border)]">
                         <!-- Mint Shares Form -->
-                        <div class="bg-white border border-blue-100 rounded-lg p-6 shadow-sm mb-2">
+                        <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleMintShares}>
-                                <h3 class="text-xl font-semibold mb-2">Mint Shares to Pool</h3>
-                                <div class="border-b border-blue-100 mb-4"></div>
+                                <h3 class="section-header">Mint Shares to Pool</h3>
+                                <div class="border-b border-[color:var(--border)] mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
                                         type="number" 
                                         bind:value={adminForms.mintShares.amount}
                                         placeholder="Amount to Mint"
-                                        class="p-2 border rounded w-full"
+                                        class="input w-full"
                                         disabled={loadingStates.mintShares}
                                     />
                                     {#if errorStates.mintShares}
-                                        <div class="text-red-500 text-sm">{errorStates.mintShares}</div>
+                                        <div class="text-[color:var(--destructive)]">{errorStates.mintShares}</div>
                                     {/if}
                                     <div class="flex justify-end">
                                         <button 
                                             type="submit"
-                                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300 min-w-[140px]"
+                                            class="btn-primary min-w-[140px]"
                                             disabled={loadingStates.mintShares}
                                         >
                                             {#if loadingStates.mintShares}
@@ -438,33 +438,33 @@
                         </div>
 
                         <!-- Allocate Shares Form -->
-                        <div class="bg-white border border-blue-100 rounded-lg p-6 shadow-sm mb-2">
+                        <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleAllocateShares}>
-                                <h3 class="text-xl font-semibold mb-2">Allocate Shares to Claimant</h3>
-                                <div class="border-b border-blue-100 mb-4"></div>
+                                <h3 class="section-header">Allocate Shares to Claimant</h3>
+                                <div class="border-b border-[color:var(--border)] mb-4"></div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input 
                                         type="number" 
                                         bind:value={adminForms.allocateShares.amount}
                                         placeholder="Amount"
-                                        class="p-2 border rounded w-full"
+                                        class="input w-full"
                                         disabled={loadingStates.allocateShares}
                                     />
                                     <input 
                                         type="text" 
                                         bind:value={adminForms.allocateShares.ownerAddress}
                                         placeholder="Owner Address"
-                                        class="p-2 border rounded w-full"
+                                        class="input w-full"
                                         disabled={loadingStates.allocateShares}
                                     />
                                 </div>
                                 {#if errorStates.allocateShares}
-                                    <div class="text-red-500 text-sm">{errorStates.allocateShares}</div>
+                                    <div class="text-[color:var(--destructive)]">{errorStates.allocateShares}</div>
                                 {/if}
                                 <div class="flex justify-end">
                                     <button 
                                         type="submit"
-                                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300 min-w-[140px]"
+                                        class="btn-primary min-w-[140px]"
                                         disabled={loadingStates.allocateShares}
                                     >
                                         {#if loadingStates.allocateShares}
@@ -478,25 +478,25 @@
                         </div>
 
                         <!-- Deallocate Shares Form -->
-                        <div class="bg-white border border-blue-100 rounded-lg p-6 shadow-sm mb-2">
+                        <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleDeallocateShares}>
-                                <h3 class="text-xl font-semibold mb-2">Deallocate Shares</h3>
-                                <div class="border-b border-blue-100 mb-4"></div>
+                                <h3 class="section-header">Deallocate Shares</h3>
+                                <div class="border-b border-[color:var(--border)] mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
                                         type="text" 
                                         bind:value={adminForms.deallocateShares.ownerAddress}
                                         placeholder="Owner Address"
-                                        class="p-2 border rounded w-full"
+                                        class="input w-full"
                                         disabled={loadingStates.deallocateShares}
                                     />
                                     {#if errorStates.deallocateShares}
-                                        <div class="text-red-500 text-sm">{errorStates.deallocateShares}</div>
+                                        <div class="text-[color:var(--destructive)]">{errorStates.deallocateShares}</div>
                                     {/if}
                                     <div class="flex justify-end">
                                         <button 
                                             type="submit"
-                                            class="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:bg-red-300 min-w-[140px]"
+                                            class="btn-secondary min-w-[140px]"
                                             disabled={loadingStates.deallocateShares}
                                         >
                                             {#if loadingStates.deallocateShares}
@@ -511,25 +511,25 @@
                         </div>
 
                         <!-- Change Max Shares Form -->
-                        <div class="bg-white border border-blue-100 rounded-lg p-6 shadow-sm mb-2">
+                        <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleChangeMaxShares}>
-                                <h3 class="text-xl font-semibold mb-2">Change Max Shares</h3>
-                                <div class="border-b border-blue-100 mb-4"></div>
+                                <h3 class="section-header">Change Max Shares</h3>
+                                <div class="border-b border-[color:var(--border)] mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
                                         type="number" 
                                         bind:value={adminForms.changeMaxShares.newMax}
                                         placeholder="New Maximum Shares"
-                                        class="p-2 border rounded w-full"
+                                        class="input w-full"
                                         disabled={loadingStates.changeMaxShares}
                                     />
                                     {#if errorStates.changeMaxShares}
-                                        <div class="text-red-500 text-sm">{errorStates.changeMaxShares}</div>
+                                        <div class="text-[color:var(--destructive)]">{errorStates.changeMaxShares}</div>
                                     {/if}
                                     <div class="flex justify-end">
                                         <button 
                                             type="submit"
-                                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300 min-w-[140px]"
+                                            class="btn-primary min-w-[140px]"
                                             disabled={loadingStates.changeMaxShares}
                                         >
                                             {#if loadingStates.changeMaxShares}
@@ -544,33 +544,33 @@
                         </div>
 
                         <!-- Add Company Data Form -->
-                        <div class="bg-white border border-blue-100 rounded-lg p-6 shadow-sm mb-2">
+                        <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleAddCompanyData}>
-                                <h3 class="text-xl font-semibold mb-2">Add Company Data</h3>
-                                <div class="border-b border-blue-100 mb-4"></div>
+                                <h3 class="section-header">Add Company Data</h3>
+                                <div class="border-b border-[color:var(--border)] mb-4"></div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input 
                                         type="number" 
                                         bind:value={adminForms.addCompanyData.maxShares}
                                         placeholder="Max Shares"
-                                        class="p-2 border rounded w-full"
+                                        class="input w-full"
                                         disabled={loadingStates.addCompanyData}
                                     />
                                     <input 
                                         type="number" 
                                         bind:value={adminForms.addCompanyData.registryNumber}
                                         placeholder="Registry Number"
-                                        class="p-2 border rounded w-full"
+                                        class="input w-full"
                                         disabled={loadingStates.addCompanyData}
                                     />
                                 </div>
                                 {#if errorStates.addCompanyData}
-                                    <div class="text-red-500 text-sm">{errorStates.addCompanyData}</div>
+                                    <div class="text-[color:var(--destructive)]">{errorStates.addCompanyData}</div>
                                 {/if}
                                 <div class="flex justify-end">
                                     <button 
                                         type="submit"
-                                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300 min-w-[140px]"
+                                        class="btn-primary min-w-[140px]"
                                         disabled={loadingStates.addCompanyData}
                                     >
                                         {#if loadingStates.addCompanyData}
@@ -584,25 +584,25 @@
                         </div>
 
                         <!-- Change Admin Form -->
-                        <div class="bg-white border border-blue-100 rounded-lg p-6 shadow-sm mb-2">
+                        <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleChangeAdmin}>
-                                <h3 class="text-xl font-semibold mb-2">Change Admin</h3>
-                                <div class="border-b border-blue-100 mb-4"></div>
+                                <h3 class="section-header">Change Admin</h3>
+                                <div class="border-b border-[color:var(--border)] mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
                                         type="text" 
                                         bind:value={adminForms.changeAdmin.newAdminAddress}
                                         placeholder="New Admin Address"
-                                        class="p-2 border rounded w-full"
+                                        class="input w-full"
                                         disabled={loadingStates.changeAdmin}
                                     />
                                     {#if errorStates.changeAdmin}
-                                        <div class="text-red-500 text-sm">{errorStates.changeAdmin}</div>
+                                        <div class="text-[color:var(--destructive)]">{errorStates.changeAdmin}</div>
                                     {/if}
                                     <div class="flex justify-end">
                                         <button 
                                             type="submit"
-                                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300 min-w-[140px]"
+                                            class="btn-primary min-w-[140px]"
                                             disabled={loadingStates.changeAdmin}
                                         >
                                             {#if loadingStates.changeAdmin}

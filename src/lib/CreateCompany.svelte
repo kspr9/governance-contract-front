@@ -101,46 +101,46 @@
 </script>
 <div class="container mx-auto p-4">
     
-    <form onsubmit={handleCreateCompany} class="space-y-4 p-4 border rounded">
-      <h2 class="text-2xl font-bold">Deploy a new Company Share Wallet</h2>
+    <form onsubmit={handleCreateCompany} class="space-y-4 p-4 border rounded card">
+      <h2 class="section-header">Deploy a new Company Share Wallet</h2>
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-gray-700">Company Admin Address</label>
+        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">Company Admin Address</label>
         <input
           type="text"
           bind:value={adminAddress}
           placeholder="Admin Address"
-          class="mt-1 block w-full p-2 border rounded"
+          class="input mt-1 block w-full"
           required
         />
       </div>
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-gray-700">Max Shares</label>
+        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">Max Shares</label>
         <input
           type="number"
           bind:value={maxShares}
           placeholder="Maximum Shares"
-          class="mt-1 block w-full p-2 border rounded"
+          class="input mt-1 block w-full"
           required
         />
       </div>
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-gray-700">Registry Number</label>
+        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">Registry Number</label>
         <input
           type="number"
           bind:value={registryNumber}
           placeholder="Registry Number"
-          class="mt-1 block w-full p-2 border rounded"
+          class="input mt-1 block w-full"
           required
         />
       </div>
     
-      <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600" disabled={isLoading}>
+      <button type="submit" class="btn-primary" disabled={isLoading}>
         {#if isLoading}
           Sending...
         {:else}
@@ -149,40 +149,40 @@
       </button>
     
       {#if txHash}
-        <p class="text-green-600">Transaction sent! Hash: {txHash}</p>
+        <p class="text-[color:var(--primary)]">Transaction sent! Hash: {txHash}</p>
       {/if}
     
       {#if errorMsg}
-        <p class="text-red-600">{errorMsg}</p>
+        <p class="text-[color:var(--destructive)]">{errorMsg}</p>
       {/if}
     </form>
 
     <!-- Deployed Wallet Contracts Table -->
-    <div class="mt-8 bg-white rounded-lg shadow p-4">
-      <div class="font-semibold text-lg mb-2">Deployed Wallet Contracts</div>
-      <div class="text-sm text-gray-500 mb-4">View all wallet contracts that have been deployed from the governance contract.</div>
+    <div class="mt-8 card">
+      <div class="section-header mb-2">Deployed Wallet Contracts</div>
+      <div class="text-sm text-[color:var(--muted-foreground)] mb-4">View all wallet contracts that have been deployed from the governance contract.</div>
       <table class="w-full border-collapse text-sm">
         <thead>
-          <tr>
-            <th class="text-left p-2 bg-gray-100">Registry Number</th>
-            <th class="text-left p-2 bg-gray-100">Contract Address</th>
-            <th class="text-left p-2 bg-gray-100">Actions</th>
+          <tr class="table-header">
+            <th class="text-left p-2">Registry Number</th>
+            <th class="text-left p-2">Contract Address</th>
+            <th class="text-left p-2">Actions</th>
           </tr>
         </thead>
         <tbody>
           {#if governanceStorageData.deployedContracts && Object.keys(governanceStorageData.deployedContracts).length > 0}
             {#each Object.entries(governanceStorageData.deployedContracts) as [registry, address]}
-              <tr class="border-t">
+              <tr class="table-row">
                 <td class="p-2">{registry}</td>
                 <td class="font-mono p-2">{address}</td>
                 <td class="p-2">
-                  <button class="px-3 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600 text-xs">View</button>
+                  <button class="btn-secondary px-3 py-1 text-xs">View</button>
                 </td>
               </tr>
             {/each}
           {:else}
-            <tr class="border-t">
-              <td class="text-center p-2 text-gray-500" colspan="3">No deployed contracts found</td>
+            <tr class="table-row">
+              <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="3">No deployed contracts found</td>
             </tr>
           {/if}
         </tbody>

@@ -240,16 +240,16 @@
 <div class="space-y-6">
     <Toast />
     <!-- Contract Loading Card -->
-    <div class="bg-violet-200 rounded-lg shadow p-4">
-        <div class="font-semibold text-lg mb-2">Load your Wallet Contract</div>
+    <div class="bg-[color:var(--card)] border border-[color:var(--border)] rounded-lg shadow p-4">
+        <div class="font-semibold text-lg mb-2 text-[color:var(--primary)]">Load your Wallet Contract</div>
         <div class="flex gap-2 mb-2">
             <input 
-                class="flex-1 p-2 border rounded" 
+                class="flex-1 p-2 border rounded bg-[color:var(--background)] text-[color:var(--foreground)]" 
                 bind:value={$contractState.contractAddress} 
                 placeholder="Contract address" 
             />
             <button 
-                class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+                class="px-4 py-2 bg-[color:var(--primary)] text-[color:var(--background)] rounded hover:bg-[color:var(--accent)] border border-[color:var(--border)]"
                 onclick={handleLoadContract}
             >
                 Load
@@ -259,50 +259,49 @@
 
     <!-- Contract Details Card -->
     {#if tzktStorageData.admin_address !== null}
-        <div class="rounded-lg shadow p-0 overflow-hidden" style="background: linear-gradient(90deg, #e0e7ff 60%, #f5f3ff 100%);">
-            <div class="bg-violet-200 px-6 py-4 flex items-center justify-between">
-                <div class="font-bold text-xl">Wallet Contract</div>
-                <!-- Optionally, add an icon or avatar here -->
+        <div class="rounded-lg shadow p-0 overflow-hidden border border-[color:var(--border)]" style="background: linear-gradient(90deg, #232B3A 60%, #2d3650 100%);">
+            <div class="bg-[color:var(--card)] px-6 py-4 flex items-center justify-between border-b border-[color:var(--border)]">
+                <div class="font-bold text-xl text-[color:var(--primary)]">Wallet Contract</div>
             </div>
             <div class="px-6 py-4">
                 <div class="flex items-center gap-2 mb-4">
                     <input
-                        class="flex-1 p-2 border rounded bg-white font-mono text-sm cursor-default select-all"
+                        class="flex-1 p-2 border rounded bg-[color:var(--background)] font-mono text-sm cursor-default select-all text-[color:var(--foreground)]"
                         value={$contractState.contractAddress}
                         readonly
                         style="min-width:0;"
                     />
                     <button
-                        class="p-2 bg-violet-100 rounded hover:bg-violet-200"
+                        class="p-2 bg-[color:var(--muted)] rounded hover:bg-[color:var(--card)] border border-[color:var(--border)]"
                         title="Copy contract address"
                         aria-label="Copy contract address"
                         onclick={() => navigator.clipboard.writeText($contractState.contractAddress || '')}
                     >
-                        <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8M8 12h8m-7 8h6a2 2 0 002-2V6a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8M8 12h8m-7 8h6a2 2 0 002-2V6a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     </button>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <span class="text-xs text-gray-500">Contract Admin</span>
-                        <div class="font-mono text-sm">{tzktStorageData.admin_address}</div>
+                        <span class="text-xs text-[color:var(--muted-foreground)]">Contract Admin</span>
+                        <div class="font-mono text-sm text-[color:var(--foreground)]">{tzktStorageData.admin_address}</div>
                     </div>
                     <div>
-                        <span class="text-xs text-gray-500">Registry Number</span>
-                        <div class="text-sm">{tzktStorageData.registry_number || 'Not set'}</div>
+                        <span class="text-xs text-[color:var(--muted-foreground)]">Registry Number</span>
+                        <div class="text-sm text-[color:var(--foreground)]">{tzktStorageData.registry_number || 'Not set'}</div>
                     </div>
                 </div>
-                <div class="flex flex-row gap-8 justify-between border-t pt-4">
+                <div class="flex flex-row gap-8 justify-between border-t pt-4 border-[color:var(--border)]">
                     <div class="flex-1">
-                        <span class="text-xs text-gray-500">Max Shares</span>
-                        <div class="text-2xl font-bold">{tzktStorageData.max_shares || 'Not set'}</div>
+                        <span class="text-xs text-[color:var(--muted-foreground)]">Max Shares</span>
+                        <div class="text-2xl font-bold text-[color:var(--primary)]">{tzktStorageData.max_shares || 'Not set'}</div>
                     </div>
                     <div class="flex-1">
-                        <span class="text-xs text-gray-500">Issued Shares</span>
-                        <div class="text-2xl font-bold">{tzktStorageData.issued_shares}</div>
+                        <span class="text-xs text-[color:var(--muted-foreground)]">Issued Shares</span>
+                        <div class="text-2xl font-bold text-[color:var(--primary)]">{tzktStorageData.issued_shares}</div>
                     </div>
                     <div class="flex-1">
-                        <span class="text-xs text-gray-500">Unclaimed Shares</span>
-                        <div class="text-2xl font-bold">{tzktStorageData.total_allocated_shares}</div>
+                        <span class="text-xs text-[color:var(--muted-foreground)]">Unclaimed Shares</span>
+                        <div class="text-2xl font-bold text-[color:var(--primary)]">{tzktStorageData.total_allocated_shares}</div>
                     </div>
                 </div>
             </div>
@@ -311,27 +310,27 @@
 
     <!-- Share Ledger Card (Prominent) -->
     {#if tzktStorageData.admin_address !== null}
-        <div class="bg-indigo-50 rounded-lg shadow p-4">
+        <div class="card">
             <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleLedger}>
-                <div class="font-semibold text-lg">Share Ledger <span class="text-xs text-indigo-600 ml-2">Current owners</span></div>
-                <svg class="h-5 w-5 transition-transform" style="transform: rotate({showLedger ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <div class="section-header">Share Ledger <span class="text-xs text-[color:var(--muted-foreground)] ml-2">Current owners</span></div>
+                <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showLedger ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>
             {#if showLedger}
             <table class="w-full border-collapse text-sm">
                 <thead>
-                    <tr>
-                        <th class="text-left p-2 bg-gray-100">Address</th>
-                        <th class="text-right p-2 bg-gray-100">Owned Shares</th>
+                    <tr class="table-header">
+                        <th class="text-left p-2">Address</th>
+                        <th class="text-right p-2">Owned Shares</th>
                     </tr>
                 </thead>
                 <tbody>
                     {#if tzktShareLedgerEntries.length > 0}
                         {#each tzktShareLedgerEntries as [address, claimedShares]}
-                            <tr class="border-t">
+                            <tr class="table-row">
                                 <td class="font-mono p-2">
                                     {#if address.startsWith("KT1")}
                                         <button 
-                                            class="text-indigo-600 hover:text-indigo-800 hover:underline text-left"
+                                            class="text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left"
                                             onclick={() => {
                                                 $contractState.contractAddress = address;
                                                 handleLoadContract();
@@ -347,8 +346,8 @@
                             </tr>
                         {/each}
                     {:else}
-                        <tr class="border-t">
-                            <td class="text-center p-2 text-gray-500" colspan="2">No share ledger entries</td>
+                        <tr class="table-row">
+                            <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="2">No share ledger entries</td>
                         </tr>
                     {/if}
                 </tbody>
@@ -359,44 +358,44 @@
 
     <!-- Share Wallet Card (Prominent) -->
     {#if tzktStorageData.admin_address !== null}
-        <div class="bg-indigo-50 rounded-lg shadow p-4">
+        <div class="card">
             <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleWallet}>
-                <div class="font-semibold text-lg">Share Wallet</div>
-                <svg class="h-5 w-5 transition-transform" style="transform: rotate({showWallet ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <div class="section-header">Share Wallet</div>
+                <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showWallet ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>
             {#if showWallet}
                 <div class="space-y-4">
                     {#if tzktHeldExternalSharesEntries.length > 0}
                         {#each tzktHeldExternalSharesEntries as [_, ticket]}
-                            <div class="bg-white rounded-xl shadow-md p-5 flex flex-col gap-3 border border-violet-100">
+                            <div class="bg-[color:var(--background)] rounded-xl shadow-md p-5 flex flex-col gap-3 border border-[color:var(--border)]">
                                 <div class="grid grid-cols-2 gap-4 mt-2">
                                 <div class="flex flex-col items-stretch">
-                                    <span class="text-xs text-gray-500">Registry number</span>
-                                    <span class="text-base font-semibold">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
+                                    <span class="text-xs text-[color:var(--muted-foreground)]">Registry number</span>
+                                    <span class="text-base font-semibold text-[color:var(--foreground)]">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
                                 </div>
                                 <div class="flex flex-col items-center">
-                                    <span class="text-xs text-gray-500">Amount</span>
-                                    <span class="text-lg font-bold">
+                                    <span class="text-xs text-[color:var(--muted-foreground)]">Amount</span>
+                                    <span class="text-lg font-bold text-[color:var(--primary)]">
                                     {ticket.amount}
                                     {#if maxSharesLoading[ticket.address]}
-                                        <span class="text-xs text-gray-400 ml-2">/ ...</span>
+                                        <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ ...</span>
                                     {:else if maxSharesCache[ticket.address]}
-                                        <span class="text-xs text-gray-500 ml-2">/ {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
+                                        <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
                                     {:else}
-                                        <span class="text-xs text-gray-400 ml-2">/ ?</span>
+                                        <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ ?</span>
                                     {/if}
                                     </span>
                                 </div>
                                 </div>
                                 <div class="flex items-start justify-between">
                                     <div>
-                                        <div class="text-xs text-gray-500 font-semibold">Issuing contract</div>
-                                        <button class="font-mono text-sm break-all text-indigo-600 hover:underline" title="Load this contract" onclick={() => { $contractState.contractAddress = ticket.address; handleLoadContract(); }}>
+                                        <div class="text-xs text-[color:var(--muted-foreground)] font-semibold">Issuing contract</div>
+                                        <button class="font-mono text-sm break-all text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline" title="Load this contract" onclick={() => { $contractState.contractAddress = ticket.address; handleLoadContract(); }}>
                                             {ticket.address}
                                         </button>
                                     </div>
-                                    <button class="p-2 flex items-center gap-1 bg-violet-100 rounded hover:bg-violet-200 font-semibold text-violet-700 mt-1" title="Transfer" onclick={() => { openTransferCard = openTransferCard === ticket.address ? null : ticket.address; }}>
-                                        <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                    <button class="btn-secondary p-2 flex items-center gap-1 mt-1" title="Transfer" onclick={() => { openTransferCard = openTransferCard === ticket.address ? null : ticket.address; }}>
+                                        <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                                         <span class="text-xs">Transfer</span>
                                     </button>
                                 </div>
@@ -404,7 +403,7 @@
                                     {#key openTransferCard}
                                         <form class="mt-2 flex flex-col gap-2" onsubmit={(e) => handleTransfer(e, ticket)}>
                                             <input
-                                                class="p-2 border rounded"
+                                                class="input"
                                                 placeholder="Enter destination address"
                                                 value={transferForms[ticket.address]?.destination || ''}
                                                 oninput={(e) => {
@@ -414,7 +413,7 @@
                                                 disabled={loadingStates.transfer}
                                             />
                                             <input
-                                                class="p-2 border rounded"
+                                                class="input"
                                                 placeholder="Enter amount"
                                                 type="number"
                                                 min="1"
@@ -426,11 +425,11 @@
                                                 disabled={loadingStates.transfer}
                                             />
                                             {#if errorStates.transfer}
-                                                <div class="text-red-500 text-sm">{errorStates.transfer}</div>
+                                                <div class="text-[color:var(--destructive)]">{errorStates.transfer}</div>
                                             {/if}
                                             <button 
                                                 type="submit" 
-                                                class="px-4 py-2 bg-violet-400 text-white rounded hover:bg-violet-500 disabled:bg-violet-300"
+                                                class="btn-primary"
                                                 disabled={loadingStates.transfer}
                                             >
                                                 {#if loadingStates.transfer}
@@ -445,16 +444,16 @@
                             </div>
                         {/each}
                     {:else}
-                        <div class="text-center p-2 text-gray-500">No external shares held</div>
+                        <div class="text-center p-2 text-[color:var(--muted-foreground)]">No external shares held</div>
                     {/if}
 
                     <!-- Claim Shares Section -->
-                    <div class="mt-6 border-t pt-4">
-                        <h3 class="text-lg font-semibold mb-3">Claim Shares</h3>
+                    <div class="mt-6 border-t border-[color:var(--border)] pt-4">
+                        <h3 class="section-header">Claim Shares</h3>
                         <form class="space-y-3" onsubmit={(e) => handleClaimShares(e)}>
                             <input 
                                 type="text" 
-                                class="w-full p-2 border rounded"
+                                class="input w-full"
                                 placeholder="Enter issuing contract address to claim shares to your wallet"
                                 value={userForms.claimShares.address}
                                 oninput={(e) => {
@@ -464,11 +463,11 @@
                                 disabled={loadingStates.claimShares}
                             />
                             {#if errorStates.claimShares}
-                                <div class="text-red-500 text-sm">{errorStates.claimShares}</div>
+                                <div class="text-[color:var(--destructive)]">{errorStates.claimShares}</div>
                             {/if}
                             <button 
                                 type="submit"
-                                class="w-full px-4 py-2 bg-violet-500 text-white rounded hover:bg-violet-600 disabled:bg-violet-300"
+                                class="btn-primary w-full"
                                 disabled={loadingStates.claimShares}
                             >
                                 {#if loadingStates.claimShares}
@@ -486,30 +485,30 @@
 
     <!-- Unclaimed Share Pool Card (Less Prominent) -->
     {#if tzktStorageData.admin_address !== null}
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="card">
             <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleUnclaimed}>
-                <div class="font-medium text-base">Unclaimed Share Pool</div>
-                <svg class="h-5 w-5 transition-transform" style="transform: rotate({showUnclaimed ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <div class="section-header">Unclaimed Share Pool</div>
+                <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showUnclaimed ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>
             {#if showUnclaimed}
             <table class="w-full border-collapse text-sm">
                 <thead>
-                    <tr>
-                        <th class="text-left p-2 bg-gray-100">Issuer</th>
-                        <th class="text-right p-2 bg-gray-100">Amount</th>
+                    <tr class="table-header">
+                        <th class="text-left p-2">Issuer</th>
+                        <th class="text-right p-2">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
                     {#if tzktUnclaimedSharePoolEntries.length > 0}
                         {#each tzktUnclaimedSharePoolEntries as [_, ticket]}
-                            <tr class="border-t">
+                            <tr class="table-row">
                                 <td class="text-left p-2">{ticket.address}</td>
                                 <td class="text-right p-2">{ticket.amount}</td>
                             </tr>
                         {/each}
                     {:else}
-                        <tr class="border-t">
-                            <td class="text-center p-2 text-gray-500" colspan="2">No unclaimed shares</td>
+                        <tr class="table-row">
+                            <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="2">No unclaimed shares</td>
                         </tr>
                     {/if}
                 </tbody>
@@ -520,27 +519,27 @@
 
     <!-- Eligible Claimants Card (Less Prominent) -->
     {#if tzktStorageData.admin_address !== null}
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="card">
             <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleClaimants}>
-                <div class="font-medium text-base">Eligible Claimants</div>
-                <svg class="h-5 w-5 transition-transform" style="transform: rotate({showClaimants ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <div class="section-header">Eligible Claimants</div>
+                <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showClaimants ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>
             {#if showClaimants}
             <table class="w-full border-collapse text-sm">
                 <thead>
-                    <tr>
-                        <th class="text-left p-2 bg-gray-100">Address</th>
-                        <th class="text-right p-2 bg-gray-100">Entitled Shares</th>
+                    <tr class="table-header">
+                        <th class="text-left p-2">Address</th>
+                        <th class="text-right p-2">Entitled Shares</th>
                     </tr>
                 </thead>
                 <tbody>
                     {#if tzktEligibleClaimantsEntries.length > 0}
                         {#each tzktEligibleClaimantsEntries as [address, shares]}
-                            <tr class="border-t">
+                            <tr class="table-row">
                                 <td class="font-mono p-2">
                                     {#if address.startsWith('KT1')}
                                         <button 
-                                            class="text-indigo-600 hover:text-indigo-800 hover:underline text-left"
+                                            class="text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left"
                                             onclick={() => {
                                                 $contractState.contractAddress = address;
                                                 handleLoadContract();
@@ -556,20 +555,20 @@
                             </tr>
                         {/each}
                     {:else}
-                        <tr class="border-t">
-                            <td class="text-center p-2 text-gray-500" colspan="2">No eligible claimants registered</td>
+                        <tr class="table-row">
+                            <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="2">No eligible claimants registered</td>
                         </tr>
                     {/if}
                 </tbody>
             </table>
 
             <!-- Direct Claim Section -->
-            <div class="mt-6 border-t pt-4">
-                <h3 class="text-lg font-semibold mb-3">Direct Claim Shares</h3>
+            <div class="mt-6 border-t border-[color:var(--border)] pt-4">
+                <h3 class="section-header">Direct Claim Shares</h3>
                 <form class="space-y-3" onsubmit={(e) => handleClaimSharesDirect(e)}>
                     <input 
                         type="text" 
-                        class="w-full p-2 border rounded"
+                        class="input w-full"
                         placeholder="Enter destination address"
                         value={userForms.claimSharesDirect.destination_address}
                         oninput={(e) => {
@@ -579,11 +578,11 @@
                         disabled={loadingStates.claimSharesDirect}
                     />
                     {#if errorStates.claimSharesDirect}
-                        <div class="text-red-500 text-sm">{errorStates.claimSharesDirect}</div>
+                        <div class="text-[color:var(--destructive)]">{errorStates.claimSharesDirect}</div>
                     {/if}
                     <button 
                         type="submit"
-                        class="w-full px-4 py-2 bg-violet-500 text-white rounded hover:bg-violet-600 disabled:bg-violet-300"
+                        class="btn-primary w-full"
                         disabled={loadingStates.claimSharesDirect}
                     >
                         {#if loadingStates.claimSharesDirect}
@@ -600,10 +599,10 @@
 
     <!-- Contract Operations Card -->
     {#if $contractState.contractAddress !== null}
-        <div class="bg-orange-50 rounded-lg shadow p-4">
+        <div class="card">
             <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleAdminOps}>
-                <div class="font-semibold text-lg">Admin Operations</div>
-                <svg class="h-5 w-5 transition-transform" style="transform: rotate({showAdminOps ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <div class="section-header">Admin Operations</div>
+                <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showAdminOps ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>
             {#if showAdminOps}
                 <ContractOps />
