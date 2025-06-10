@@ -12,8 +12,9 @@ interface TransferHeldSharesArgs {
 /**
  * Transfers held shares from the current contract to a destination address.
  * Ensures wallet and contract are connected, then calls the contract entrypoint.
+ * @returns The operation hash of the transfer
  */
-export async function transferHeldShares({ amount, destination, share }: TransferHeldSharesArgs): Promise<void> {
+export async function transferHeldShares({ amount, destination, share }: TransferHeldSharesArgs): Promise<string> {
   if (!beaconState.isConnected) {
     throw new Error('Wallet not connected');
   }
@@ -27,10 +28,14 @@ export async function transferHeldShares({ amount, destination, share }: Transfe
     contract = await Tezos.wallet.at(state.contractAddress!);
     contractInstance.set(contract);
   }
+  if (!contract) {
+    throw new Error('Failed to get contract instance');
+  }
   const op = await contract.methodsObject.transfer_held_shares({
     amount,
     destination,
     share
   }).send();
-  await op.confirmation(2);
+  const result = await op.confirmation(2);
+  return result.hash;
 } 
