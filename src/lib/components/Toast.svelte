@@ -4,14 +4,14 @@
     import { cubicOut } from 'svelte/easing';
 
     const getToastClasses = (type: 'success' | 'error' | 'info') => {
-        const baseClasses = 'p-4 rounded-lg shadow-lg mb-2 flex items-start justify-between';
+        const baseClasses = 'card p-4 mb-2 flex items-start justify-between';
         switch (type) {
             case 'success':
-                return `${baseClasses} bg-green-100 text-green-800 border border-green-200`;
+                return `${baseClasses} border-l-4 border-[color:var(--primary)] bg-[color:var(--card)] text-[color:var(--primary)]`;
             case 'error':
-                return `${baseClasses} bg-red-100 text-red-800 border border-red-200`;
+                return `${baseClasses} border-l-4 border-red-500 bg-[color:var(--card)] text-red-400`;
             case 'info':
-                return `${baseClasses} bg-blue-100 text-blue-800 border border-blue-200`;
+                return `${baseClasses} border-l-4 border-[color:var(--accent)] bg-[color:var(--card)] text-[color:var(--accent)]`;
         }
     };
 
@@ -44,7 +44,7 @@
                 {/if}
             </div>
             <button 
-                class="ml-4 text-gray-500 hover:text-gray-700"
+                class="ml-4 text-[color:var(--muted-foreground)] hover:text-[color:var(--primary)]"
                 on:click={() => toastStore.remove(toast.id)}
             >
                 ×

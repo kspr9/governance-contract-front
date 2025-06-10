@@ -146,8 +146,8 @@
 
 </script>
 
-<div class="w-full max-w-xl mx-auto bg-white rounded-lg shadow p-4 mb-4 border border-solid border-indigo-600">
-  <h2 class="text-lg font-semibold mb-2">Connected wallet</h2>
+<div class="w-full max-w-xl mx-auto bg-[color:var(--card)] rounded-lg shadow p-4 mb-4 border border-[color:var(--border)]">
+  <h2 class="text-lg font-semibold mb-2 text-[color:var(--primary)]">Connected wallet</h2>
   {#if beaconState.error}
     <div class="p-2 mb-2 bg-red-100 text-red-700 rounded">
       {beaconState.error}
@@ -155,11 +155,11 @@
   {/if}
   {#if beaconState.isConnected}
     <div class="flex items-center justify-between mb-2">
-      <span class="font-mono text-sm truncate">{beaconState.address}</span>
-      <button class="px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 border border-indigo-600 ml-2" onclick={disconnectWallet}>Disconnect</button>
+      <span class="font-mono text-sm truncate text-[color:var(--foreground)]">{beaconState.address}</span>
+      <button class="px-3 py-1 rounded bg-[color:var(--muted)] text-[color:var(--primary)] hover:bg-[color:var(--card)] border border-[color:var(--border)] ml-2" onclick={disconnectWallet}>Disconnect</button>
     </div>
-    <div class="text-xs text-gray-500">Balance: {beaconState.wbalance} {tezSym}</div>
+    <div class="text-xs text-[color:var(--muted-foreground)]">Balance: {beaconState.wbalance} {tezSym}</div>
   {:else}
-    <button class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 w-full" onclick={connectWallet}>Connect Wallet</button>
+    <button class="px-4 py-2 bg-[color:var(--primary)] text-[color:var(--background)] rounded hover:bg-[color:var(--accent)] w-full border border-[color:var(--border)]" onclick={connectWallet}>Connect Wallet</button>
   {/if}
 </div>

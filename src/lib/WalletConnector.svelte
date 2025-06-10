@@ -61,21 +61,21 @@
 
 <div>
      <!-- Wallet Info -->
-     <div class="mb-8 p-4 bg-gray-100 rounded-lg">
-        <h2 class="text-2xl font-bold mb-4">Wallet Information</h2>
+     <div class="card mb-8">
+        <h2 class="section-header mb-4">Wallet Information</h2>
         {#if walletState.walletDataAvailable}
             <div class="grid grid-cols-5 gap-4">
                 <div class="col-span-4">
-                    <span class="font-semibold">Address:</span> 
-                    <span class="font-mono">{walletState.userAddress}</span>
+                    <span class="font-semibold text-[color:var(--primary)]">Address:</span> 
+                    <span class="font-mono text-[color:var(--foreground)]">{walletState.userAddress}</span>
                 </div>
                 <div class="flex justify-end">
-                    <span class="font-semibold">Balance:</span> 
-                    <span>{walletState.wbalance} {tezSym}</span>
+                    <span class="font-semibold text-[color:var(--primary)]">Balance:</span> 
+                    <span class="text-[color:var(--foreground)]">{walletState.wbalance} {tezSym}</span>
                 </div>
             </div>
         {:else}
-            <p>Loading wallet data...</p>
+            <p class="text-[color:var(--muted-foreground)]">Loading wallet data...</p>
         {/if}
     </div>
 </div>
