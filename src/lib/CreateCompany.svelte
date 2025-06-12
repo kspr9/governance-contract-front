@@ -4,7 +4,15 @@
     import { contractInstance, contractState } from './stores/contractStore.svelte';
     import { governanceStorageData } from './stores/governanceStorage.svelte';
     import { loadGovernanceContractTzkt } from './utils/governanceLoader';
+    import { loadContractTzkt } from './utils/contractLoader';
     import { onMount } from 'svelte';
+
+    // Accept the callback function as a prop
+    interface Props {
+        onViewContract: (contractAddress: string) => void;
+    }
+    
+    let { onViewContract }: Props = $props();
 
     let adminAddress: string = "";
     let maxShares: string = "";
@@ -93,6 +101,11 @@
         }
     }
 
+    function handleViewContract(contractAddress: string) {
+        // Call the parent function to switch views and set the contract address
+        onViewContract(contractAddress);
+    }
+
     // Load governance contract storage on mount
     onMount(() => {
         loadGovernanceContractTzkt(governanceContractAddress);
@@ -176,7 +189,12 @@
                 <td class="p-2">{registry}</td>
                 <td class="font-mono p-2">{address}</td>
                 <td class="p-2">
-                  <button class="btn-secondary px-3 py-1 text-xs">View</button>
+                  <button 
+                    class="btn-secondary px-3 py-1 text-xs"
+                    onclick={() => handleViewContract(address)}
+                  >
+                    View
+                  </button>
                 </td>
               </tr>
             {/each}

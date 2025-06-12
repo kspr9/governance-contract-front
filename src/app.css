@@ -4,113 +4,146 @@
  
 @layer base {
   :root {
-    --background: #0a1623;
-    --foreground: #ffffff;
-    --muted: #232B3A;
-    --muted-foreground: #ffe066;
-    --popover: #0a1623;
-    --popover-foreground: #ffffff;
-    --card: #19243a;
-    --card-foreground: #ffffff;
-    --border: #ffd600;
-    --input: #232B3A;
-    --primary: #ffd600;
-    --primary-foreground: #0a1623;
-    --secondary: #232B3A;
-    --secondary-foreground: #ffffff;
-    --accent: #ffe066;
-    --accent-foreground: #0a1623;
+    /* Styleguide Colors */
+    --background: #0A101C; /* Oxford Blue */
+    --card: #101828;       /* Charcoal */
+    --primary: #D4AF37;    /* Gold */
+    --accent: #D4AF37;     /* Gold (same as primary accent) */
+    --foreground: #F0F2F5; /* Off-White */
+    --muted: #232B3A;      /* Muted BG */
+    --muted-foreground: #8A94A6; /* Light Grey */
+    --border: #333F54;     /* Subtle Border */
     --destructive: #ff4d4f;
     --destructive-foreground: #ffffff;
-    --ring: #ffd600;
+    --success: #10B981;    /* Green */
+    --input: #0A101C;      /* Primary BG for inputs */
+    --popover: #101828;
+    --popover-foreground: #F0F2F5;
+    --primary-foreground: #101828;
+    --secondary: #232B3A;
+    --secondary-foreground: #F0F2F5;
+    --accent-foreground: #101828;
+    --ring: #D4AF37;
     --radius: 0.75rem;
-    --navy-900: #0a1623;
-    --navy-800: #14213d;
-    --navy-700: #22304a;
-    --gold-400: #ffd600;
-    --gold-300: #ffe066;
-    --gold-500: #ffd600;
   }
- 
+
   .dark {
-    --background: 224 44% 10%;
-    --foreground: 210 40% 98%;
-    --muted: 217 32% 17%;
-    --muted-foreground: 215 20% 65%;
-    --popover: 224 44% 10%;
-    --popover-foreground: 210 40% 98%;
-    --card: 224 44% 14%;
-    --card-foreground: 210 40% 98%;
-    --border: 44 100% 60%;
-    --input: 217 32% 17%;
-    --primary: 44 100% 60%;
-    --primary-foreground: 224 44% 10%;
-    --secondary: 217 32% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --accent: 44 100% 60%;
-    --accent-foreground: 224 44% 10%;
-    --destructive: 0 62% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --ring: 44 100% 60%;
+    /* Use the same palette for dark mode for now */
+    --background: #0A101C;
+    --card: #101828;
+    --primary: #D4AF37;
+    --accent: #D4AF37;
+    --foreground: #F0F2F5;
+    --muted: #232B3A;
+    --muted-foreground: #8A94A6;
+    --border: #333F54;
+    --destructive: #ff4d4f;
+    --destructive-foreground: #ffffff;
+    --success: #10B981;
+    --input: #0A101C;
+    --popover: #101828;
+    --popover-foreground: #F0F2F5;
+    --primary-foreground: #101828;
+    --secondary: #232B3A;
+    --secondary-foreground: #F0F2F5;
+    --accent-foreground: #101828;
+    --ring: #D4AF37;
   }
 }
  
 @layer base {
   * {
     @apply border-border;
+    font-family: 'Inter', sans-serif;
   }
   body {
     @apply bg-background text-foreground;
   }
 }
 
-/* Global utility classes for harmonized theme */
-.card {
+/* Card with gold accent top border */
+.card-accent {
   background: var(--card);
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   box-shadow: 0 4px 24px 0 rgba(20,33,61,0.12);
   color: var(--foreground);
   border: 1.5px solid var(--border);
-  padding: 2rem 1.5rem;
+  border-top: 4px solid var(--accent);
+  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
 }
-.btn-primary {
-  background: var(--primary);
-  color: var(--background);
+
+.card {
+  background: var(--card);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 24px 0 rgba(20,33,61,0.12);
+  color: var(--foreground);
   border: 1.5px solid var(--border);
+  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--primary-foreground);
+  border: none;
   border-radius: 0.5rem;
   font-weight: 600;
-  transition: background 0.2s;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  transition: opacity 0.2s;
+}
+.btn-accent:hover {
+  opacity: 0.9;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  transition: opacity 0.2s;
 }
 .btn-primary:hover {
-  background: var(--accent);
+  opacity: 0.9;
 }
+
 .btn-secondary {
-  background: var(--muted);
+  background: var(--card);
   color: var(--primary);
   border: 1.5px solid var(--border);
   border-radius: 0.5rem;
   font-weight: 600;
-  transition: background 0.2s;
+  font-size: 1rem;
+  padding: 0.5rem 1.25rem;
+  transition: border-color 0.2s, color 0.2s;
 }
 .btn-secondary:hover {
-  background: var(--card);
+  border-color: var(--accent);
+  color: var(--accent);
 }
+
 .input {
-  background: var(--background);
+  background: var(--input);
   color: var(--foreground);
   border: 1.5px solid var(--border);
   border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   font-size: 1rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
 .input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px var(--primary);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
 }
+
 .table-header {
   background: var(--muted);
   color: var(--primary);
+  font-weight: 600;
+  font-size: 1rem;
 }
 .table-row {
   background: var(--card);
@@ -122,4 +155,12 @@
   font-weight: 700;
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+}
+
+/* Responsive card padding */
+@media (max-width: 640px) {
+  .card, .card-accent {
+    padding: 1rem 0.5rem;
+  }
 }

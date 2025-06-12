@@ -1,3 +1,4 @@
+
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { contractState, contractInstance } from './stores/contractStore.svelte';
@@ -121,7 +122,7 @@
         }
     });
 
-    async function handleLoadContract() {
+    export async function handleLoadContract() {
         const entries = await loadContractTzkt();
         tzktEligibleClaimantsEntries = entries.eligibleClaimantsEntries;
         tzktUnclaimedSharePoolEntries = entries.unclaimedSharePoolEntries;

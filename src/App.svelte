@@ -6,12 +6,22 @@
 
   import ContractLoader from '$lib/ContractLoader.svelte';
   import NewContract from '$lib/NewContract.svelte';
-    import CreateCompany from '$lib/CreateCompany.svelte';
+  import CreateCompany from '$lib/CreateCompany.svelte';
+  import { contractState } from '$lib/stores/contractStore.svelte';
 
   let showContractLoader = true;
+  let contractLoaderRef: any;
 
   function handleToggle() {
     showContractLoader = !showContractLoader;
+  }
+
+  function handleViewContract(contractAddress: string) {
+    showContractLoader = true;
+    contractState.update(state => ({ ...state, contractAddress }));
+    setTimeout(() => {
+      contractLoaderRef?.handleLoadContract();
+    });
   }
 </script>
 
@@ -59,11 +69,11 @@
       </div> -->
       {#if showContractLoader}
         <div class="mt-4 card">
-          <ContractLoader />
+          <ContractLoader bind:this={contractLoaderRef} />
         </div>
       {:else}
         <div class="mt-4 card">
-          <CreateCompany />
+          <CreateCompany onViewContract={handleViewContract} />
         </div>
       {/if}
     </div>
