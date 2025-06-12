@@ -35,12 +35,7 @@ class BeaconWalletManager {
 
     async requestPermissions() {
         try {
-            const permissions = await this.dAppClient.requestPermissions({
-                network: {
-                    type: NetworkType.GHOSTNET,
-                    rpcUrl: "https://ghostnet.smartpy.io"
-                }
-            });
+            const permissions = await this.dAppClient.requestPermissions({});
             console.log("Got permissions:", permissions.address);
             return permissions;
         } catch (error) {

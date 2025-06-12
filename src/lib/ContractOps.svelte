@@ -14,11 +14,7 @@
     // clearly indicate that process is ongoing.
     // notify the user with the result - e.g. "Shares allocated successfully" or "Shares minted successfully"
     
-    const isAdmin = $derived(
-        beaconState.address !== null && 
-        tzktStorageData.admin_address !== null && 
-        beaconState.address === tzktStorageData.admin_address
-    );
+
  
 
     // Form states
@@ -360,6 +356,12 @@
         }
     }
 
+    const isAdmin = $derived(
+        beaconState.address !== null && 
+        tzktStorageData.admin_address !== null && 
+        beaconState.address === tzktStorageData.admin_address
+    );
+    
     // Debug effect to help track state changes
     $effect(() => {
         console.log('State Debug:', {
@@ -374,17 +376,24 @@
     <Toast />
     <!-- Always visible Connect to Contract section -->
     <div class="p-4">
-        <button 
-            onclick={connectContract}
-            class="btn-primary"
-        >
-            { $contractInstance ? "Reconnect to Contract" : "Connect to Contract" }
-        </button>
-        {#if $contractState.contractAddress}
-            <div class="mt-2 text-sm text-[color:var(--foreground)]">
-                Contract Address: {$contractState.contractAddress}
-            </div>
+        {#if !isAdmin}
+        <div class="p-4 text-[color:var(--muted-foreground)]">
+            You are not authorized admin. Only connected admin wallet can access this section.
+        </div>
+        {:else}
+            <button 
+                onclick={connectContract}
+                class="btn-primary"
+            >
+                { $contractInstance ? "Reconnect to Contract" : "Connect to Contract" }
+            </button>
+            {#if $contractState.contractAddress}
+                <div class="mt-2 text-sm text-[color:var(--foreground)]">
+                    Contract Address: {$contractState.contractAddress}
+                </div>
+            {/if}
         {/if}
+        
     </div>
 
     <!-- Provide user feedback if wallet is not connected -->

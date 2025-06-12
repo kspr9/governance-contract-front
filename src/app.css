@@ -164,3 +164,19 @@
     padding: 1rem 0.5rem;
   }
 }
+
+.btn1 {
+  @apply btn-primary; /* or copy btn-primary styles here */
+}
+.btn2 {
+  @apply btn-secondary; /* or copy btn-secondary styles here */
+}
+.btn3 {
+  @apply p-2 bg-[color:var(--muted)] rounded border border-[color:var(--border)] hover:bg-[color:var(--card)];
+}
+.btn4 {
+  @apply btn-primary w-full;
+}
+.btn5 {
+  @apply btn-secondary px-3 py-1 text-xs;
+}

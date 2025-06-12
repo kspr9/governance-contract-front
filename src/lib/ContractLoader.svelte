@@ -1,4 +1,3 @@
-
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { contractState, contractInstance } from './stores/contractStore.svelte';
@@ -11,6 +10,7 @@
     import { toastStore } from './stores/toastStore.svelte';
     import Toast from './components/Toast.svelte';
     import LoadingDots from './components/LoadingDots.svelte';
+    import { beaconState } from "./stores/beaconStore.svelte";
     
     
     // TODO: create two tabs under the 'Wallet Contract' section, where
@@ -30,8 +30,8 @@
     let tzktShareLedgerEntries = $state<[string, string][]>([]);
 
     // Collapsible state
-    let showLedger = $state(true);
-    let showWallet = $state(true);
+    let showLedger = $state(false);
+    let showWallet = $state(false);
     let showUnclaimed = $state(false);
     let showClaimants = $state(false);
 
@@ -70,7 +70,7 @@
     });
 
     // Add state for admin operations collapse
-    let showAdminOps = $state(true);
+    let showAdminOps = $state(false);
     function toggleAdminOps() { showAdminOps = !showAdminOps; }
 
     /**
@@ -107,6 +107,8 @@
         uniqueIssuers.forEach(addr => fetchMaxShares(addr));
     });
 
+
+
     /**
      * Test contracts
      * KT1SP3hazeQKE1Sk8MKaCED86GPGhyX2Jyu3
@@ -128,6 +130,7 @@
         tzktUnclaimedSharePoolEntries = entries.unclaimedSharePoolEntries;
         tzktHeldExternalSharesEntries = entries.heldExternalSharesEntries;
         tzktShareLedgerEntries = entries.shareLedgerEntries;
+        contractState.update(state => ({ ...state, isLoaded: true }));
         // Connect contract for wallet operations
         await resetProvider();
         if ($contractState.contractAddress && typeof $contractState.contractAddress === 'string') {
@@ -241,7 +244,7 @@
 <div class="space-y-6">
     <Toast />
     <!-- Contract Loading Card -->
-    <div class="bg-[color:var(--card)] border border-[color:var(--border)] rounded-lg shadow p-4">
+    <div class="bg-[color:var(--card)] border border-[color:var(--border)] rounded-sm shadow p-4">
         <div class="font-semibold text-lg mb-2 text-[color:var(--primary)]">Load your Wallet Contract</div>
         <div class="flex gap-2 mb-2">
             <input 
@@ -260,7 +263,7 @@
 
     <!-- Contract Details Card -->
     {#if tzktStorageData.admin_address !== null}
-        <div class="rounded-lg shadow p-0 overflow-hidden border border-[color:var(--border)]" style="background: linear-gradient(90deg, #232B3A 60%, #2d3650 100%);">
+        <div class="rounded-sm shadow p-0 overflow-hidden border border-[color:var(--border)]" style="background: linear-gradient(90deg, #232B3A 60%, #2d3650 100%);">
             <div class="bg-[color:var(--card)] px-6 py-4 flex items-center justify-between border-b border-[color:var(--border)]">
                 <div class="font-bold text-xl text-[color:var(--primary)]">Wallet Contract</div>
             </div>
@@ -306,183 +309,182 @@
                     </div>
                 </div>
             </div>
-        </div>
-    {/if}
 
-    <!-- Share Ledger Card (Prominent) -->
-    {#if tzktStorageData.admin_address !== null}
-        <div class="card">
-            <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleLedger}>
-                <div class="section-header">Share Ledger <span class="text-xs text-[color:var(--muted-foreground)] ml-2">Current owners</span></div>
-                <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showLedger ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
-            {#if showLedger}
-            <table class="w-full border-collapse text-sm">
-                <thead>
-                    <tr class="table-header">
-                        <th class="text-left p-2">Address</th>
-                        <th class="text-right p-2">Owned Shares</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#if tzktShareLedgerEntries.length > 0}
-                        {#each tzktShareLedgerEntries as [address, claimedShares]}
-                            <tr class="table-row">
-                                <td class="font-mono p-2">
-                                    {#if address.startsWith("KT1")}
-                                        <button 
-                                            class="text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left"
-                                            onclick={() => {
-                                                $contractState.contractAddress = address;
-                                                handleLoadContract();
-                                            }}
-                                        >
-                                            {address}
-                                        </button>
-                                    {:else}
-                                        {address}
-                                    {/if}
-                                </td>
-                                <td class="text-right p-2">{claimedShares}</td>
-                            </tr>
-                        {/each}
-                    {:else}
-                        <tr class="table-row">
-                            <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="2">No share ledger entries</td>
+            <!-- Share Ledger Card -->
+            <div class="card">
+                <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleLedger}>
+                    <div class="section-header">Share Ledger <span class="text-xs text-[color:var(--muted-foreground)] ml-2">Current owners</span></div>
+                    <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showLedger ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+                {#if showLedger}
+                <table class="w-full border-collapse text-sm">
+                    <thead>
+                        <tr class="table-header">
+                            <th class="text-left p-2">Address</th>
+                            <th class="text-right p-2">Owned Shares</th>
                         </tr>
-                    {/if}
-                </tbody>
-            </table>
-            {/if}
-        </div>
-    {/if}
+                    </thead>
+                    <tbody>
+                        {#if tzktShareLedgerEntries.length > 0}
+                            {#each tzktShareLedgerEntries as [address, claimedShares]}
+                                <tr class="table-row">
+                                    <td class="font-mono p-2">
+                                        {#if address.startsWith("KT1")}
+                                            <button 
+                                                class="text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left"
+                                                onclick={() => {
+                                                    $contractState.contractAddress = address;
+                                                    handleLoadContract();
+                                                }}
+                                            >
+                                                {address}
+                                            </button>
+                                        {:else}
+                                            {address}
+                                        {/if}
+                                    </td>
+                                    <td class="text-right p-2">{claimedShares}</td>
+                                </tr>
+                            {/each}
+                        {:else}
+                            <tr class="table-row">
+                                <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="2">No share ledger entries</td>
+                            </tr>
+                        {/if}
+                    </tbody>
+                </table>
+                {/if}
+            </div>
 
-    <!-- Share Wallet Card (Prominent) -->
-    {#if tzktStorageData.admin_address !== null}
-        <div class="card">
-            <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleWallet}>
-                <div class="section-header">Share Wallet</div>
-                <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showWallet ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
-            {#if showWallet}
-                <div class="space-y-4">
-                    {#if tzktHeldExternalSharesEntries.length > 0}
-                        {#each tzktHeldExternalSharesEntries as [_, ticket]}
-                            <div class="bg-[color:var(--background)] rounded-xl shadow-md p-5 flex flex-col gap-3 border border-[color:var(--border)]">
-                                <div class="grid grid-cols-2 gap-4 mt-2">
-                                <div class="flex flex-col items-stretch">
-                                    <span class="text-xs text-[color:var(--muted-foreground)]">Registry number</span>
-                                    <span class="text-base font-semibold text-[color:var(--foreground)]">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <span class="text-xs text-[color:var(--muted-foreground)]">Amount</span>
-                                    <span class="text-lg font-bold text-[color:var(--primary)]">
-                                    {ticket.amount}
-                                    {#if maxSharesLoading[ticket.address]}
-                                        <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ ...</span>
-                                    {:else if maxSharesCache[ticket.address]}
-                                        <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
-                                    {:else}
-                                        <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ ?</span>
-                                    {/if}
-                                    </span>
-                                </div>
-                                </div>
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <div class="text-xs text-[color:var(--muted-foreground)] font-semibold">Issuing contract</div>
-                                        <button class="font-mono text-sm break-all text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline" title="Load this contract" onclick={() => { $contractState.contractAddress = ticket.address; handleLoadContract(); }}>
-                                            {ticket.address}
+
+            <!-- Share Wallet Card -->
+            <div class="card">
+                <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleWallet}>
+                    <div class="section-header">Share Wallet</div>
+                    <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showWallet ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+                {#if showWallet}
+                    <div class="space-y-4">
+                        {#if tzktHeldExternalSharesEntries.length > 0}
+                            {#each tzktHeldExternalSharesEntries as [_, ticket]}
+                                <div class="bg-[color:var(--background)] rounded-xl shadow-md p-5 flex flex-col gap-3 border border-[color:var(--border)]">
+                                    <div class="grid grid-cols-2 gap-4 mt-2">
+                                    <div class="flex flex-col items-stretch">
+                                        <span class="text-xs text-[color:var(--muted-foreground)]">Registry number</span>
+                                        <span class="text-base font-semibold text-[color:var(--foreground)]">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-xs text-[color:var(--muted-foreground)]">Amount</span>
+                                        <span class="text-lg font-bold text-[color:var(--primary)]">
+                                        {ticket.amount}
+                                        {#if maxSharesLoading[ticket.address]}
+                                            <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ ...</span>
+                                        {:else if maxSharesCache[ticket.address]}
+                                            <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
+                                        {:else}
+                                            <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ ?</span>
+                                        {/if}
+                                        </span>
+                                    </div>
+                                    </div>
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <div class="text-xs text-[color:var(--muted-foreground)] font-semibold">Issuing contract</div>
+                                            <button class="font-mono text-sm break-all text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline" title="Load this contract" onclick={() => { $contractState.contractAddress = ticket.address; handleLoadContract(); }}>
+                                                {ticket.address}
+                                            </button>
+                                        </div>
+                                        <button class="btn-secondary p-2 flex items-center gap-1 mt-1" title="Transfer" onclick={() => { openTransferCard = openTransferCard === ticket.address ? null : ticket.address; }}>
+                                            <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                            <span class="text-xs">Transfer</span>
                                         </button>
                                     </div>
-                                    <button class="btn-secondary p-2 flex items-center gap-1 mt-1" title="Transfer" onclick={() => { openTransferCard = openTransferCard === ticket.address ? null : ticket.address; }}>
-                                        <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                                        <span class="text-xs">Transfer</span>
+                                    {#if openTransferCard === ticket.address}
+                                        {#key openTransferCard}
+                                            <form class="mt-2 flex flex-col gap-2" onsubmit={(e) => handleTransfer(e, ticket)}>
+                                                <input
+                                                    class="input"
+                                                    placeholder="Enter destination address"
+                                                    value={transferForms[ticket.address]?.destination || ''}
+                                                    oninput={(e) => {
+                                                        const val = (e.target as HTMLInputElement).value;
+                                                        transferForms[ticket.address] = { ...(transferForms[ticket.address] || { amount: '' }), destination: val };
+                                                    }}
+                                                    disabled={loadingStates.transfer}
+                                                />
+                                                <input
+                                                    class="input"
+                                                    placeholder="Enter amount"
+                                                    type="number"
+                                                    min="1"
+                                                    value={transferForms[ticket.address]?.amount || ''}
+                                                    oninput={(e) => {
+                                                        const val = (e.target as HTMLInputElement).value;
+                                                        transferForms[ticket.address] = { ...(transferForms[ticket.address] || { destination: '' }), amount: val };
+                                                    }}
+                                                    disabled={loadingStates.transfer}
+                                                />
+                                                {#if errorStates.transfer}
+                                                    <div class="text-[color:var(--destructive)]">{errorStates.transfer}</div>
+                                                {/if}
+                                                <button 
+                                                    type="submit" 
+                                                    class="btn-primary"
+                                                    disabled={loadingStates.transfer}
+                                                >
+                                                    {#if loadingStates.transfer}
+                                                        Transferring<LoadingDots />
+                                                    {:else}
+                                                        Transfer
+                                                    {/if}
+                                                </button>
+                                            </form>
+                                        {/key}
+                                    {/if}
+                                </div>
+                            {/each}
+                        {:else}
+                            <div class="text-center p-2 text-[color:var(--muted-foreground)]">No external shares held</div>
+                        {/if}
+    
+                        <!-- Claim Shares Section -->
+                        <div class="mt-6 border-t border-[color:var(--border)] pt-4">
+                            <h3 class="section-header">Claim Shares</h3>
+                            <form class="space-y-3" onsubmit={(e) => handleClaimShares(e)}>
+                                <input 
+                                    type="text" 
+                                    class="input w-full"
+                                    placeholder="Enter issuing contract address to claim shares to your wallet"
+                                    value={userForms.claimShares.address}
+                                    oninput={(e) => {
+                                        const val = (e.target as HTMLInputElement).value;
+                                        userForms.claimShares = { ...userForms.claimShares, address: val };
+                                    }}
+                                    disabled={loadingStates.claimShares}
+                                />
+                                {#if errorStates.claimShares}
+                                    <div class="text-[color:var(--destructive)]">{errorStates.claimShares}</div>
+                                {/if}
+                                <div class="flex justify-end">
+                                    <button 
+                                        type="submit"
+                                        class="btn-primary"
+                                        disabled={loadingStates.claimShares}
+                                    >
+                                        {#if loadingStates.claimShares}
+                                            Claiming<LoadingDots />
+                                        {:else}
+                                            Claim Shares
+                                        {/if}
                                     </button>
                                 </div>
-                                {#if openTransferCard === ticket.address}
-                                    {#key openTransferCard}
-                                        <form class="mt-2 flex flex-col gap-2" onsubmit={(e) => handleTransfer(e, ticket)}>
-                                            <input
-                                                class="input"
-                                                placeholder="Enter destination address"
-                                                value={transferForms[ticket.address]?.destination || ''}
-                                                oninput={(e) => {
-                                                    const val = (e.target as HTMLInputElement).value;
-                                                    transferForms[ticket.address] = { ...(transferForms[ticket.address] || { amount: '' }), destination: val };
-                                                }}
-                                                disabled={loadingStates.transfer}
-                                            />
-                                            <input
-                                                class="input"
-                                                placeholder="Enter amount"
-                                                type="number"
-                                                min="1"
-                                                value={transferForms[ticket.address]?.amount || ''}
-                                                oninput={(e) => {
-                                                    const val = (e.target as HTMLInputElement).value;
-                                                    transferForms[ticket.address] = { ...(transferForms[ticket.address] || { destination: '' }), amount: val };
-                                                }}
-                                                disabled={loadingStates.transfer}
-                                            />
-                                            {#if errorStates.transfer}
-                                                <div class="text-[color:var(--destructive)]">{errorStates.transfer}</div>
-                                            {/if}
-                                            <button 
-                                                type="submit" 
-                                                class="btn-primary"
-                                                disabled={loadingStates.transfer}
-                                            >
-                                                {#if loadingStates.transfer}
-                                                    Transferring<LoadingDots />
-                                                {:else}
-                                                    Transfer
-                                                {/if}
-                                            </button>
-                                        </form>
-                                    {/key}
-                                {/if}
-                            </div>
-                        {/each}
-                    {:else}
-                        <div class="text-center p-2 text-[color:var(--muted-foreground)]">No external shares held</div>
-                    {/if}
-
-                    <!-- Claim Shares Section -->
-                    <div class="mt-6 border-t border-[color:var(--border)] pt-4">
-                        <h3 class="section-header">Claim Shares</h3>
-                        <form class="space-y-3" onsubmit={(e) => handleClaimShares(e)}>
-                            <input 
-                                type="text" 
-                                class="input w-full"
-                                placeholder="Enter issuing contract address to claim shares to your wallet"
-                                value={userForms.claimShares.address}
-                                oninput={(e) => {
-                                    const val = (e.target as HTMLInputElement).value;
-                                    userForms.claimShares = { ...userForms.claimShares, address: val };
-                                }}
-                                disabled={loadingStates.claimShares}
-                            />
-                            {#if errorStates.claimShares}
-                                <div class="text-[color:var(--destructive)]">{errorStates.claimShares}</div>
-                            {/if}
-                            <button 
-                                type="submit"
-                                class="btn-primary w-full"
-                                disabled={loadingStates.claimShares}
-                            >
-                                {#if loadingStates.claimShares}
-                                    Claiming<LoadingDots />
-                                {:else}
-                                    Claim Shares
-                                {/if}
-                            </button>
-                        </form>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            {/if}
+                {/if}
+            </div>
         </div>
-    {/if}
+        {/if}
 
     <!-- Unclaimed Share Pool Card (Less Prominent) -->
     {#if tzktStorageData.admin_address !== null}
@@ -597,9 +599,9 @@
             {/if}
         </div>
     {/if}
-
+ 
     <!-- Contract Operations Card -->
-    {#if $contractState.contractAddress !== null}
+    {#if $contractState.contractAddress !== null && $contractState.isLoaded}
         <div class="card">
             <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleAdminOps}>
                 <div class="section-header">Admin Operations</div>

@@ -158,7 +158,7 @@
       <span class="font-mono text-sm truncate text-[color:var(--foreground)]">{beaconState.address}</span>
       <button class="px-3 py-1 rounded bg-[color:var(--muted)] text-[color:var(--primary)] hover:bg-[color:var(--card)] border border-[color:var(--border)] ml-2" onclick={disconnectWallet}>Disconnect</button>
     </div>
-    <div class="text-xs text-[color:var(--muted-foreground)]">Balance: {beaconState.wbalance} {tezSym}</div>
+    <div class="text-xs text-[color:var(--muted-foreground)]">Balance: {beaconState.wbalance?.toFixed(3)} {tezSym}</div>
   {:else}
     <button class="px-4 py-2 bg-[color:var(--primary)] text-[color:var(--background)] rounded hover:bg-[color:var(--accent)] w-full border border-[color:var(--border)]" onclick={connectWallet}>Connect Wallet</button>
   {/if}

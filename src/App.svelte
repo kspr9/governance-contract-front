@@ -40,7 +40,7 @@
           on:click={handleToggle}
         >
           <span class="text-sm font-medium">
-            {showContractLoader ? 'Create Company' : 'View Contracts'}
+            {showContractLoader ? 'Create Share Wallet' : 'View Contracts'}
           </span>
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -64,11 +64,8 @@
       <div class="mt-4">
         <WalletConnectorBeacon />
       </div>
-      <!-- <div class="mt-4">
-        <NewContract />
-      </div> -->
       {#if showContractLoader}
-        <div class="mt-4 card">
+        <div class="mt-4">
           <ContractLoader bind:this={contractLoaderRef} />
         </div>
       {:else}
