@@ -1,102 +1,45 @@
-import { type AccountInfo, DAppClient, type DAppClientOptions, NetworkType } from '@airgap/beacon-sdk';
+import { type AccountInfo, DAppClient, type DAppClientOptions, NetworkType, BeaconEvent } from '@airgap/beacon-sdk';
 import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
-import { BeaconEvent } from "@airgap/beacon-sdk";
 import { walletStore } from '$lib/stores/beaconStore.svelte';
-
+import { beaconState } from '$lib/stores/beaconStore.svelte';
 
 const rpcUrl_teztnets = "https://rpc.ghostnet.teztnets.com";
 const rpcUrl_smartpy = "https://ghostnet.smartpy.io";
 const rpcUrl_tzkt = "https://rpc.tzkt.io/ghostnet";
 const rpcUrl_mainnet = "https://rpc.tzkt.io/mainnet";
-
 const SELECTED_RPC_URL = rpcUrl_mainnet;
 
-let tezosToolkitInstance = new TezosToolkit(SELECTED_RPC_URL);
-let beaconWalletInstance = new BeaconWallet({ 
+// Singleton instances
+export const Tezos = new TezosToolkit(SELECTED_RPC_URL);
+export const wallet = new BeaconWallet({ 
     name: "Tokenshare Beacon Wallet", 
     preferredNetwork: NetworkType.MAINNET 
 });
 
+Tezos.setWalletProvider(wallet);
+walletStore.set(wallet);
 
-// Export configured instances
-export const Tezos = tezosToolkitInstance;
-export const wallet = beaconWalletInstance;
+// Subscribe to ACTIVE_ACCOUNT_SET to keep app state in sync with wallet
+wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, async (account) => {
+    console.log(`${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `, account?.address);
+    if (account) {
+        beaconState.address = account.address;
+        beaconState.isConnected = true;
+        beaconState.wbalance = await getWalletBalance(account.address);
+    } else {
+        beaconState.address = null;
+        beaconState.isConnected = false;
+        beaconState.wbalance = null;
+    }
+});
 
-// Update wallet store
-walletStore.set(beaconWalletInstance);
-
-
-// Configure Tezos toolkit with wallet
-tezosToolkitInstance.setWalletProvider(wallet);
-
-if (wallet) {
-    wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, async (account) => {
-        console.log(
-            `${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `,
-            account,
-            account?.address,
-        );
-
-        if (!account) {
-            return;
-        }
-
-        // // Re-enable the wallet provider just in case
-        // Tezos.setWalletProvider(wallet);
-    });
-}
-
-
-
-
-// const options: DAppClientOptions = {
-//     name: 'TokenshareBeaconDApp',
-//     iconUrl: 'https://taquito.io/img/favicon.svg',
-//     network: { type: NetworkType.GHOSTNET },
-//     enableMetrics: true,
-// };
-
-// let beaconDAppClientInstance: DAppClient | null = null;
-
-
-// export function getBeaconDAppClient(): DAppClient {
-//     if (beaconDAppClientInstance === null) {
-//         beaconDAppClientInstance = new DAppClient(options);
-//         console.log("Creating a new DAppClient instance");
-//     }
-//     return beaconDAppClientInstance;
-// }
-
-// export function getTezosToolkit(): TezosToolkit {
-//     if (tezosToolkitInstance === null) {
-//         tezosToolkitInstance = new TezosToolkit(rpcUrl_teztnets);
-//         console.log("Creating a new TezosToolkit instance");
-//     }
-//     return tezosToolkitInstance;
-// }
-
-// export function getBeaconWallet(): BeaconWallet {
-//     if (beaconWalletInstance === null) {
-//         beaconWalletInstance = new BeaconWallet({ 
-//             name: "Tokenshare Beacon Wallet", 
-//             preferredNetwork: NetworkType.GHOSTNET });
-//         console.log("Creating a new BeaconWallet instance");
-//         walletStore.set(beaconWalletInstance);
-//     }
-//     return beaconWalletInstance;
-// }
-
-// Helper functions
+// Helper: get active account
 export async function getActiveAccount(): Promise<AccountInfo | undefined> {
     try {
         const activeAccount = await wallet.client.getActiveAccount();
         if (activeAccount) {
-            console.log("Active account:", activeAccount.address);
-            
-            // Important: Ensure wallet provider is set
             Tezos.setWalletProvider(wallet);
-            
             return activeAccount;
         }
         return undefined;
@@ -106,10 +49,34 @@ export async function getActiveAccount(): Promise<AccountInfo | undefined> {
     }
 }
 
+// Helper: connect wallet
+export async function connectWallet() {
+    // Only request permissions if not already connected
+    const activeAccount = await wallet.client.getActiveAccount();
+    if (activeAccount) {
+        return activeAccount;
+    }
+    const permissions = await wallet.client.requestPermissions();
+    Tezos.setWalletProvider(wallet);
+    walletStore.set(wallet);
+    return permissions;
+}
+
+// Helper: disconnect wallet
+export async function disconnectWallet() {
+    await wallet.client.clearActiveAccount();
+    walletStore.set(null);
+}
+
+// Helper: get balance
+export async function getWalletBalance(address: string) {
+    const balance = await Tezos.tz.getBalance(address);
+    return balance.toNumber() / 1000000;
+}
+
 export async function resetProvider() {
     // First disconnect existing provider if any
     Tezos.setProvider({ rpc: SELECTED_RPC_URL });
     // Then set wallet provider again
     Tezos.setWalletProvider(wallet);
 }
-

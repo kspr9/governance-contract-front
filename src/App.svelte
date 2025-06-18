@@ -20,7 +20,7 @@
     showContractLoader = true;
     contractState.update(state => ({ ...state, contractAddress }));
     setTimeout(() => {
-      contractLoaderRef?.handleLoadContract();
+      contractLoaderRef?.handleLoadContract(contractAddress);
     });
   }
 </script>

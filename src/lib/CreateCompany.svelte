@@ -24,10 +24,10 @@
     let errorMsg = $state("");
 
     // The target contract address that holds the create_company entrypoint
-    const governanceContractAddress: string = "KT1DoyveycFuAXcNwRvGJy4VGGsSiskdCcU1";
+    //const governanceContractAddress: string = "KT1DoyveycFuAXcNwRvGJy4VGGsSiskdCcU1";
 
     // test-governance on mainnet
-    //const governanceContractAddress: string = "KT1A68pp2xWMSbyvVmC63oJreW6RAfotCVNE";
+    const governanceContractAddress: string = "KT1A68pp2xWMSbyvVmC63oJreW6RAfotCVNE";
 
     async function handleCreateCompany(event: Event) {
         event.preventDefault();

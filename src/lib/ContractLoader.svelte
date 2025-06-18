@@ -73,6 +73,8 @@
     let showAdminOps = $state(false);
     function toggleAdminOps() { showAdminOps = !showAdminOps; }
 
+    let contractInput = $state('');
+
     /**
      * Fetch and cache max_shares for a given issuing contract address
      */
@@ -124,7 +126,8 @@
         }
     });
 
-    export async function handleLoadContract() {
+    export async function handleLoadContract(address: string) {
+        $contractState.contractAddress = address;
         const entries = await loadContractTzkt();
         tzktEligibleClaimantsEntries = entries.eligibleClaimantsEntries;
         tzktUnclaimedSharePoolEntries = entries.unclaimedSharePoolEntries;
@@ -135,7 +138,7 @@
         await resetProvider();
         if ($contractState.contractAddress && typeof $contractState.contractAddress === 'string') {
             const contract = await import('./config/beaconConfig').then(m => m.Tezos.wallet.at($contractState.contractAddress as string));
-            contractInstance.set(await contract);
+            contractInstance.set(contract);
         }
     }
 
@@ -166,7 +169,7 @@
             transferForms[ticket.address] = { destination: '', amount: '' };
             openTransferCard = null;
             // After transfer, reload contract data
-            await handleLoadContract();
+            await handleLoadContract($contractState.contractAddress || '');
         } catch (err) {
             console.error('Transfer failed:', err);
             const errorMessage = err instanceof Error ? err.message : 'Failed to transfer shares';
@@ -197,7 +200,7 @@
             
             toastStore.add('success', 'Shares claimed successfully', result.hash);
             userForms.claimShares.address = '';
-            await handleLoadContract();
+            await handleLoadContract($contractState.contractAddress || '');
         } catch (error) {
             console.error("Failed to claim shares:", error);
             const errorMessage = error instanceof Error ? error.message : 'Failed to claim shares';
@@ -228,7 +231,7 @@
             
             toastStore.add('success', 'Direct claim of shares successful', result.hash);
             userForms.claimSharesDirect.destination_address = '';
-            await handleLoadContract();
+            await handleLoadContract($contractState.contractAddress || '');
         } catch (error) {
             console.error("Failed to claim shares directly:", error);
             const errorMessage = error instanceof Error ? error.message : 'Failed to claim shares directly';
@@ -245,16 +248,16 @@
     <Toast />
     <!-- Contract Loading Card -->
     <div class="bg-[color:var(--card)] border border-[color:var(--border)] rounded-sm shadow p-4">
-        <div class="font-semibold text-lg mb-2 text-[color:var(--primary)]">Load your Wallet Contract</div>
+        <div class="font-semibold text-lg mb-2 text-[color:var(--primary)]">Load Company Captable</div>
         <div class="flex gap-2 mb-2">
             <input 
                 class="flex-1 p-2 border rounded bg-[color:var(--background)] text-[color:var(--foreground)]" 
-                bind:value={$contractState.contractAddress} 
+                bind:value={contractInput} 
                 placeholder="Contract address" 
             />
             <button 
                 class="px-4 py-2 bg-[color:var(--primary)] text-[color:var(--background)] rounded hover:bg-[color:var(--accent)] border border-[color:var(--border)]"
-                onclick={handleLoadContract}
+                onclick={() => handleLoadContract(contractInput)}
             >
                 Load
             </button>
@@ -265,16 +268,16 @@
     {#if tzktStorageData.admin_address !== null}
         <div class="rounded-sm shadow p-0 overflow-hidden border border-[color:var(--border)]" style="background: linear-gradient(90deg, #232B3A 60%, #2d3650 100%);">
             <div class="bg-[color:var(--card)] px-6 py-4 flex items-center justify-between border-b border-[color:var(--border)]">
-                <div class="font-bold text-xl text-[color:var(--primary)]">Wallet Contract</div>
+                <div class="font-bold text-xl text-[color:var(--primary)]">Share Register for Company {tzktStorageData.registry_number}</div>
             </div>
             <div class="px-6 py-4">
                 <div class="flex items-center gap-2 mb-4">
-                    <input
+                    <div
                         class="flex-1 p-2 border rounded bg-[color:var(--background)] font-mono text-sm cursor-default select-all text-[color:var(--foreground)]"
-                        value={$contractState.contractAddress}
-                        readonly
                         style="min-width:0;"
-                    />
+                    >
+                        {$contractState.contractAddress}
+                    </div>
                     <button
                         class="p-2 bg-[color:var(--muted)] rounded hover:bg-[color:var(--card)] border border-[color:var(--border)]"
                         title="Copy contract address"
@@ -283,6 +286,16 @@
                     >
                         <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8M8 12h8m-7 8h6a2 2 0 002-2V6a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     </button>
+                    <a
+                        class="p-2 bg-[color:var(--muted)] rounded hover:bg-[color:var(--card)] border border-[color:var(--border)] ml-1 flex items-center"
+                        href={`https://better-call.dev/mainnet/${$contractState.contractAddress}/operations`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="View on TzKT Explorer"
+                        aria-label="View on TzKT Explorer"
+                    >
+                        <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 3h7m0 0v7m0-7L10 14m-4 0v7a2 2 0 002 2h7a2 2 0 002-2v-7"/></svg>
+                    </a>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
@@ -313,7 +326,7 @@
             <!-- Share Ledger Card -->
             <div class="card">
                 <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleLedger}>
-                    <div class="section-header">Share Ledger <span class="text-xs text-[color:var(--muted-foreground)] ml-2">Current owners</span></div>
+                    <div class="section-header">Share Ledger / Cap table <span class="text-xs text-[color:var(--muted-foreground)] ml-2">Current owners</span></div>
                     <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showLedger ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
                 {#if showLedger}
@@ -334,7 +347,7 @@
                                                 class="text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left"
                                                 onclick={() => {
                                                     $contractState.contractAddress = address;
-                                                    handleLoadContract();
+                                                    handleLoadContract(address);
                                                 }}
                                             >
                                                 {address}
@@ -390,7 +403,7 @@
                                     <div class="flex items-start justify-between">
                                         <div>
                                             <div class="text-xs text-[color:var(--muted-foreground)] font-semibold">Issuing contract</div>
-                                            <button class="font-mono text-sm break-all text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline" title="Load this contract" onclick={() => { $contractState.contractAddress = ticket.address; handleLoadContract(); }}>
+                                            <button class="font-mono text-sm break-all text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline" title="Load this contract" onclick={() => { $contractState.contractAddress = ticket.address; handleLoadContract(ticket.address); }}>
                                                 {ticket.address}
                                             </button>
                                         </div>
@@ -545,7 +558,7 @@
                                             class="text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left"
                                             onclick={() => {
                                                 $contractState.contractAddress = address;
-                                                handleLoadContract();
+                                                handleLoadContract(address);
                                             }}
                                         >
                                             {address}
