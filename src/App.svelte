@@ -26,7 +26,7 @@
 </script>
 
 <main class="min-h-screen bg-[color:var(--background)]">
-  <div class="max-w-3xl mx-auto bg-[color:var(--card)] shadow-lg min-h-screen rounded-xl p-2 border border-[color:var(--border)]">
+  <div class="max-w-5xl mx-auto bg-[color:var(--card)] shadow-lg min-h-screen rounded-xl p-2 border border-[color:var(--border)]">
     <!-- App Header -->
     <div class="border-b border-[color:var(--border)] p-4">
       <div class="flex items-center justify-between">

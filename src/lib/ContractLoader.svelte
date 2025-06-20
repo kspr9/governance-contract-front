@@ -13,6 +13,7 @@
     import { beaconState } from "./stores/beaconStore.svelte";
     import OwnedShareCard from './components/OwnedShareCard.svelte';
     import { fetchCompanyData } from './utils/estonianRegistry';
+    import { shareLedgerStore } from './stores/shareLedgerStore.svelte';
     
     
     // TODO: create two tabs under the 'Wallet Contract' section, where
@@ -26,13 +27,12 @@
         address: string;
     }
 
-    let tzktEligibleClaimantsEntries = $state<[string, string][]>([]);
-    let tzktUnclaimedSharePoolEntries = $state<[string, TzktTicket][]>([]);
-    let tzktHeldExternalSharesEntries = $state<[string, TzktTicket][]>([]);
-    let tzktShareLedgerEntries = $state<[string, string][]>([]);
+    let { state: shareLedgerState } = shareLedgerStore;
+
+    let sortedShareLedgerEntries = $derived([...shareLedgerState.shareLedger].sort((a, b) => Number(b[1]) - Number(a[1])));
 
     // Collapsible state
-    let showLedger = $state(false);
+    let showLedger = $state(true);
     let showWallet = $state(false);
     let showUnclaimed = $state(false);
     let showClaimants = $state(false);
@@ -84,6 +84,9 @@
     // Add error state for company data
     let companyDataError = $state<string | null>(null);
 
+    // Add cache for shareholder names
+    let shareholderNameCache = $state<Record<string, { name?: string; loading: boolean; error?: string }>>({});
+
     /**
      * Fetch and cache max_shares for a given issuing contract address
      */
@@ -107,15 +110,62 @@
         }
     }
 
+    /**
+     * Fetch shareholder name from Estonian Business Registry
+     */
+    async function fetchShareholderName(registryNumber: string) {
+        if (!registryNumber || shareholderNameCache[registryNumber]) return;
+
+        shareholderNameCache[registryNumber] = { loading: true };
+
+        try {
+            // Get credentials from environment variables
+            const username = import.meta.env.VITE_ESTONIAN_REGISTRY_USERNAME;
+            const password = import.meta.env.VITE_ESTONIAN_REGISTRY_PASSWORD;
+            
+            if (!username || !password) {
+                throw new Error('Estonian Business Registry credentials not configured');
+            }
+
+            const data = await fetchCompanyData(registryNumber, username, password);
+            if (data && data.name) {
+                shareholderNameCache[registryNumber] = { name: data.name, loading: false };
+            } else {
+                throw new Error('Company not found');
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to fetch name';
+            shareholderNameCache[registryNumber] = { error: message, loading: false };
+            console.error(`Failed to fetch shareholder name for ${registryNumber}:`, error);
+        }
+    }
+
     // On contract load, fetch max_shares for all unique issuing contracts in held_external_shares
     $effect(() => {
         const uniqueIssuers = new Set<string>();
-        for (const [_, ticket] of tzktHeldExternalSharesEntries) {
+        for (const [_, ticket] of shareLedgerState.heldExternalShares) {
             if (ticket && ticket.address) {
                 uniqueIssuers.add(ticket.address);
             }
         }
+        for (const [address, _] of shareLedgerState.shareLedger) {
+            if (address.startsWith('KT1')) {
+                uniqueIssuers.add(address);
+            }
+        }
         uniqueIssuers.forEach(addr => fetchMaxShares(addr));
+    });
+
+    // Fetch shareholder names when share ledger is updated
+    $effect(() => {
+        for (const [address, _] of shareLedgerState.shareLedger) {
+            if (address.startsWith('KT1') && maxSharesCache[address]?.registry_number) {
+                const registryNumber = maxSharesCache[address].registry_number;
+                if (registryNumber && registryNumber.length === 8) {
+                    fetchShareholderName(registryNumber);
+                }
+            }
+        }
     });
 
     /**
@@ -178,36 +228,48 @@
     */
 
     onMount(async () => {
-        try {
-            
-        } catch (err) {
-            console.error(err);
-
+        // If a contract address is already in the state on load, fetch its data
+        if ($contractState.contractAddress) {
+            handleLoadContract($contractState.contractAddress);
         }
     });
 
     export async function handleLoadContract(address: string) {
+        if (!address) return;
         $contractState.contractAddress = address;
-        const entries = await loadContractTzkt();
-        tzktEligibleClaimantsEntries = entries.eligibleClaimantsEntries;
-        tzktUnclaimedSharePoolEntries = entries.unclaimedSharePoolEntries;
-        tzktHeldExternalSharesEntries = entries.heldExternalSharesEntries;
-        tzktShareLedgerEntries = entries.shareLedgerEntries;
-        contractState.update(state => ({ ...state, isLoaded: true }));
-        // Connect contract for wallet operations
-        await resetProvider();
-        if ($contractState.contractAddress && typeof $contractState.contractAddress === 'string') {
-            const contract = await import('./config/beaconConfig').then(m => m.Tezos.wallet.at($contractState.contractAddress as string));
-            contractInstance.set(contract);
-        }
+        
+        shareLedgerStore.setLoading(true);
+        try {
+            const entries = await loadContractTzkt();
+            shareLedgerStore.set({
+                eligibleClaimants: entries.eligibleClaimantsEntries,
+                unclaimedSharePool: entries.unclaimedSharePoolEntries,
+                heldExternalShares: entries.heldExternalSharesEntries,
+                shareLedger: entries.shareLedgerEntries
+            });
+            contractState.update(state => ({ ...state, isLoaded: true }));
+            
+            // Connect contract for wallet operations
+            await resetProvider();
+            if ($contractState.contractAddress && typeof $contractState.contractAddress === 'string') {
+                const contract = await import('./config/beaconConfig').then(m => m.Tezos.wallet.at($contractState.contractAddress as string));
+                contractInstance.set(contract);
+            }
 
-        // Reset company data
-        companyData = null;
-        companyDataError = null;
+            // Reset company data
+            companyData = null;
+            companyDataError = null;
 
-        // Fetch company data if we have a registry number
-        if (tzktStorageData.registry_number) {
-            await fetchEstonianCompanyData(tzktStorageData.registry_number);
+            // Fetch company data if we have a registry number
+            if (tzktStorageData.registry_number) {
+                await fetchEstonianCompanyData(tzktStorageData.registry_number);
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to load contract data';
+            shareLedgerStore.setError(message);
+            toastStore.add('error', message);
+        } finally {
+            shareLedgerStore.setLoading(false);
         }
     }
 
@@ -313,7 +375,7 @@
                         <div class="text-sm text-[color:var(--muted-foreground)]">
                             Registry number: {tzktStorageData.registry_number}
                             {#if companyData.status}
-                                • Status: {companyData.status}
+                                Status: {companyData.status}
                             {/if}
                         </div>
                         {#if companyData.address}
@@ -339,11 +401,13 @@
                     </div>
                     <button
                         class="p-2 bg-[color:var(--muted)] rounded hover:bg-[color:var(--card)] border border-[color:var(--border)]"
-                        title="Copy contract address"
-                        aria-label="Copy contract address"
-                        onclick={() => navigator.clipboard.writeText($contractState.contractAddress || '')}
+                        title="Reload contract data"
+                        aria-label="Reload contract data"
+                        onclick={() => handleLoadContract($contractState.contractAddress || '')}
                     >
-                        <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8M8 12h8m-7 8h6a2 2 0 002-2V6a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <svg class="w-5 h-5 text-[color:var(--primary)]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                           <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" transform="scale(-1, 1) translate(-24 0)"/>
+                        </svg>
                     </button>
                     <a
                         class="p-2 bg-[color:var(--muted)] rounded hover:bg-[color:var(--card)] border border-[color:var(--border)] ml-1 flex items-center"
@@ -353,7 +417,9 @@
                         title="View on TzKT Explorer"
                         aria-label="View on TzKT Explorer"
                     >
-                        <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 3h7m0 0v7m0-7L10 14m-4 0v7a2 2 0 002 2h7a2 2 0 002-2v-7"/></svg>
+                        <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
                     </a>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-4">
@@ -389,38 +455,93 @@
                     <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showLedger ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
                 {#if showLedger}
-                <table class="w-full border-collapse text-sm">
+                <table class="w-full border-collapse text-sm table-fixed">
+                    <colgroup>
+                        <col style="width: 25%;" />
+                        <col style="width: 15%;" />
+                        <col style="width: 35%;" />
+                        <col style="width: 25%;" />
+                    </colgroup>
                     <thead>
                         <tr class="table-header">
+                            <th class="text-left p-2">Name</th>
+                            <th class="text-left p-2">Registry Number</th>
                             <th class="text-left p-2">Address</th>
                             <th class="text-right p-2">Owned Shares</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {#if tzktShareLedgerEntries.length > 0}
-                            {#each tzktShareLedgerEntries as [address, claimedShares]}
-                                <tr class="table-row">
-                                    <td class="font-mono p-2">
-                                        {#if address.startsWith("KT1")}
-                                            <button 
-                                                class="text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left"
-                                                onclick={() => {
-                                                    $contractState.contractAddress = address;
-                                                    handleLoadContract(address);
-                                                }}
-                                            >
-                                                {address}
-                                            </button>
+                        {#if shareLedgerState.loading}
+                            <tr class="table-row">
+                                <td class="text-center p-4" colspan="4">
+                                    <LoadingDots />
+                                </td>
+                            </tr>
+                        {:else if sortedShareLedgerEntries.length > 0}
+                            {#each sortedShareLedgerEntries as [address, claimedShares], i}
+                                {@const registryNumber = maxSharesCache[address]?.registry_number}
+                                {@const nameInfo = registryNumber ? shareholderNameCache[registryNumber] : undefined}
+                                <tr class="table-row" class:zebra-stripe={i % 2 !== 0}>
+                                    <td class="text-left p-2 truncate">
+                                        {#if maxSharesLoading[address]}
+                                            <LoadingDots />
+                                        {:else if registryNumber}
+                                            {#if registryNumber.length === 8}
+                                                {#if nameInfo?.loading}
+                                                    <LoadingDots />
+                                                {:else if nameInfo?.name}
+                                                    {nameInfo.name}
+                                                {:else if nameInfo?.error}
+                                                    <span class="text-[color:var(--destructive)]" title={nameInfo.error}>Error</span>
+                                                {:else}
+                                                    -
+                                                {/if}
+                                            {:else}
+                                                Private person
+                                            {/if}
                                         {:else}
-                                            {address}
+                                            -
                                         {/if}
                                     </td>
-                                    <td class="text-right p-2">{claimedShares}</td>
+                                    <td class="text-left p-2">
+                                        {#if maxSharesLoading[address]}
+                                            <LoadingDots />
+                                        {:else if registryNumber}
+                                            {registryNumber}
+                                        {:else}
+                                            -
+                                        {/if}
+                                    </td>
+                                    <td class="font-mono p-2">
+                                        <div class="flex items-center gap-2">
+                                            {#if address.startsWith("KT1")}
+                                                <button 
+                                                    class="text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left"
+                                                    onclick={() => {
+                                                        $contractState.contractAddress = address;
+                                                        handleLoadContract(address);
+                                                    }}
+                                                >
+                                                    {address}
+                                                </button>
+                                            {:else}
+                                                <span class="truncate">{address}</span>
+                                            {/if}
+                                        </div>
+                                    </td>
+                                    <td class="text-right p-2">
+                                        <span>{claimedShares}</span>
+                                        {#if tzktStorageData.max_shares && Number(tzktStorageData.max_shares) > 0}
+                                            <span class="text-[color:var(--muted-foreground)] ml-2">
+                                                ({( (Number(claimedShares) / Number(tzktStorageData.max_shares)) * 100 ).toFixed(2)}%)
+                                            </span>
+                                        {/if}
+                                    </td>
                                 </tr>
                             {/each}
                         {:else}
                             <tr class="table-row">
-                                <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="2">No share ledger entries</td>
+                                <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="4">No share ledger entries</td>
                             </tr>
                         {/if}
                     </tbody>
@@ -437,8 +558,8 @@
                 </button>
                 {#if showWallet}
                     <div class="space-y-4">
-                        {#if tzktHeldExternalSharesEntries.length > 0}
-                            {#each tzktHeldExternalSharesEntries as [_, ticket]}
+                        {#if shareLedgerState.heldExternalShares.length > 0}
+                            {#each shareLedgerState.heldExternalShares as [_, ticket]}
                                 <OwnedShareCard
                                     {ticket}
                                     {maxSharesCache}
@@ -505,8 +626,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#if tzktUnclaimedSharePoolEntries.length > 0}
-                        {#each tzktUnclaimedSharePoolEntries as [_, ticket]}
+                    {#if shareLedgerState.unclaimedSharePool.length > 0}
+                        {#each shareLedgerState.unclaimedSharePool as [_, ticket]}
                             <tr class="table-row">
                                 <td class="text-left p-2">{ticket.address}</td>
                                 <td class="text-right p-2">{ticket.amount}</td>
@@ -539,8 +660,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#if tzktEligibleClaimantsEntries.length > 0}
-                        {#each tzktEligibleClaimantsEntries as [address, shares]}
+                    {#if shareLedgerState.eligibleClaimants.length > 0}
+                        {#each shareLedgerState.eligibleClaimants as [address, shares]}
                             <tr class="table-row">
                                 <td class="font-mono p-2">
                                     {#if address.startsWith('KT1')}
@@ -617,3 +738,9 @@
     {/if}
 
 </div>
+
+<style>
+    .zebra-stripe {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+</style>

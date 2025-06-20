@@ -50,6 +50,7 @@ export async function fetchCompanyData(
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:iden="http://x-road.eu/xsd/identifiers" xmlns:prod="http://arireg.x-road.eu/producer/" xmlns:xro="http://x-road.eu/xsd/xroad.xsd">
     <soapenv:Body>
         <prod:lihtandmed_v2>
+            <prod:language>eng</prod:language> 
             <prod:keha>
                 <prod:ariregister_kasutajanimi>${username}</prod:ariregister_kasutajanimi>
                 <prod:ariregister_parool>${password}</prod:ariregister_parool>
@@ -78,7 +79,7 @@ export async function fetchCompanyData(
         }
 
         const responseText = await response.text();
-        console.log('Raw Response:', responseText);
+        //console.log('Raw Response:', responseText);
         
         // Parse the JSON response
         const jsonMatch = responseText.match(/\{"keha":.*\}/s);
