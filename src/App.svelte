@@ -8,6 +8,7 @@
   import NewContract from '$lib/NewContract.svelte';
   import CreateCompany from '$lib/CreateCompany.svelte';
   import { contractState } from '$lib/stores/contractStore.svelte';
+  import LoadContractForm from '$lib/components/LoadContractForm.svelte';
 
   let showContractLoader = true;
   let contractLoaderRef: any;
@@ -22,6 +23,12 @@
     setTimeout(() => {
       contractLoaderRef?.handleLoadContract(contractAddress);
     });
+  }
+
+  async function handleLoadContract(address: string) {
+    if (contractLoaderRef) {
+      await contractLoaderRef.handleLoadContract(address);
+    }
   }
 </script>
 
@@ -61,8 +68,11 @@
     </div>
     <!-- Main Content -->
     <div class="p-4 space-y-4">
-      <div class="mt-4">
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <WalletConnectorBeacon />
+        {#if showContractLoader}
+          <LoadContractForm {handleLoadContract} />
+        {/if}
       </div>
       {#if showContractLoader}
         <div class="mt-4">

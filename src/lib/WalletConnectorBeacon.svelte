@@ -52,7 +52,7 @@
     }
 </script>
 
-<div class="w-full max-w-md mx-auto bg-[color:var(--card)] rounded-lg shadow p-4 mb-4 border border-[color:var(--border)]">
+<div class="w-full h-full bg-[color:var(--card)] rounded-lg shadow p-4 border border-[color:var(--border)]">
     {#if beaconState.isConnected}
         <h2 class="text-lg font-semibold mb-2 text-[color:var(--primary)]">Connected account</h2>
     {/if}

@@ -73,8 +73,6 @@
     let showAdminOps = $state(false);
     function toggleAdminOps() { showAdminOps = !showAdminOps; }
 
-    let contractInput = $state('');
-
     // Add state for company data
     let companyData = $state<{ name: string; status: string; address?: string } | null>(null);
 
@@ -339,24 +337,6 @@
 
 <div class="space-y-6">
     <Toast />
-    <!-- Contract Loading Card -->
-    <div class="bg-[color:var(--card)] border border-[color:var(--border)] rounded-sm shadow p-4">
-        <div class="font-semibold text-lg mb-2 text-[color:var(--primary)]">Load Company Share Register</div>
-        <div class="flex gap-2 mb-2">
-            <input 
-                class="flex-1 p-2 border rounded bg-[color:var(--background)] text-[color:var(--foreground)]" 
-                bind:value={contractInput} 
-                placeholder="Contract address" 
-            />
-            <button 
-                class="px-4 py-2 bg-[color:var(--primary)] text-[color:var(--background)] rounded hover:bg-[color:var(--accent)] border border-[color:var(--border)]"
-                onclick={() => handleLoadContract(contractInput)}
-            >
-                Load
-            </button>
-        </div>
-    </div>
-
     <!-- Contract Details Card -->
     {#if tzktStorageData.admin_address !== null}
         <div class="rounded-sm shadow p-0 overflow-hidden border border-[color:var(--border)]" style="background: linear-gradient(90deg, #232B3A 60%, #2d3650 100%);">
