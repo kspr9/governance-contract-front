@@ -416,13 +416,13 @@
                         <!-- Mint Shares Form -->
                         <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleMintShares}>
-                                <h3 class="section-header">Mint Shares to Pool</h3>
+                                <h3 class="section-header">Issue new shares</h3>
                                 <div class="border-b border-[color:var(--border)] mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
                                         type="number" 
                                         bind:value={adminForms.mintShares.amount}
-                                        placeholder="Amount to Mint"
+                                        placeholder="Amount to Issue"
                                         class="input w-full"
                                         disabled={loadingStates.mintShares}
                                     />
@@ -436,9 +436,9 @@
                                             disabled={loadingStates.mintShares}
                                         >
                                             {#if loadingStates.mintShares}
-                                                Minting<LoadingDots />
+                                                Issuing<LoadingDots />
                                             {:else}
-                                                Mint Shares
+                                                Issue Shares
                                             {/if}
                                         </button>
                                     </div>

@@ -11,6 +11,8 @@
     import Toast from './components/Toast.svelte';
     import LoadingDots from './components/LoadingDots.svelte';
     import { beaconState } from "./stores/beaconStore.svelte";
+    import OwnedShareCard from './components/OwnedShareCard.svelte';
+    import { fetchCompanyData } from './utils/estonianRegistry';
     
     
     // TODO: create two tabs under the 'Wallet Contract' section, where
@@ -57,14 +59,12 @@
 
     // Add loading states
     let loadingStates = $state({
-        transfer: false,
         claimShares: false,
         claimSharesDirect: false
     });
 
     // Add error states
     let errorStates = $state({
-        transfer: null as string | null,
         claimShares: null as string | null,
         claimSharesDirect: null as string | null
     });
@@ -74,6 +74,15 @@
     function toggleAdminOps() { showAdminOps = !showAdminOps; }
 
     let contractInput = $state('');
+
+    // Add state for company data
+    let companyData = $state<{ name: string; status: string; address?: string } | null>(null);
+
+    // Add loading state for company data
+    let companyDataLoading = $state(false);
+
+    // Add error state for company data
+    let companyDataError = $state<string | null>(null);
 
     /**
      * Fetch and cache max_shares for a given issuing contract address
@@ -109,7 +118,58 @@
         uniqueIssuers.forEach(addr => fetchMaxShares(addr));
     });
 
-
+    /**
+     * Fetch company data from Estonian Business Registry
+     */
+    async function fetchEstonianCompanyData(registryNumber: string) {
+        companyDataLoading = true;
+        companyDataError = null;
+        
+        try {
+            console.log('Starting Estonian company data fetch for registry number:', registryNumber);
+            
+            // Get credentials from environment variables
+            const username = import.meta.env.VITE_ESTONIAN_REGISTRY_USERNAME;
+            const password = import.meta.env.VITE_ESTONIAN_REGISTRY_PASSWORD;
+            
+            // Log credential presence (not the actual values)
+            console.log('Credentials check:', {
+                hasUsername: !!username,
+                hasPassword: !!password
+            });
+            
+            if (!username || !password) {
+                throw new Error('Estonian Business Registry credentials not configured');
+            }
+            
+            console.log('Calling fetchCompanyData...');
+            const data = await fetchCompanyData(registryNumber, username, password);
+            console.log('Received company data response:', data);
+            
+            if (data) {
+                companyData = data;
+                console.log('Successfully updated company data state:', companyData);
+            } else {
+                console.log('No company data returned from API');
+                companyDataError = 'Company not found';
+            }
+        } catch (error) {
+            console.error('Failed to fetch company data:', error);
+            console.error('Error details:', {
+                message: error instanceof Error ? error.message : 'Unknown error',
+                stack: error instanceof Error ? error.stack : 'No stack trace'
+            });
+            companyDataError = error instanceof Error ? error.message : 'Failed to fetch company data';
+            toastStore.add('error', 'Failed to fetch company data from Estonian Business Registry');
+        } finally {
+            companyDataLoading = false;
+            console.log('Company data fetch completed. Final states:', {
+                companyData,
+                companyDataError,
+                companyDataLoading
+            });
+        }
+    }
 
     /**
      * Test contracts
@@ -140,43 +200,14 @@
             const contract = await import('./config/beaconConfig').then(m => m.Tezos.wallet.at($contractState.contractAddress as string));
             contractInstance.set(contract);
         }
-    }
 
-    // Transfer logic (calls contractOps or similar)
-    interface Ticket {
-        data: string;
-        amount: string;
-        address: string;
-    }
+        // Reset company data
+        companyData = null;
+        companyDataError = null;
 
-    async function handleTransfer(event: Event, ticket: Ticket) {
-        event.preventDefault();
-        const { destination, amount } = transferForms[ticket.address] || {};
-        if (!destination || !amount) return;
-        
-        loadingStates.transfer = true;
-        errorStates.transfer = null;
-        
-        try {
-            const result = await transferHeldShares({
-                amount,
-                destination,
-                share: ticket.address
-            });
-            
-            toastStore.add('success', 'Shares transferred successfully', result);
-            // Reset form and close
-            transferForms[ticket.address] = { destination: '', amount: '' };
-            openTransferCard = null;
-            // After transfer, reload contract data
-            await handleLoadContract($contractState.contractAddress || '');
-        } catch (err) {
-            console.error('Transfer failed:', err);
-            const errorMessage = err instanceof Error ? err.message : 'Failed to transfer shares';
-            errorStates.transfer = errorMessage;
-            toastStore.add('error', errorMessage);
-        } finally {
-            loadingStates.transfer = false;
+        // Fetch company data if we have a registry number
+        if (tzktStorageData.registry_number) {
+            await fetchEstonianCompanyData(tzktStorageData.registry_number);
         }
     }
 
@@ -248,7 +279,7 @@
     <Toast />
     <!-- Contract Loading Card -->
     <div class="bg-[color:var(--card)] border border-[color:var(--border)] rounded-sm shadow p-4">
-        <div class="font-semibold text-lg mb-2 text-[color:var(--primary)]">Load Company Captable</div>
+        <div class="font-semibold text-lg mb-2 text-[color:var(--primary)]">Load Company Share Register</div>
         <div class="flex gap-2 mb-2">
             <input 
                 class="flex-1 p-2 border rounded bg-[color:var(--background)] text-[color:var(--foreground)]" 
@@ -268,7 +299,35 @@
     {#if tzktStorageData.admin_address !== null}
         <div class="rounded-sm shadow p-0 overflow-hidden border border-[color:var(--border)]" style="background: linear-gradient(90deg, #232B3A 60%, #2d3650 100%);">
             <div class="bg-[color:var(--card)] px-6 py-4 flex items-center justify-between border-b border-[color:var(--border)]">
-                <div class="font-bold text-xl text-[color:var(--primary)]">Share Register for Company {tzktStorageData.registry_number}</div>
+                <div>
+                    <div class="font-bold text-xl text-[color:var(--primary)]">
+                        {#if companyDataLoading}
+                            Loading company data<LoadingDots />
+                        {:else if companyData}
+                            {companyData.name}
+                        {:else}
+                            Share Register for Company {tzktStorageData.registry_number}
+                        {/if}
+                    </div>
+                    {#if companyData}
+                        <div class="text-sm text-[color:var(--muted-foreground)]">
+                            Registry number: {tzktStorageData.registry_number}
+                            {#if companyData.status}
+                                • Status: {companyData.status}
+                            {/if}
+                        </div>
+                        {#if companyData.address}
+                            <div class="text-sm text-[color:var(--muted-foreground)]">
+                                {companyData.address}
+                            </div>
+                        {/if}
+                    {/if}
+                    {#if companyDataError}
+                        <div class="text-sm text-[color:var(--destructive)]">
+                            {companyDataError}
+                        </div>
+                    {/if}
+                </div>
             </div>
             <div class="px-6 py-4">
                 <div class="flex items-center gap-2 mb-4">
@@ -380,81 +439,12 @@
                     <div class="space-y-4">
                         {#if tzktHeldExternalSharesEntries.length > 0}
                             {#each tzktHeldExternalSharesEntries as [_, ticket]}
-                                <div class="bg-[color:var(--background)] rounded-xl shadow-md p-5 flex flex-col gap-3 border border-[color:var(--border)]">
-                                    <div class="grid grid-cols-2 gap-4 mt-2">
-                                    <div class="flex flex-col items-stretch">
-                                        <span class="text-xs text-[color:var(--muted-foreground)]">Registry number</span>
-                                        <span class="text-base font-semibold text-[color:var(--foreground)]">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
-                                    </div>
-                                    <div class="flex flex-col items-center">
-                                        <span class="text-xs text-[color:var(--muted-foreground)]">Amount</span>
-                                        <span class="text-lg font-bold text-[color:var(--primary)]">
-                                        {ticket.amount}
-                                        {#if maxSharesLoading[ticket.address]}
-                                            <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ ...</span>
-                                        {:else if maxSharesCache[ticket.address]}
-                                            <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
-                                        {:else}
-                                            <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ ?</span>
-                                        {/if}
-                                        </span>
-                                    </div>
-                                    </div>
-                                    <div class="flex items-start justify-between">
-                                        <div>
-                                            <div class="text-xs text-[color:var(--muted-foreground)] font-semibold">Issuing contract</div>
-                                            <button class="font-mono text-sm break-all text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline" title="Load this contract" onclick={() => { $contractState.contractAddress = ticket.address; handleLoadContract(ticket.address); }}>
-                                                {ticket.address}
-                                            </button>
-                                        </div>
-                                        <button class="btn-secondary p-2 flex items-center gap-1 mt-1" title="Transfer" onclick={() => { openTransferCard = openTransferCard === ticket.address ? null : ticket.address; }}>
-                                            <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                                            <span class="text-xs">Transfer</span>
-                                        </button>
-                                    </div>
-                                    {#if openTransferCard === ticket.address}
-                                        {#key openTransferCard}
-                                            <form class="mt-2 flex flex-col gap-2" onsubmit={(e) => handleTransfer(e, ticket)}>
-                                                <input
-                                                    class="input"
-                                                    placeholder="Enter destination address"
-                                                    value={transferForms[ticket.address]?.destination || ''}
-                                                    oninput={(e) => {
-                                                        const val = (e.target as HTMLInputElement).value;
-                                                        transferForms[ticket.address] = { ...(transferForms[ticket.address] || { amount: '' }), destination: val };
-                                                    }}
-                                                    disabled={loadingStates.transfer}
-                                                />
-                                                <input
-                                                    class="input"
-                                                    placeholder="Enter amount"
-                                                    type="number"
-                                                    min="1"
-                                                    value={transferForms[ticket.address]?.amount || ''}
-                                                    oninput={(e) => {
-                                                        const val = (e.target as HTMLInputElement).value;
-                                                        transferForms[ticket.address] = { ...(transferForms[ticket.address] || { destination: '' }), amount: val };
-                                                    }}
-                                                    disabled={loadingStates.transfer}
-                                                />
-                                                {#if errorStates.transfer}
-                                                    <div class="text-[color:var(--destructive)]">{errorStates.transfer}</div>
-                                                {/if}
-                                                <button 
-                                                    type="submit" 
-                                                    class="btn-primary"
-                                                    disabled={loadingStates.transfer}
-                                                >
-                                                    {#if loadingStates.transfer}
-                                                        Transferring<LoadingDots />
-                                                    {:else}
-                                                        Transfer
-                                                    {/if}
-                                                </button>
-                                            </form>
-                                        {/key}
-                                    {/if}
-                                </div>
+                                <OwnedShareCard
+                                    {ticket}
+                                    {maxSharesCache}
+                                    {maxSharesLoading}
+                                    {handleLoadContract}
+                                />
                             {/each}
                         {:else}
                             <div class="text-center p-2 text-[color:var(--muted-foreground)]">No external shares held</div>
@@ -503,7 +493,7 @@
     {#if tzktStorageData.admin_address !== null}
         <div class="card">
             <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleUnclaimed}>
-                <div class="section-header">Unclaimed Share Pool</div>
+                <div class="section-header">Treasury Shares</div>
                 <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showUnclaimed ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>
             {#if showUnclaimed}
