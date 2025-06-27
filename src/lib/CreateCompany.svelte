@@ -6,6 +6,8 @@
     import { loadGovernanceContractTzkt } from './utils/governanceLoader';
     import { loadContractTzkt } from './utils/contractLoader';
     import { onMount } from 'svelte';
+    import { terminology } from './terminology';
+    import HelpTip from './components/HelpTip.svelte';
 
     // Accept the callback function as a prop
     interface Props {
@@ -115,11 +117,13 @@
 <div class="container mx-auto p-4">
     
     <form onsubmit={handleCreateCompany} class="space-y-4 p-4 border rounded card">
-      <h2 class="section-header">Deploy a new Company Share Wallet</h2>
+      <h2 class="section-header">{terminology.CREATE_SHARE_WALLET}
+        <HelpTip text="Create a new digital share register for a company" />
+      </h2>
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">Company Admin Address</label>
+        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">{terminology.ADMIN_ADDRESS}</label>
         <input
           type="text"
           bind:value={adminAddress}
@@ -131,7 +135,7 @@
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">Max Shares</label>
+        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">{terminology.MAX_SHARES}</label>
         <input
           type="number"
           bind:value={maxShares}
@@ -143,7 +147,7 @@
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">Registry Number</label>
+        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">{terminology.REGISTRY_NUMBER}</label>
         <input
           type="number"
           bind:value={registryNumber}
@@ -172,7 +176,7 @@
 
     <!-- Deployed Wallet Contracts Table -->
     <div class="mt-8 card">
-      <div class="section-header mb-2">Deployed Wallet Contracts</div>
+      <div class="section-header mb-2">Deployed Share Registers</div>
       <div class="text-sm text-[color:var(--muted-foreground)] mb-4">View all wallet contracts that have been deployed from the governance contract.</div>
       <table class="w-full border-collapse text-sm">
         <thead>

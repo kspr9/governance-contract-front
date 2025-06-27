@@ -7,8 +7,9 @@
     import { loadContractTzkt } from './utils/contractLoader';
     import { toastStore } from './stores/toastStore.svelte';
     import Toast from './components/Toast.svelte';
-    import { onMount, onDestroy } from "svelte";
+import { onMount, onDestroy } from "svelte";
     import LoadingDots from './components/LoadingDots.svelte';
+    import HelpTip from './components/HelpTip.svelte';
 
     // TODO: add a loading visual to appear each time when an entrypoint is called but result is not yet received
     // clearly indicate that process is ongoing.
@@ -627,6 +628,39 @@
                     </div>
                 {/if}
             {/if}
+            
+            <!-- Direct Share Transfer Section (Admin Function) -->
+            <div class="card mb-2">
+                <h3 class="section-header">Send Allocated Shares
+                    <HelpTip text="Send shares that have been allocated to a designated wallet address (admin function)" />
+                </h3>
+                <div class="border-b border-[color:var(--border)] mb-4"></div>
+                <form class="space-y-3" onsubmit={(e) => handleClaimSharesDirect(e)}>
+                    <input 
+                        type="text" 
+                        class="input w-full"
+                        placeholder="Enter destination wallet address"
+                        bind:value={userForms.claimSharesDirect.destination_address}
+                        disabled={loadingStates.claimSharesDirect}
+                    />
+                    {#if errorStates.claimSharesDirect}
+                        <div class="text-[color:var(--destructive)]">{errorStates.claimSharesDirect}</div>
+                    {/if}
+                    <div class="flex justify-end">
+                        <button 
+                            type="submit"
+                            class="btn-primary min-w-[140px]"
+                            disabled={loadingStates.claimSharesDirect}
+                        >
+                            {#if loadingStates.claimSharesDirect}
+                                Sending<LoadingDots />
+                            {:else}
+                                Send Shares
+                            {/if}
+                        </button>
+                    </div>
+                </form>
+            </div>
 
         </div>
     {/if}

@@ -3,6 +3,8 @@
     import LoadingDots from './LoadingDots.svelte';
     import type { TzktTicket } from '../types/contract';
     import { transferHeldShares } from '../utils/contractActions';
+    import { terminology } from '../terminology';
+    import HelpTip from './HelpTip.svelte';
 
     let { ticket, maxSharesCache, maxSharesLoading, handleLoadContract } = $props<{
         ticket: TzktTicket;
@@ -64,11 +66,11 @@
 <div class="bg-[color:var(--background)] rounded-xl shadow-md p-5 flex flex-col gap-3 border border-[color:var(--border)]">
     <div class="grid grid-cols-2 gap-4 mt-2">
         <div class="flex flex-col items-stretch">
-            <span class="text-xs text-[color:var(--muted-foreground)]">Registry number</span>
+            <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.REGISTRY_NUMBER}</span>
             <span class="text-base font-semibold text-[color:var(--foreground)]">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
         </div>
         <div class="flex flex-col items-center">
-            <span class="text-xs text-[color:var(--muted-foreground)]">Amount</span>
+            <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.AMOUNT}</span>
             <span class="text-lg font-bold text-[color:var(--primary)]">
                 {ticket.amount}
                 {#if maxSharesLoading[ticket.address]}
@@ -83,7 +85,10 @@
     </div>
     <div class="flex items-start justify-between">
         <div>
-            <div class="text-xs text-[color:var(--muted-foreground)] font-semibold">Issuing contract</div>
+            <div class="text-xs text-[color:var(--muted-foreground)] font-semibold flex items-center">
+                {terminology.ISSUING_CONTRACT}
+                <HelpTip text="The share register where these shares were issued" />
+            </div>
             <button 
                 class="font-mono text-sm break-all text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline" 
                 title="Load this contract" 
@@ -103,20 +108,20 @@
             <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
             </svg>
-            <span class="text-xs">Transfer</span>
+            <span class="text-xs">{terminology.TRANSFER_SHARES}</span>
         </button>
     </div>
     {#if openTransferCard}
         <form class="mt-2 flex flex-col gap-2" onsubmit={handleTransfer}>
             <input
                 class="input"
-                placeholder="Enter destination address"
+                placeholder={terminology.DESTINATION_ADDRESS}
                 bind:value={transferForm.destination}
                 disabled={loadingState}
             />
             <input
                 class="input"
-                placeholder="Enter amount"
+                placeholder={terminology.AMOUNT}
                 type="number"
                 min="1"
                 bind:value={transferForm.amount}

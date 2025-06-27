@@ -9,6 +9,7 @@
   import CreateCompany from '$lib/CreateCompany.svelte';
   import { contractState } from '$lib/stores/contractStore.svelte';
   import LoadContractForm from '$lib/components/LoadContractForm.svelte';
+  import { terminology } from '$lib/terminology';
 
   let showContractLoader = true;
   let contractLoaderRef: any;
@@ -47,7 +48,7 @@
           on:click={handleToggle}
         >
           <span class="text-sm font-medium">
-            {showContractLoader ? 'Create Share Wallet' : 'View Contracts'}
+            {showContractLoader ? terminology.DEPLOY_CONTRACT : terminology.VIEW_CONTRACTS}
           </span>
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
