@@ -48,7 +48,7 @@
           on:click={handleToggle}
         >
           <span class="text-sm font-medium">
-            {showContractLoader ? terminology.DEPLOY_CONTRACT : terminology.VIEW_CONTRACTS}
+            {showContractLoader ? terminology.MANAGE_DEPLOYED_WALLETS : terminology.VIEW_CONTRACTS}
           </span>
           <svg 
             xmlns="http://www.w3.org/2000/svg" 

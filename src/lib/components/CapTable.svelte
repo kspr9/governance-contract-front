@@ -60,7 +60,7 @@
         <tr class="table-header">
           <th class="text-left p-2">Name</th>
           <th class="text-left p-2">{terminology.REGISTRY_NUMBER}</th>
-          <th class="text-left p-2">Address</th>
+          <th class="text-left p-2">Wallet Address</th>
           <th class="text-right p-2">Owned Shares</th>
         </tr>
       </thead>

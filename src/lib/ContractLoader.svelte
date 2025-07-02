@@ -342,8 +342,7 @@
         </DashboardTabs>
     {:else}
         <div class="p-4 text-center text-[color:var(--muted-foreground)]">
-            Loading contract data...
-        </div>
+            Register not loaded yet        </div>
     {/if}
 
 </div>

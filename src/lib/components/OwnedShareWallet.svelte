@@ -115,7 +115,7 @@
       <input 
         type="text" 
         class="input w-full"
-        placeholder="Enter the issuing contract address to claim your allocated shares"
+        placeholder="Enter the issuing register's address to claim your allocated shares"
         bind:value={userForms.claimShares.address}
         disabled={loadingStates.claimShares}
       />

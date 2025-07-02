@@ -161,7 +161,7 @@
         {#if isLoading}
           Sending...
         {:else}
-          Create a Company
+          Deploy new Company Share Register
         {/if}
       </button>
     

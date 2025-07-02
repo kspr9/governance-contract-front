@@ -24,7 +24,7 @@
 </script>
 
 {#if tzktStorageData.admin_address !== null}
-<div class="rounded-sm shadow p-0 overflow-hidden border border-[color:var(--border)]" style="background: linear-gradient(90deg, #232B3A 60%, #2d3650 100%);">
+<div class="rounded-sm shadow p-0 border border-[color:var(--border)]" style="background: linear-gradient(90deg, #232B3A 60%, #2d3650 100%);">
   <div class="bg-[color:var(--card)] px-6 py-4 flex items-center justify-between border-b border-[color:var(--border)]">
     <div>
       <div class="font-bold text-xl text-[color:var(--primary)]">

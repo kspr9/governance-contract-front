@@ -9,6 +9,7 @@ export const terminology = {
   VIEW_CONTRACTS: "View Share Registers", 
   LOAD_CONTRACT: "Open Share Register",
   CREATE_SHARE_WALLET: "Deploy New Register",
+  MANAGE_DEPLOYED_WALLETS: "Manage Deployed Registers",
   
   // Contract Operations - User Actions
   CLAIM_SHARES: "Claim Allocated Shares",
@@ -66,7 +67,7 @@ export const terminology = {
   TAB_ADMIN: "Company Management",
   
   // Help Text
-  HELP_CLAIM_SHARES: "Claim shares that have been allocated to your wallet contract by entering the issuing contract address",
+  HELP_CLAIM_SHARES: "Claim shares that have been allocated to you by entering the issuing register's address",
   HELP_CLAIM_SHARES_DIRECT: "Send allocated shares to any designated wallet address (admin function)",
   HELP_TRANSFER_SHARES: "Send your shares to another wallet or share register",
   HELP_ISSUE_SHARES: "Create new shares and add them to the unallocated pool",
