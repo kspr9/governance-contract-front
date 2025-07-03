@@ -4,7 +4,7 @@
    * Provides tabbed interface for Wallet, Share Register, and Company Admin views
    */
   
-  import { terminology } from '../terminology';
+  import { terminology } from '../utils/terminology';
   import { beaconState } from '../stores/beaconStore.svelte';
   import { tzktStorageData } from '../stores/tzktStorage.svelte';
   import HelpTip from './HelpTip.svelte';

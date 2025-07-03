@@ -8,7 +8,7 @@
   import { tzktStorageData } from '../stores/tzktStorage.svelte';
   import { contractState } from '../stores/contractStore.svelte';
   import LoadingDots from './LoadingDots.svelte';
-  import { terminology } from '../terminology';
+  import { terminology } from '../utils/terminology';
   import HelpTip from './HelpTip.svelte';
   
   let { 

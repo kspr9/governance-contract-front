@@ -3,7 +3,7 @@
     import LoadingDots from './LoadingDots.svelte';
     import type { TzktTicket } from '../types/contract';
     import { transferHeldShares } from '../utils/contractActions';
-    import { terminology } from '../terminology';
+    import { terminology } from '../utils/terminology';
     import HelpTip from './HelpTip.svelte';
 
     let { ticket, maxSharesCache, maxSharesLoading, handleLoadContract } = $props<{
@@ -63,7 +63,7 @@
     }
 </script>
 
-<div class="bg-[color:var(--background)] rounded-xl shadow-md p-5 flex flex-col gap-3 border border-[color:var(--border)]">
+<div class="bg-[color:var(--card)] rounded-[var(--radius)] shadow-md p-5 flex flex-col gap-3 border border-[color:var(--border)]">
     <div class="grid grid-cols-2 gap-4 mt-2">
         <div class="flex flex-col items-stretch">
             <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.REGISTRY_NUMBER}</span>

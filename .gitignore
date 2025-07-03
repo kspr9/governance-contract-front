@@ -5,3 +5,5 @@ dist/
 package-lock.json
 lovable-conf.txt
 .env
+*.png
+context-and-plan.md

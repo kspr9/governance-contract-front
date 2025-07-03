@@ -6,7 +6,7 @@
     import { loadGovernanceContractTzkt } from './utils/governanceLoader';
     import { loadContractTzkt } from './utils/contractLoader';
     import { onMount } from 'svelte';
-    import { terminology } from './terminology';
+    import { terminology } from './utils/terminology';
     import HelpTip from './components/HelpTip.svelte';
 
     // Accept the callback function as a prop

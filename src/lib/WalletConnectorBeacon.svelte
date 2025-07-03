@@ -52,13 +52,13 @@
     }
 </script>
 
-<div class="w-full h-full bg-[color:var(--card)] rounded-lg shadow p-4 border border-[color:var(--border)]">
+<div class="w-full h-full bg-[color:var(--card)] rounded-[var(--radius)] shadow p-4 border border-[color:var(--border)]">
     {#if beaconState.isConnected}
         <h2 class="text-lg font-semibold mb-2 text-[color:var(--primary)]">Connected account</h2>
     {/if}
 
     {#if beaconState.error}
-        <div class="p-2 mb-2 bg-red-100 text-red-700 rounded">
+        <div class="p-2 mb-2 bg-red-100 text-red-700 rounded-[calc(var(--radius)*0.5)]">
             {beaconState.error}
         </div>
     {/if}
@@ -66,7 +66,7 @@
     {#if beaconState.isConnected}
         <div class="flex items-center justify-between mb-2">
             <span class="font-mono text-sm truncate text-[color:var(--foreground)]">{beaconState.address}</span>
-            <button class="px-3 py-1 rounded bg-[color:var(--muted)] text-[color:var(--primary)] hover:bg-[color:var(--card)] border border-[color:var(--border)] ml-2" onclick={handleDisconnectWallet}>
+            <button class="btn-secondary" onclick={handleDisconnectWallet}>
                 Log out
             </button>
         </div>
@@ -77,7 +77,7 @@
                 <h2 class="text-lg font-semibold text-[color:var(--primary)]">Connected account</h2>
                 <div class="text-sm text-[color:var(--muted-foreground)] mt-1">To interact with Share Register, <br>connect your personal wallet.</div>
             </div>
-            <button class="px-4 py-2 bg-[color:var(--primary)] text-[color:var(--background)] rounded hover:bg-[color:var(--accent)] border border-[color:var(--border)]" onclick={handleConnectWallet}>
+            <button class="btn-primary" onclick={handleConnectWallet}>
                 Log in with wallet
             </button>
         </div>

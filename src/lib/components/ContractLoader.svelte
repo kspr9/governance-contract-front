@@ -1,22 +1,22 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import { contractState, contractInstance } from './stores/contractStore.svelte';
-    import { tzktStorageData } from './stores/tzktStorage.svelte';
+    import { contractState, contractInstance } from '../stores/contractStore.svelte';
+    import { tzktStorageData } from '../stores/tzktStorage.svelte';
     import ContractOps from "./ContractOps.svelte";
-    import { loadContractTzkt } from './utils/contractLoader';
-    import CreateCompany from "./CreateCompany.svelte";
-    import { transferHeldShares } from './utils/contractActions';
-    import { resetProvider } from './config/beaconConfig';
-    import { toastStore } from './stores/toastStore.svelte';
-    import Toast from './components/Toast.svelte';
-    import LoadingDots from './components/LoadingDots.svelte';
-    import { beaconState } from "./stores/beaconStore.svelte";
-    import { fetchCompanyData } from './utils/estonianRegistry';
-    import { shareLedgerStore } from './stores/shareLedgerStore.svelte';
-    import ContractSummary from './components/ContractSummary.svelte';
-    import DashboardTabs from './components/DashboardTabs.svelte';
-    import OwnedShareWallet from './components/OwnedShareWallet.svelte';
-    import CapTable from './components/CapTable.svelte';
+    import { loadContractTzkt } from '../utils/contractLoader';
+    import CreateCompany from "../CreateCompany.svelte";
+    import { transferHeldShares } from '../utils/contractActions';
+    import { resetProvider } from '../config/beaconConfig';
+    import { toastStore } from '../stores/toastStore.svelte';
+    import Toast from './Toast.svelte';
+    import LoadingDots from './LoadingDots.svelte';
+    import { beaconState } from "../stores/beaconStore.svelte";
+    import { fetchCompanyData } from '../utils/estonianRegistry';
+    import { shareLedgerStore } from '../stores/shareLedgerStore.svelte';
+    import ContractSummary from './ContractSummary.svelte';
+    import DashboardTabs from './DashboardTabs.svelte';
+    import OwnedShareWallet from './OwnedShareWallet.svelte';
+    import CapTable from './CapTable.svelte';
     
     
     // TODO: create two tabs under the 'Wallet Contract' section, where
@@ -250,7 +250,7 @@
             // Connect contract for wallet operations
             await resetProvider();
             if ($contractState.contractAddress && typeof $contractState.contractAddress === 'string') {
-                const contract = await import('./config/beaconConfig').then(m => m.Tezos.wallet.at($contractState.contractAddress as string));
+                const contract = await import('../config/beaconConfig').then(m => m.Tezos.wallet.at($contractState.contractAddress as string));
                 contractInstance.set(contract);
             }
 

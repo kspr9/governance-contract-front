@@ -7,7 +7,7 @@
   import { contractState } from '../stores/contractStore.svelte';
   import { tzktStorageData } from '../stores/tzktStorage.svelte';
   import LoadingDots from './LoadingDots.svelte';
-  import { terminology } from '../terminology';
+  import { terminology } from '../utils/terminology';
   import HelpTip from './HelpTip.svelte';
   
   let { 
@@ -24,8 +24,8 @@
 </script>
 
 {#if tzktStorageData.admin_address !== null}
-<div class="rounded-sm shadow p-0 border border-[color:var(--border)]" style="background: linear-gradient(90deg, #232B3A 60%, #2d3650 100%);">
-  <div class="bg-[color:var(--card)] px-6 py-4 flex items-center justify-between border-b border-[color:var(--border)]">
+<div class="rounded-lg shadow p-0 border border-[color:var(--border)] bg-[color:var(--card)]">
+  <div class="px-6 py-4 flex items-center justify-between border-b border-[color:var(--border)]">
     <div>
       <div class="font-bold text-xl text-[color:var(--primary)]">
         {#if companyDataLoading}
@@ -57,9 +57,10 @@
     </div>
   </div>
   <div class="px-6 py-4">
+    <div class="text-sm text-[color:var(--muted-foreground)]">Registry address</div>
     <div class="flex items-center gap-2 mb-4">
       <div
-        class="flex-1 p-2 border rounded bg-[color:var(--background)] font-mono text-sm cursor-default select-all text-[color:var(--foreground)]"
+        class="flex-1 p-2 border rounded bg-[color:var(--muted)] font-mono text-sm cursor-default select-all text-[color:var(--foreground)]"
         style="min-width:0;"
       >
         {$contractState.contractAddress}

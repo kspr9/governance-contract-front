@@ -11,7 +11,7 @@
   import { toastStore } from '../stores/toastStore.svelte';
   import OwnedShareCard from './OwnedShareCard.svelte';
   import LoadingDots from './LoadingDots.svelte';
-  import { terminology } from '../terminology';
+  import { terminology } from '../utils/terminology';
   import HelpTip from './HelpTip.svelte';
   
   let { 

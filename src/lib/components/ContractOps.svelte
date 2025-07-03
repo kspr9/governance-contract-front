@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { contractState, contractInstance } from './stores/contractStore.svelte';
-    import { tzktStorageData } from './stores/tzktStorage.svelte';
-    import { beaconState, walletStore } from './stores/beaconStore.svelte';
+    import { contractState, contractInstance } from '../stores/contractStore.svelte';
+    import { tzktStorageData } from '../stores/tzktStorage.svelte';
+    import { beaconState, walletStore } from '../stores/beaconStore.svelte';
     import { get } from "svelte/store";
-    import { Tezos, wallet, resetProvider } from './config/beaconConfig';
-    import { loadContractTzkt } from './utils/contractLoader';
-    import { toastStore } from './stores/toastStore.svelte';
-    import Toast from './components/Toast.svelte';
-import { onMount, onDestroy } from "svelte";
-    import LoadingDots from './components/LoadingDots.svelte';
-    import HelpTip from './components/HelpTip.svelte';
+    import { Tezos, wallet, resetProvider } from '../config/beaconConfig';
+    import { loadContractTzkt } from '../utils/contractLoader';
+    import { toastStore } from '../stores/toastStore.svelte';
+    import Toast from './Toast.svelte';
+    import { onMount, onDestroy } from "svelte";
+    import LoadingDots from './LoadingDots.svelte';
+    import HelpTip from './HelpTip.svelte';
 
     // TODO: add a loading visual to appear each time when an entrypoint is called but result is not yet received
     // clearly indicate that process is ongoing.

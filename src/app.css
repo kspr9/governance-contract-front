@@ -3,8 +3,45 @@
 @tailwind utilities;
  
 @layer base {
+  /* Default theme - Light Blue Theme */
   :root {
-    /* Styleguide Colors */
+    --background: #e7e7e7; /* Light grey background */
+    --card: #FFFFFF;       /* White cards */
+    --primary: #1E88E5;    /* Brighter blue primary */
+    --accent: #2196F3;     /* Brighter blue accent */
+    --foreground: #1E293B; /* Dark text */
+    --muted: #F1F5F9;      /* Light grey muted */
+    --muted-foreground: #64748B; /* Grey text */
+    --border: #E2E8F0;     /* Light border */
+    --destructive: #EF4444;
+    --destructive-foreground: #ffffff;
+    --success: #10B981;    /* Green */
+    --input: #FFFFFF;      /* White inputs */
+    --popover: #FFFFFF;
+    --popover-foreground: #1E293B;
+    --primary-foreground: #FFFFFF;
+    --secondary: #F1F5F9;
+    --secondary-foreground: #1E293B;
+    --accent-foreground: #FFFFFF;
+    --ring: #2196F3;
+    --radius: 0.2rem;        /* More rounded corners */
+    --radius-01: calc(var(--radius) * 0.1);
+    --radius-02: calc(var(--radius) * 0.2);
+    --radius-03: calc(var(--radius) * 0.3);
+    --radius-04: calc(var(--radius) * 0.4);
+    --radius-05: calc(var(--radius) * 0.5);
+    --radius-06: calc(var(--radius) * 0.6);
+    --radius-07: calc(var(--radius) * 0.7);
+    --radius-08: calc(var(--radius) * 0.8);
+    --radius-09: calc(var(--radius) * 0.9);
+    --radius-10: calc(var(--radius) * 1.0);
+    --radius-12: calc(var(--radius) * 1.2);
+    --radius-15: calc(var(--radius) * 1.5);
+    --radius-20: calc(var(--radius) * 2.0);
+  }
+
+  /* Dark Gold Theme - Original theme */
+  .theme-dark-gold {
     --background: #0A101C; /* Oxford Blue */
     --card: #101828;       /* Charcoal */
     --primary: #D4AF37;    /* Gold */
@@ -24,11 +61,10 @@
     --secondary-foreground: #F0F2F5;
     --accent-foreground: #101828;
     --ring: #D4AF37;
-    --radius: 0.75rem;
   }
 
+  /* Keep .dark class for compatibility */
   .dark {
-    /* Use the same palette for dark mode for now */
     --background: #0A101C;
     --card: #101828;
     --primary: #D4AF37;
@@ -61,31 +97,52 @@
   }
 }
 
-/* Card with gold accent top border */
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Card with accent top border */
 .card-accent {
   background: var(--card);
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 24px 0 rgba(20,33,61,0.12);
+  border-radius: var(--radius-10);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   color: var(--foreground);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   border-top: 4px solid var(--accent);
   padding: 1.5rem 1.5rem 1.5rem 1.5rem;
 }
 
 .card {
   background: var(--card);
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 24px 0 rgba(20,33,61,0.12);
+  border-radius: var(--radius-10);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   color: var(--foreground);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+}
+
+/* Dark theme specific card shadows */
+.theme-dark-gold .card,
+.theme-dark-gold .card-accent,
+.dark .card,
+.dark .card-accent {
+  box-shadow: 0 4px 24px 0 rgba(20,33,61,0.12);
+  border: 1.5px solid var(--border);
 }
 
 .btn-accent {
   background: var(--accent);
   color: var(--primary-foreground);
   border: none;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-15);
   font-weight: 600;
   font-size: 1rem;
   padding: 0.75rem 1.5rem;
@@ -99,7 +156,7 @@
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-15);
   font-weight: 600;
   font-size: 1rem;
   padding: 0.75rem 1.5rem;
@@ -112,8 +169,8 @@
 .btn-secondary {
   background: var(--card);
   color: var(--primary);
-  border: 1.5px solid var(--border);
-  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-05);
   font-weight: 600;
   font-size: 1rem;
   padding: 0.5rem 1.25rem;
@@ -127,8 +184,8 @@
 .input {
   background: var(--input);
   color: var(--foreground);
-  border: 1.5px solid var(--border);
-  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-05);
   padding: 0.75rem 1rem;
   font-size: 1rem;
   transition: box-shadow 0.2s, border-color 0.2s;
