@@ -27,7 +27,7 @@ export const terminology = {
   ADD_COMPANY_DATA: "Update Company Information",
   
   // Data Labels
-  SHARE_LEDGER: "Share Register",
+  SHARE_LEDGER: "Shareholders",
   CAP_TABLE: "Ownership Summary",
   WALLET_CONTRACT: "Digital Share Register",
   TREASURY_SHARES: "Unallocated Shares",

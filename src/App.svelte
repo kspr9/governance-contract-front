@@ -44,32 +44,12 @@
     <div class="max-w-5xl mx-auto">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <img src="./src/assets/miracap_logo-Photoroom.png" alt="Miracap Logo" class="h-8 w-8 rounded-full border-2 border-white bg-white" />
-          <span class="poppins-semibold text-2xl text-white">miracap</span>
+          <img src="./src/assets/Miracap_logo_white.png" alt="Miracap Logo" class="h-8" />
+          <!-- <span class="poppins-semibold text-2xl text-white">miracap</span> -->
         </div>
-        <button 
-          class="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/20 hover:bg-white/10 transition-colors bg-transparent text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50"
-          aria-label="Toggle View"
-          on:click={handleToggle}
-        >
-          <span class="text-sm font-medium">
-            {showContractLoader ? terminology.MANAGE_DEPLOYED_WALLETS : terminology.VIEW_CONTRACTS}
-          </span>
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            class="h-5 w-5 text-white" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              stroke-width="2" 
-              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-            />
-          </svg>
-        </button>
+        <div class="flex items-center ml-auto">
+          <WalletConnectorBeacon navbarMode={true} />
+        </div>
       </div>
     </div>
   </div>
@@ -140,6 +120,30 @@
           <span class="{sidebarOpen ? 'block' : 'hidden'} whitespace-nowrap">Settings</span>
         </a>
       </nav>
+      <button 
+        class="flex items-center gap-2 w-full px-4 py-3 rounded-lg border border-white/20 hover:bg-white/10 transition-colors bg-transparent text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 mt-auto"
+        aria-label="Toggle View"
+        on:click={handleToggle}
+        style="min-width:0;"
+      >
+        <span class="text-sm font-medium {sidebarOpen ? 'block' : 'hidden'}">
+          {showContractLoader ? terminology.MANAGE_DEPLOYED_WALLETS : terminology.VIEW_CONTRACTS}
+        </span>
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          class="h-5 w-5 text-white" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            stroke-width="2" 
+            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+          />
+        </svg>
+      </button>
     </div>
 
     <!-- Mobile overlay -->
@@ -150,12 +154,11 @@
     <!-- Main Content -->
     <div class="flex-1">
       <div class="max-w-5xl mx-auto p-4 space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <WalletConnectorBeacon />
-          {#if showContractLoader}
+        {#if showContractLoader}
+          <div>
             <LoadContractForm {handleLoadContract} />
-          {/if}
-        </div>
+          </div>
+        {/if}
         {#if showContractLoader}
           <div>
             <ContractLoader bind:this={contractLoaderRef} />

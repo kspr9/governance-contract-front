@@ -44,7 +44,7 @@
       <div class="section-header flex items-center">
         {terminology.SHARE_LEDGER}
         <HelpTip text={terminology.HELP_SHARE_REGISTER} />
-        <span class="text-xs text-[color:var(--muted-foreground)] ml-2">Current owners</span>
+        <!-- <span class="text-xs text-[color:var(--muted-foreground)] ml-2">Current owners</span> -->
       </div>
       <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showLedger ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
     </button>

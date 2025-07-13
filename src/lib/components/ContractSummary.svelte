@@ -57,10 +57,10 @@
     </div>
   </div>
   <div class="px-6 py-4">
-    <div class="text-sm text-[color:var(--muted-foreground)]">Registry address</div>
+    <div class="text-sm text-[color:var(--muted-foreground)]">Company Share Register address</div>
     <div class="flex items-center gap-2 mb-4">
       <div
-        class="flex-1 p-2 border rounded bg-[color:var(--muted)] font-mono text-sm cursor-default select-all text-[color:var(--foreground)]"
+        class="flex-1 p-2 rounded font-mono text-sm cursor-default select-all text-[color:var(--foreground)]"
         style="min-width:0;"
       >
         {$contractState.contractAddress}

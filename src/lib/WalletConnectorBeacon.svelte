@@ -3,7 +3,15 @@
     import { beaconState, walletStore } from './stores/beaconStore.svelte';
     import { Tezos, wallet, connectWallet, disconnectWallet, getActiveAccount, getWalletBalance } from './config/beaconConfig';
 
+    export let navbarMode: boolean = false;
+
     export const tezSym: string = 'ꜩ';
+
+    // Helper to shorten address
+    function getShortAddress(address: string | null | undefined): string {
+        if (!address || address.length < 8) return address || '';
+        return `${address.slice(0, 3)}...${address.slice(-4)}`;
+    }
 
     // On mount, check for existing connection
     onMount(async () => {
@@ -52,34 +60,45 @@
     }
 </script>
 
-<div class="w-full h-full bg-[color:var(--card)] rounded-[var(--radius)] shadow p-4 border border-[color:var(--border)]">
+{#if navbarMode}
     {#if beaconState.isConnected}
-        <h2 class="text-lg font-semibold mb-2 text-[color:var(--primary)]">Connected account</h2>
-    {/if}
-
-    {#if beaconState.error}
-        <div class="p-2 mb-2 bg-red-100 text-red-700 rounded-[calc(var(--radius)*0.5)]">
-            {beaconState.error}
-        </div>
-    {/if}
-
-    {#if beaconState.isConnected}
-        <div class="flex items-center justify-between mb-2">
-            <span class="font-mono text-sm truncate text-[color:var(--foreground)]">{beaconState.address}</span>
-            <button class="btn-secondary" onclick={handleDisconnectWallet}>
+        <div class="flex items-center gap-5">
+            <span class="font-mono text-xs md:text-sm truncate text-white" title={beaconState.address}>
+                {getShortAddress(beaconState.address)}
+            </span>
+            <span class="text-xs text-white/80">{beaconState.wbalance?.toFixed(3)} {tezSym}</span>
+            <button class="text-xs font-semibold text-[color:var(--primary)] bg-white rounded px-3 py-1 shadow-sm hover:bg-blue-100 focus:outline-none transition-colors" onclick={handleDisconnectWallet}>
                 Log out
             </button>
         </div>
-        <div class="text-xs text-[color:var(--muted-foreground)]">Balance: {beaconState.wbalance?.toFixed(3)} {tezSym}</div>
     {:else}
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="text-lg font-semibold text-[color:var(--primary)]">Connected account</h2>
-                <div class="text-sm text-[color:var(--muted-foreground)] mt-1">To interact with Share Register, <br>connect your personal wallet.</div>
-            </div>
-            <button class="btn-primary" onclick={handleConnectWallet}>
-                Log in with wallet
+        <div class="relative group">
+            <button class="btn-primary text-xs px-3 py-1" onclick={handleConnectWallet}>
+                Connect Wallet
             </button>
+            <div class="absolute left-1/2 -translate-x-1/2 -top-9 w-max bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 whitespace-nowrap shadow-lg">
+                Connect your Wallet to interact with Tokenized Shares Register
+            </div>
         </div>
     {/if}
-</div>
+{:else}
+    <div class="w-full h-full bg-[color:var(--card)] rounded-[var(--radius)] shadow p-4 border border-[color:var(--border)]">
+        {#if beaconState.isConnected}
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-sm truncate text-[color:var(--foreground)]" title={beaconState.address}>
+                    {getShortAddress(beaconState.address)}
+                </span>
+                <button class="btn-secondary" onclick={handleDisconnectWallet}>
+                    Log out
+                </button>
+            </div>
+            <div class="text-xs text-[color:var(--muted-foreground)]">Balance: {beaconState.wbalance?.toFixed(3)} {tezSym}</div>
+        {:else}
+            <div class="flex items-center justify-between">
+                <button class="btn-primary" onclick={handleConnectWallet} title="To interact with Share Register, connect your personal wallet.">
+                    Connect Wallet
+                </button>
+            </div>
+        {/if}
+    </div>
+{/if}

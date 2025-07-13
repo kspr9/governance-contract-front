@@ -101,11 +101,11 @@
             </button>
         </div>
         <button 
-            class="btn-secondary p-2 flex items-center gap-1 mt-1" 
+            class={(openTransferCard ? 'btn-secondary p-2' : 'btn-primary') + ' flex items-center gap-1 mt-1'}
             title="Transfer" 
             onclick={() => { openTransferCard = !openTransferCard; }}
         >
-            <svg class="w-5 h-5 text-[color:var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class={"w-5 h-5 " + (openTransferCard ? 'text-[color:var(--primary)]' : 'text-[color:var(--primary-foreground)]')} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
             </svg>
             <span class="text-xs">{terminology.TRANSFER_SHARES}</span>

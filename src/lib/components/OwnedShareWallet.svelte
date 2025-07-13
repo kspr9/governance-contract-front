@@ -41,6 +41,10 @@
     claimShares: null as string | null
   });
   
+  // Accordion state for claim form
+  let showClaimForm = $state(false);
+  function toggleClaimForm() { showClaimForm = !showClaimForm; }
+  
   async function handleClaimShares(event: Event) {
     event.preventDefault();
     loadingStates.claimShares = true;
@@ -106,36 +110,40 @@
   
   <!-- Claim Shares Section -->
   <div class="card">
-    <div class="section-header flex items-center mb-4">
-      {terminology.CLAIM_SHARES}
-      <HelpTip text={terminology.HELP_CLAIM_SHARES} />
-    </div>
-    
-    <form class="space-y-3" onsubmit={(e) => handleClaimShares(e)}>
-      <input 
-        type="text" 
-        class="input w-full"
-        placeholder="Enter the issuing register's address to claim your allocated shares"
-        bind:value={userForms.claimShares.address}
-        disabled={loadingStates.claimShares}
-      />
-      {#if errorStates.claimShares}
-        <div class="text-[color:var(--destructive)]">{errorStates.claimShares}</div>
-      {/if}
-      <div class="flex justify-end">
-        <button 
-          type="submit"
-          class="btn-primary"
-          disabled={loadingStates.claimShares || !beaconState.isConnected}
-        >
-          {#if loadingStates.claimShares}
-            Claiming<LoadingDots />
-          {:else}
-            {terminology.CLAIM_SHARES}
-          {/if}
-        </button>
+    <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleClaimForm}>
+      <div class="section-header flex items-center">
+        {terminology.CLAIM_SHARES}
+        <HelpTip text={terminology.HELP_CLAIM_SHARES} />
       </div>
-    </form>
+      <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showClaimForm ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </button>
+    {#if showClaimForm}
+      <form class="space-y-3" onsubmit={(e) => handleClaimShares(e)}>
+        <input 
+          type="text" 
+          class="input w-full"
+          placeholder="Enter the issuing register's address to claim your allocated shares"
+          bind:value={userForms.claimShares.address}
+          disabled={loadingStates.claimShares}
+        />
+        {#if errorStates.claimShares}
+          <div class="text-[color:var(--destructive)]">{errorStates.claimShares}</div>
+        {/if}
+        <div class="flex justify-end">
+          <button 
+            type="submit"
+            class="btn-primary"
+            disabled={loadingStates.claimShares || !beaconState.isConnected}
+          >
+            {#if loadingStates.claimShares}
+              Claiming<LoadingDots />
+            {:else}
+              {terminology.CLAIM_SHARES}
+            {/if}
+          </button>
+        </div>
+      </form>
+    {/if}
   </div>
   
   
