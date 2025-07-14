@@ -1,0 +1,104 @@
+{
+  ".svelte-kit/generated/server/internal.js": {
+    "file": "internal.js",
+    "name": "internal",
+    "src": ".svelte-kit/generated/server/internal.js",
+    "isEntry": true,
+    "imports": [
+      "_internal.js"
+    ]
+  },
+  "_equality.js": {
+    "file": "chunks/equality.js",
+    "name": "equality"
+  },
+  "_exports.js": {
+    "file": "chunks/exports.js",
+    "name": "exports"
+  },
+  "_index.js": {
+    "file": "chunks/index.js",
+    "name": "index",
+    "imports": [
+      "_equality.js"
+    ]
+  },
+  "_index2.js": {
+    "file": "chunks/index2.js",
+    "name": "index"
+  },
+  "_internal.js": {
+    "file": "chunks/internal.js",
+    "name": "internal",
+    "imports": [
+      "_equality.js",
+      "_index2.js"
+    ]
+  },
+  "node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte": {
+    "file": "entries/fallbacks/error.svelte.js",
+    "name": "entries/fallbacks/error.svelte",
+    "src": "node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index2.js",
+      "_equality.js",
+      "_exports.js",
+      "_index.js"
+    ]
+  },
+  "node_modules/@sveltejs/kit/src/runtime/server/index.js": {
+    "file": "index.js",
+    "name": "index",
+    "src": "node_modules/@sveltejs/kit/src/runtime/server/index.js",
+    "isEntry": true,
+    "imports": [
+      "_internal.js",
+      "_exports.js",
+      "_index.js"
+    ]
+  },
+  "src/routes/+layout.svelte": {
+    "file": "entries/pages/_layout.svelte.js",
+    "name": "entries/pages/_layout.svelte",
+    "src": "src/routes/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index2.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_layout.CALoE1Cl.css"
+    ]
+  },
+  "src/routes/+page.svelte": {
+    "file": "entries/pages/_page.svelte.js",
+    "name": "entries/pages/_page.svelte",
+    "src": "src/routes/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index2.js",
+      "_index.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.C6Cj7YAT.css"
+    ]
+  },
+  "src/routes/api/contract/[address]/operations/+server.ts": {
+    "file": "entries/endpoints/api/contract/_address_/operations/_server.ts.js",
+    "name": "entries/endpoints/api/contract/_address_/operations/_server.ts",
+    "src": "src/routes/api/contract/[address]/operations/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/api/contract/[address]/storage/+server.ts": {
+    "file": "entries/endpoints/api/contract/_address_/storage/_server.ts.js",
+    "name": "entries/endpoints/api/contract/_address_/storage/_server.ts",
+    "src": "src/routes/api/contract/[address]/storage/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/api/registry/[registryNumber]/+server.ts": {
+    "file": "entries/endpoints/api/registry/_registryNumber_/_server.ts.js",
+    "name": "entries/endpoints/api/registry/_registryNumber_/_server.ts",
+    "src": "src/routes/api/registry/[registryNumber]/+server.ts",
+    "isEntry": true
+  }
+}

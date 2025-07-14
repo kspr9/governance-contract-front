@@ -1,5 +1,5 @@
+import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
 import tailwindcss from '@tailwindcss/vite';
 import path from "path";
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
@@ -10,22 +10,24 @@ import type { Plugin } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    svelte(), 
+    sveltekit(), 
     //tailwindcss()
   ],
+  ssr: {
+    external: ['@taquito/taquito', '@taquito/beacon-wallet', '@airgap/beacon-sdk', '@airgap/beacon-blockchain-substrate']
+  },
   define: {
     'process.env': {},
     global: 'globalThis',
   },
   resolve: {
     alias: {
-      $lib: path.resolve("./src/lib"),
-      buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
-      stream: 'rollup-plugin-node-polyfills/polyfills/stream',
-      crypto: 'rollup-plugin-node-polyfills/polyfills/crypto-browserify',
-      process: 'rollup-plugin-node-polyfills/polyfills/process-es6',
-      util: 'rollup-plugin-node-polyfills/polyfills/util',
-      events: 'rollup-plugin-node-polyfills/polyfills/events',
+      buffer: 'buffer',
+      stream: 'stream-browserify',
+      crypto: 'crypto-browserify',
+      process: 'process/browser',
+      util: 'util',
+      events: 'events',
     },
   },
   css: {
