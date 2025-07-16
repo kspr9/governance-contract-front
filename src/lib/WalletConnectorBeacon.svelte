@@ -3,7 +3,11 @@
     import { beaconState, walletStore } from './stores/beaconStore.svelte';
     import { Tezos, wallet, connectWallet, disconnectWallet, getActiveAccount, getWalletBalance } from './config/beaconConfig';
 
-    export let navbarMode: boolean = false;
+    interface Props {
+        navbarMode?: boolean;
+    }
+
+    let { navbarMode = false }: Props = $props();
 
     export const tezSym: string = 'ꜩ';
 

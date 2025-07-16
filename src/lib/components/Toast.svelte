@@ -44,7 +44,7 @@
                 {/if}
             </div>
             <button 
-                class="ml-4 text-[color:var(--muted-foreground)] hover:text-[color:var(--primary)]"
+                class="btn-close ml-4"
                 on:click={() => toastStore.remove(toast.id)}
             >
                 ×

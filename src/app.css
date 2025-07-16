@@ -320,6 +320,67 @@
 /* Min-width utilities */
 .min-w-0 { min-width: 0; }
 
+/* Specialized Button Types */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-05);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-icon:hover {
+  background: var(--card);
+  color: var(--primary);
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-05);
+  transition: color 0.2s ease;
+}
+.btn-close:hover {
+  color: var(--primary);
+}
+
+.btn-help {
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 0.125rem;
+  border-radius: var(--radius-05);
+  transition: color 0.2s ease;
+}
+.btn-help:hover, .btn-help:focus {
+  color: var(--primary);
+  outline: none;
+}
+
+.btn-collapse {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-radius: var(--radius-10);
+}
+.btn-collapse:hover {
+  background: var(--muted);
+}
+
 /* =============================================================================
    DEPRECATED BUTTON ALIASES - Use btn-primary, btn-secondary, btn-accent instead
    ============================================================================= */

@@ -13,6 +13,7 @@
   import LoadingDots from './LoadingDots.svelte';
   import { terminology } from '../utils/terminology';
   import HelpTip from './HelpTip.svelte';
+  import CollapsibleSection from './shared/CollapsibleSection.svelte';
   
   let { 
     maxSharesCache,
@@ -41,9 +42,9 @@
     claimShares: null as string | null
   });
   
-  // Accordion state for claim form
+  // Collapsible state
+  let showPortfolio = $state(true);
   let showClaimForm = $state(false);
-  function toggleClaimForm() { showClaimForm = !showClaimForm; }
   
   async function handleClaimShares(event: Event) {
     event.preventDefault();
@@ -80,11 +81,7 @@
 
 <div class="space-y-6">
   <!-- Portfolio Section -->
-  <div class="card">
-    <div class="section-header flex items-center mb-4">
-      {terminology.HELD_SHARES}
-      <HelpTip text="Shares you own from various companies" />
-    </div>
+  <CollapsibleSection title="{terminology.HELD_SHARES}" tooltip="Shares you own from various companies" bind:open={showPortfolio}>
     
     <div class="space-y-4">
       {#if shareLedgerState.heldExternalShares.length > 0}
@@ -106,18 +103,10 @@
         </div>
       {/if}
     </div>
-  </div>
+  </CollapsibleSection>
   
   <!-- Claim Shares Section -->
-  <div class="card">
-    <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleClaimForm}>
-      <div class="section-header flex items-center">
-        {terminology.CLAIM_SHARES}
-        <HelpTip text={terminology.HELP_CLAIM_SHARES} />
-      </div>
-      <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showClaimForm ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-    </button>
-    {#if showClaimForm}
+  <CollapsibleSection title="{terminology.CLAIM_SHARES}" tooltip={terminology.HELP_CLAIM_SHARES} bind:open={showClaimForm}>
       <form class="space-y-3" onsubmit={(e) => handleClaimShares(e)}>
         <input 
           type="text" 
@@ -143,8 +132,7 @@
           </button>
         </div>
       </form>
-    {/if}
-  </div>
+  </CollapsibleSection>
   
   
   {#if !beaconState.isConnected}
@@ -153,3 +141,4 @@
     </div>
   {/if}
 </div>
+

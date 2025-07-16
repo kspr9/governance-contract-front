@@ -15,7 +15,7 @@
 <div class="relative inline-flex items-center">
   <button
     type="button"
-    class="ml-1 p-0.5 text-[color:var(--muted-foreground)] hover:text-[color:var(--primary)] focus:text-[color:var(--primary)] focus:outline-none transition-colors"
+    class="btn-help ml-1"
     onmouseenter={() => showTooltip = true}
     onmouseleave={() => showTooltip = false}
     onfocus={() => showTooltip = true}

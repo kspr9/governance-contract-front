@@ -2,7 +2,7 @@
     import { onMount, onDestroy } from "svelte";
     import { contractState, contractInstance } from '../stores/contractStore.svelte';
     import { tzktStorageData } from '../stores/tzktStorage.svelte';
-    import ContractOps from "./ContractOps.svelte";
+    import ContractOpsRefactored from "./ContractOpsRefactored.svelte";
     import { loadContractTzkt } from '../utils/contractLoader';
     import CreateCompany from "../CreateCompany.svelte";
     import { transferHeldShares } from '../utils/contractActions';
@@ -336,7 +336,7 @@
                     />
                     
                 {:else if activeTab === 'admin'}
-                    <ContractOps />
+                    <ContractOpsRefactored />
                 {/if}
             {/snippet}
         </DashboardTabs>

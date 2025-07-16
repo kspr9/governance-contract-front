@@ -10,6 +10,7 @@
   import LoadingDots from './LoadingDots.svelte';
   import { terminology } from '../utils/terminology';
   import HelpTip from './HelpTip.svelte';
+  import CollapsibleSection from './shared/CollapsibleSection.svelte';
   
   let { 
     maxSharesCache,
@@ -31,24 +32,11 @@
   let showLedger = $state(true);
   let showUnclaimed = $state(false);
   let showClaimants = $state(false);
-  
-  function toggleLedger() { showLedger = !showLedger; }
-  function toggleUnclaimed() { showUnclaimed = !showUnclaimed; }
-  function toggleClaimants() { showClaimants = !showClaimants; }
 </script>
 
 <div class="space-y-4">
   <!-- Share Ledger / Cap Table -->
-  <div class="card">
-    <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleLedger}>
-      <div class="section-header flex items-center">
-        {terminology.SHARE_LEDGER}
-        <HelpTip text={terminology.HELP_SHARE_REGISTER} />
-        <!-- <span class="text-xs text-[color:var(--muted-foreground)] ml-2">Current owners</span> -->
-      </div>
-      <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showLedger ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-    </button>
-    {#if showLedger}
+  <CollapsibleSection title="{terminology.SHARE_LEDGER}" tooltip="{terminology.HELP_SHARE_REGISTER}" bind:open={showLedger}>
     <table class="w-full border-collapse text-sm table-fixed">
       <colgroup>
         <col style="width: 25%;" />
@@ -140,19 +128,10 @@
         {/if}
       </tbody>
     </table>
-    {/if}
-  </div>
+  </CollapsibleSection>
 
   <!-- Treasury Shares Card -->
-  <div class="card">
-    <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleUnclaimed}>
-      <div class="section-header flex items-center">
-        {terminology.TREASURY_SHARES}
-        <HelpTip text="Shares that have been created but not yet allocated to shareholders" />
-      </div>
-      <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showUnclaimed ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-    </button>
-    {#if showUnclaimed}
+  <CollapsibleSection title="{terminology.TREASURY_SHARES}" tooltip="Shares that have been created but not yet allocated to shareholders" bind:open={showUnclaimed}>
     <table class="w-full border-collapse text-sm">
       <thead>
         <tr class="table-header">
@@ -175,19 +154,10 @@
         {/if}
       </tbody>
     </table>
-    {/if}
-  </div>
+  </CollapsibleSection>
 
   <!-- Eligible Claimants Card -->
-  <div class="card">
-    <button type="button" class="flex items-center justify-between w-full mb-2 cursor-pointer" onclick={toggleClaimants}>
-      <div class="section-header flex items-center">
-        {terminology.ELIGIBLE_CLAIMANTS}
-        <HelpTip text="Shareholders who have been allocated shares but haven't claimed them yet" />
-      </div>
-      <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showClaimants ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-    </button>
-    {#if showClaimants}
+  <CollapsibleSection title="{terminology.ELIGIBLE_CLAIMANTS}" tooltip="Shareholders who have been allocated shares but haven't claimed them yet" bind:open={showClaimants}>
     <table class="w-full border-collapse text-sm">
       <thead>
         <tr class="table-header">
@@ -224,8 +194,7 @@
         {/if}
       </tbody>
     </table>
-    {/if}
-  </div>
+  </CollapsibleSection>
 </div>
 
 <style>

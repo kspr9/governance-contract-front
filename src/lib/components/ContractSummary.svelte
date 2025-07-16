@@ -66,7 +66,7 @@
         {$contractState.contractAddress}
       </div>
       <button
-        class="p-2 bg-[color:var(--muted)] rounded hover:bg-[color:var(--card)] border border-[color:var(--border)]"
+        class="btn-icon"
         title={terminology.RELOAD_CONTRACT}
         aria-label={terminology.RELOAD_CONTRACT}
         onclick={() => handleLoadContract($contractState.contractAddress || '')}
@@ -76,7 +76,7 @@
         </svg>
       </button>
       <a
-        class="p-2 bg-[color:var(--muted)] rounded hover:bg-[color:var(--card)] border border-[color:var(--border)] ml-1 flex items-center"
+        class="btn-icon ml-1"
         href={`https://better-call.dev/mainnet/${$contractState.contractAddress}/operations`}
         target="_blank"
         rel="noopener noreferrer"
