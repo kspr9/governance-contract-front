@@ -1,51 +1,51 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   import { onMount } from 'svelte';
-
-  //import TestGlobal from './lib/TestGlobal.svelte'
-
+  
   import LoadContractForm from '$lib/components/LoadContractForm.svelte';
-  import { terminology } from '$lib/utils/terminology';
+  import backgroundImage from '../assets/background.jpg';
+  import blockImage from '../assets/block.png';
+  import registerLogo from '../assets/2riregister-logo.png';
 
-  // Dynamic imports to avoid SSR issues with blockchain components
-  let WalletConnectorBeacon: any;
+  // Import our new shared store
+  import { showContractLoaderStore } from '$lib/stores/uiStore';
+  import { contractState } from '$lib/stores/contractStore.svelte';
+
+  // These components are specific to this page, so their imports are here.
   let ContractLoader: any;
   let CreateCompany: any;
-  let contractState: any;
+  let contractStateInstance: any;
   
   onMount(async () => {
     if (browser) {
       const [
-        { default: WalletConnectorBeaconComponent },
         { default: ContractLoaderComponent },
         { default: CreateCompanyComponent },
         { contractState: cs }
       ] = await Promise.all([
-        import('$lib/WalletConnectorBeacon.svelte'),
         import('$lib/components/ContractLoader.svelte'),
         import('$lib/CreateCompany.svelte'),
         import('$lib/stores/contractStore.svelte')
       ]);
       
-      WalletConnectorBeacon = WalletConnectorBeaconComponent;
       ContractLoader = ContractLoaderComponent;
       CreateCompany = CreateCompanyComponent;
-      contractState = cs;
+      contractStateInstance = cs;
     }
   });
 
-  let showContractLoader = true;
-  let contractLoaderRef: any;
-  let sidebarOpen = false;
+  // REMOVED: Local state and toggle function are no longer needed.
+  // let showContractLoader = true;
+  // function handleToggle() { ... }
 
-  function handleToggle() {
-    showContractLoader = !showContractLoader;
-  }
+  let contractLoaderRef: any;
 
   function handleViewContract(contractAddress: string) {
-    showContractLoader = true;
-    if (contractState) {
-      contractState.update((state: any) => ({ ...state, contractAddress }));
+    // Instead of calling a local function, we now directly set the store's value.
+    showContractLoaderStore.set(true);
+
+    if (contractStateInstance) {
+      contractStateInstance.update((state: any) => ({ ...state, contractAddress }));
     }
     setTimeout(() => {
       contractLoaderRef?.handleLoadContract(contractAddress);
@@ -57,197 +57,111 @@
       await contractLoaderRef.handleLoadContract(address);
     }
   }
-
-  function toggleSidebar() {
-    sidebarOpen = !sidebarOpen;
-  }
 </script>
 
-<main class="min-h-screen bg-[color:var(--background)]">
-  <!-- Sticky Navbar -->
-  <div class="sticky top-0 z-50 bg-[color:var(--primary)] text-white p-4 shadow-md">
-    <div class="max-w-5xl mx-auto">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <img src="./src/assets/Miracap_logo_white.png" alt="Miracap Logo" class="h-8" />
-          <!-- <span class="poppins-semibold text-2xl text-white">miracap</span> -->
-        </div>
-        <div class="flex items-center ml-auto">
-          {#if browser && WalletConnectorBeacon}
-            <svelte:component this={WalletConnectorBeacon} navbarMode={true} />
-          {/if}
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Layout Container -->
-  <div class="flex">
-    <!-- Sidebar -->
-    <div class="{sidebarOpen ? 'w-48' : 'w-16'} md:{sidebarOpen ? 'w-48' : 'w-16'} fixed md:static top-[72px] md:top-0 left-0 z-40 min-h-screen bg-[color:var(--card)] border-r border-[color:var(--border)] transition-all duration-300 ease-in-out overflow-hidden flex flex-col">
-      <div class="flex items-center justify-between p-4 border-b border-[color:var(--border)] md:hidden">
-        <span class="poppins-semibold text-lg text-[color:var(--primary)] {sidebarOpen ? 'block' : 'hidden'}">
-          Menu
-        </span>
-        <button 
-          class="p-2 rounded-lg hover:bg-[color:var(--muted)] transition-colors {sidebarOpen ? 'block' : 'hidden'}"
-          on:click={toggleSidebar}
-          aria-label="Close Sidebar"
-        >
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-      <nav class="{sidebarOpen ? 'p-4' : 'p-2'} space-y-2 flex-1">
-        <!-- Toggle Button at Top -->
-        <button 
-          class="flex items-center {sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center px-3 py-3'} w-full rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group mb-4"
-          on:click={toggleSidebar}
-          aria-label="Toggle Sidebar"
-          title="Toggle Sidebar"
-        >
-          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{sidebarOpen ? 'M11 19l-7-7 7-7m8 14l-7-7 7-7' : 'M13 5l7 7-7 7M5 5l7 7-7 7'}" />
-          </svg>
-          <span class="{sidebarOpen ? 'block' : 'hidden'} whitespace-nowrap">Collapse</span>
-        </button>
+<!-- 
+  The markup now uses the store's value directly.
+  The '$' prefix makes the component react to any changes in the store.
+-->
+{#if $showContractLoaderStore}
+  <!-- Hero Section with Background -->
+  <div class="hero-section relative {!$contractState.isLoaded ? 'min-h-[40vh]' : 'min-h-[160px]'} flex items-center justify-center">
+    <!-- Background Image -->
+    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url({backgroundImage});"></div>
+    
+    <!-- Hero Content -->
+    <div class="relative z-10 max-w-4xl mx-auto px-4 text-center text-white w-full">
+      {#if !$contractState.isLoaded}
+        <h1 class="text-4xl md:text-5xl font-bold mb-8">
+          Search for a Company Share Register
+        </h1>
         
-        <a href="#" class="flex items-center {sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center px-3 py-3'} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group" title="Dashboard">
-          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5v4" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 5v4" />
-          </svg>
-          <span class="{sidebarOpen ? 'block' : 'hidden'} whitespace-nowrap">Dashboard</span>
-        </a>
-        <a href="#" class="flex items-center {sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center px-3 py-3'} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group" title="Contracts">
-          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <span class="{sidebarOpen ? 'block' : 'hidden'} whitespace-nowrap">Contracts</span>
-        </a>
-        <a href="#" class="flex items-center {sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center px-3 py-3'} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group" title="Wallets">
-          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-          </svg>
-          <span class="{sidebarOpen ? 'block' : 'hidden'} whitespace-nowrap">Wallets</span>
-        </a>
-        <a href="#" class="flex items-center {sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center px-3 py-3'} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group" title="Companies">
-          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
-          <span class="{sidebarOpen ? 'block' : 'hidden'} whitespace-nowrap">Companies</span>
-        </a>
-        <a href="#" class="flex items-center {sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center px-3 py-3'} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group" title="Settings">
-          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <span class="{sidebarOpen ? 'block' : 'hidden'} whitespace-nowrap">Settings</span>
-        </a>
-      </nav>
-      <button 
-        class="flex items-center gap-2 w-full px-4 py-3 rounded-lg border border-white/20 hover:bg-white/10 transition-colors bg-transparent text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 mt-auto"
-        aria-label="Toggle View"
-        on:click={handleToggle}
-        style="min-width:0;"
-      >
-        <span class="text-sm font-medium {sidebarOpen ? 'block' : 'hidden'}">
-          {showContractLoader ? terminology.MANAGE_DEPLOYED_WALLETS : terminology.VIEW_CONTRACTS}
-        </span>
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          class="h-5 w-5 text-white" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor"
-        >
-          <path 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            stroke-width="2" 
-            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-          />
-        </svg>
-      </button>
+        <!-- Search Form -->
+        <div class="max-w-4xl mx-auto mb-8 w-full">
+          <LoadContractForm {handleLoadContract} />
+        </div>
+        
+        <!-- Additional Information -->
+        <div class="text-lg md:text-xl space-y-2">
+          <p>It is possible to make inquires about all legal persons.</p>
+          <p>A contractual client has even more functionalities.</p>
+        </div>
+      {:else}
+        <!-- Compact search form when contract is loaded -->
+        <div class="max-w-4xl mx-auto mb-8 w-full">
+          <LoadContractForm {handleLoadContract} />
+        </div>
+      {/if}
     </div>
+  </div>
 
-    <!-- Mobile overlay -->
-    {#if sidebarOpen}
-      <div class="fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden" on:click={toggleSidebar}></div>
-    {/if}
+  <!-- Contract Loader Section - positioned to overlap hero when contract is loaded -->
+  {#if browser && ContractLoader}
+    <div class="max-w-5xl mx-auto px-4 {!$contractState.isLoaded ? '' : '-mt-16 relative z-20'}">
+        <svelte:component this={ContractLoader} bind:this={contractLoaderRef} />
+    </div>
+  {/if}
 
-    <!-- Main Content -->
-    <div class="flex-1">
-      <div class="max-w-5xl mx-auto p-4 space-y-4">
-        {#if showContractLoader}
-          <div>
-            <LoadContractForm {handleLoadContract} />
+  <!-- Main Content Section - only show when no contract is loaded -->
+  {#if !$contractState.isLoaded}
+    <div class="bg-white py-12">
+      <div class="max-w-5xl mx-auto px-4">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Tokenized equity that actually means ownership
+          </h2>
+          <p class="text-xl text-gray-600">
+            Legally compliant and officially registered on the Estonian Business Register.
+          </p>
+        </div>
+        
+        <!-- Feature Diagram -->
+        <div class="max-w-5xl mx-auto">
+          <div class="bg-gray-50 rounded-xl p-12 shadow-sm">
+            <div class="flex items-center justify-center space-x-16">
+              <!-- RWA Tokenization -->
+              <div class="text-center">
+                <h3 class="font-medium text-gray-900 text-xl" style="font-family: 'Euclid Circular A', sans-serif; font-weight: 400;">RWA Tokenization</h3>
+                <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+                  <img src={blockImage} alt="RWA Tokenization" class="w-full h-full object-contain" />
+                </div>
+              </div>
+              
+              <!-- Connection Arrow -->
+              <div class="flex items-center">
+                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Estonian Business Register -->
+              <div class="text-center">
+                <h3 class="font-medium text-gray-900 text-xl" style="font-family: 'Euclid Circular A', sans-serif; font-weight: 400;">Estonian Business Register</h3>
+                <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+                  <img src={registerLogo} alt="Estonian Business Register" class="w-full h-full object-contain" />
+                </div>
+              </div>
+            </div>
           </div>
-        {/if}
-        {#if showContractLoader}
-          <div>
-            {#if browser && ContractLoader}
-              <svelte:component this={ContractLoader} bind:this={contractLoaderRef} />
-            {/if}
-          </div>
-        {:else}
-          <div class="card">
-            {#if browser && CreateCompany}
-              <svelte:component this={CreateCompany} onViewContract={handleViewContract} />
-            {/if}
-          </div>
+        </div>
+      </div>
+    </div>
+  {/if}
+  {:else}
+    <div class="max-w-5xl mx-auto p-4 space-y-4">
+      <div class="card">
+        {#if browser && CreateCompany}
+          <svelte:component this={CreateCompany} onViewContract={handleViewContract} />
         {/if}
       </div>
     </div>
-  </div>
-</main>
+  {/if}
 
 <style>
-:global(body) {
-  background: var(--background);
-}
-.card {
-  background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  padding: 2rem 1.5rem;
-  color: var(--foreground);
-  border: 1px solid var(--border);
-}
-
-/* Dark theme specific card shadows */
-:global(.theme-dark-gold) .card,
-:global(.dark) .card {
-  box-shadow: 0 4px 24px 0 rgba(20,33,61,0.12);
-  border: 1.5px solid var(--border);
-}
-.card h2, .card h3, .card h4 {
-  color: var(--primary);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  position: relative;
-}
-.card h2::after, .card h3::after {
-  content: '';
-  display: block;
-  width: 48px;
-  height: 3px;
-  background: var(--primary);
-  border-radius: 2px;
-  margin-top: 0.5rem;
-}
-button:hover {
-  background: var(--muted);
-  color: var(--accent);
-}
-@media (max-width: 640px) {
-  .card {
-    padding: 1rem 0.5rem;
+  .hero-section {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+    position: relative;
   }
-  .max-w-3xl {
-    max-width: 100vw;
-  }
-}
 </style>

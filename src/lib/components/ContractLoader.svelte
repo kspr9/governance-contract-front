@@ -341,8 +341,7 @@
             {/snippet}
         </DashboardTabs>
     {:else}
-        <div class="p-4 text-center text-[color:var(--muted-foreground)]">
-            Register not loaded yet        </div>
+        
     {/if}
 
 </div>
