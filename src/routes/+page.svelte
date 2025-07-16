@@ -67,7 +67,7 @@
   <!-- Hero Section with Background -->
   <div class="hero-section relative {!$contractState.isLoaded ? 'min-h-[40vh]' : 'min-h-[160px]'} flex items-center justify-center">
     <!-- Background Image -->
-    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url({backgroundImage});"></div>
+    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat hero-bg"></div>
     
     <!-- Hero Content -->
     <div class="relative z-10 max-w-4xl mx-auto px-4 text-center text-white w-full">
@@ -121,7 +121,7 @@
             <div class="flex items-center justify-center space-x-16">
               <!-- RWA Tokenization -->
               <div class="text-center">
-                <h3 class="font-medium text-gray-900 text-xl" style="font-family: 'Euclid Circular A', sans-serif; font-weight: 400;">RWA Tokenization</h3>
+                <h3 class="font-normal text-gray-900 text-xl">RWA Tokenization</h3>
                 <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center">
                   <img src={blockImage} alt="RWA Tokenization" class="w-full h-full object-contain" />
                 </div>
@@ -138,7 +138,7 @@
               
               <!-- Estonian Business Register -->
               <div class="text-center">
-                <h3 class="font-medium text-gray-900 text-xl" style="font-family: 'Euclid Circular A', sans-serif; font-weight: 400;">Estonian Business Register</h3>
+                <h3 class="font-normal text-gray-900 text-xl">Estonian Business Register</h3>
                 <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center">
                   <img src={registerLogo} alt="Estonian Business Register" class="w-full h-full object-contain" />
                 </div>
@@ -163,5 +163,9 @@
   .hero-section {
     background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
     position: relative;
+  }
+  
+  .hero-bg {
+    background-image: url('../assets/background.jpg');
   }
 </style>
