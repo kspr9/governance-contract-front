@@ -21,21 +21,54 @@
     let loading = $state(false);
     let error = $state<string | null>(null);
     let success = $state<string | null>(null);
+    let fieldErrors = $state({
+        maxShares: false,
+        registryNumber: false
+    });
+    let attempted = $state(false);
+    
+    // Clear field errors when user starts typing
+    $effect(() => {
+        if (formData.maxShares) {
+            fieldErrors.maxShares = false;
+        }
+    });
+    
+    $effect(() => {
+        if (formData.registryNumber) {
+            fieldErrors.registryNumber = false;
+        }
+    });
     
     async function handleSubmit(event: Event) {
         event.preventDefault();
+        attempted = true;
+        
+        // Validate fields and highlight errors
+        fieldErrors.maxShares = !formData.maxShares;
+        fieldErrors.registryNumber = !formData.registryNumber;
+        
+        // If any field has errors, don't submit
+        if (fieldErrors.maxShares || fieldErrors.registryNumber) {
+            return;
+        }
+        
+        // Additional validation for positive numbers
+        if (formData.maxShares <= 0) {
+            fieldErrors.maxShares = true;
+            return;
+        }
+        
+        if (formData.registryNumber <= 0) {
+            fieldErrors.registryNumber = true;
+            return;
+        }
+        
         loading = true;
         error = null;
         success = null;
         
         try {
-            if (!formData.maxShares || formData.maxShares <= 0) {
-                throw new Error("Max shares must be a positive number");
-            }
-            
-            if (!formData.registryNumber || formData.registryNumber <= 0) {
-                throw new Error("Registry number must be a positive number");
-            }
 
             await resetProvider();
 
@@ -49,6 +82,8 @@
             
             // Reset form
             formData = { maxShares: null, registryNumber: null };
+            fieldErrors = { maxShares: false, registryNumber: false };
+            attempted = false;
             success = 'Company data added successfully';
             
             await loadContractTzkt();
@@ -76,7 +111,7 @@
     {success}
     submitLabel="Add Company Data"
     {onCancel}
-    disabled={!formData.maxShares || !formData.registryNumber}
+    disabled={false}
 >
     <FormField
         label="Maximum Shares"
@@ -85,6 +120,7 @@
         bind:value={formData.maxShares}
         placeholder="Enter maximum number of shares"
         required
+        error={fieldErrors.maxShares && attempted ? "Maximum shares is required and must be positive" : null}
         helpText="The maximum number of shares that can be issued for this company"
     />
     
@@ -95,6 +131,7 @@
         bind:value={formData.registryNumber}
         placeholder="Enter Estonian business registry number"
         required
+        error={fieldErrors.registryNumber && attempted ? "Registry number is required and must be positive" : null}
         helpText="The official registry number from the Estonian Business Register"
     />
 </BaseForm>

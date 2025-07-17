@@ -21,9 +21,39 @@
     let loading = $state(false);
     let error = $state<string | null>(null);
     let success = $state<string | null>(null);
+    let fieldErrors = $state({
+        amount: false,
+        ownerAddress: false
+    });
+    let attempted = $state(false);
+    
+    // Clear field errors when user starts typing
+    $effect(() => {
+        if (formData.amount) {
+            fieldErrors.amount = false;
+        }
+    });
+    
+    $effect(() => {
+        if (formData.ownerAddress && formData.ownerAddress.trim()) {
+            fieldErrors.ownerAddress = false;
+        }
+    });
+
     
     async function handleSubmit(event: Event) {
         event.preventDefault();
+        attempted = true;
+        
+        // Validate fields and highlight errors
+        fieldErrors.amount = !formData.amount;
+        fieldErrors.ownerAddress = !formData.ownerAddress || !formData.ownerAddress.trim();
+        
+        // If any field has errors, don't submit
+        if (fieldErrors.amount || fieldErrors.ownerAddress) {
+            return;
+        }
+        
         loading = true;
         error = null;
         success = null;
@@ -31,12 +61,9 @@
         try {
             // Validate amount is a number
             const amount = Number(formData.amount);
-            if (isNaN(amount)) {
-                throw new Error("Amount must be a valid number");
-            }
-            
-            if (!formData.ownerAddress.trim()) {
-                throw new Error("Owner address is required");
+            if (isNaN(amount) || amount <= 0) {
+                fieldErrors.amount = true;
+                throw new Error("Amount must be a valid positive number");
             }
 
             await resetProvider();
@@ -51,6 +78,8 @@
             
             // Reset form
             formData = { amount: '', ownerAddress: '' };
+            fieldErrors = { amount: false, ownerAddress: false };
+            attempted = false;
             success = 'Shares allocated successfully';
             
             await loadContractTzkt();
@@ -76,7 +105,7 @@
     {success}
     submitLabel="Allocate Shares"
     {onCancel}
-    disabled={!formData.amount || !formData.ownerAddress}
+    disabled={false}
 >
     <FormField
         label="Amount"
@@ -85,6 +114,7 @@
         bind:value={formData.amount}
         placeholder="Enter number of shares to allocate"
         required
+        error={fieldErrors.amount && attempted ? "Amount is required" : null}
         helpText="Number of shares to allocate to the specified owner"
     />
     
@@ -93,8 +123,9 @@
         id="allocate-owner"
         type="text"
         bind:value={formData.ownerAddress}
-        placeholder="Enter owner wallet address"
+        placeholder="Enter owner Registry address"
         required
-        helpText="The Tezos address that will receive the allocated shares"
+        error={fieldErrors.ownerAddress && attempted ? "Owner address is required" : null}
+        helpText="The Registry address that will receive the allocated shares"
     />
 </BaseForm>

@@ -200,6 +200,28 @@
   transform: translateY(0);
 }
 
+/* Disabled button states */
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-accent:disabled,
+.btn-search:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  border-color: var(--border);
+  transform: none;
+}
+
+.btn-primary:disabled:hover,
+.btn-secondary:disabled:hover,
+.btn-accent:disabled:hover,
+.btn-search:disabled:hover {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  transform: none;
+}
+
 /* Search Button - Special case for search forms */
 .btn-search {
   display: flex;
@@ -263,19 +285,42 @@
   color: #999;
 }
 
-.input {
-  background: var(--input);
-  color: var(--foreground);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-05);
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-.input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent);
+@layer components {
+  .input {
+    background: var(--input);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-05);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  
+  .input.border-destructive {
+    border-color: var(--destructive) !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1) !important;
+  }
+  
+  .input.border-destructive:focus {
+    border-color: var(--destructive) !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+    outline: none !important;
+  }
+  
+  /* Override any potential browser defaults */
+  input.border-destructive,
+  input.border-destructive:focus,
+  input.border-destructive:hover,
+  input.border-destructive:active {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+  }
 }
 
 .table-header {

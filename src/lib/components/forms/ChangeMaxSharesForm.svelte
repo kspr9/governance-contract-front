@@ -20,17 +20,41 @@
     let loading = $state(false);
     let error = $state<string | null>(null);
     let success = $state<string | null>(null);
+    let fieldErrors = $state({
+        newMax: false
+    });
+    let attempted = $state(false);
+    
+    // Clear field errors when user starts typing
+    $effect(() => {
+        if (formData.newMax) {
+            fieldErrors.newMax = false;
+        }
+    });
     
     async function handleSubmit(event: Event) {
         event.preventDefault();
+        attempted = true;
+        
+        // Validate fields and highlight errors
+        fieldErrors.newMax = !formData.newMax;
+        
+        // If any field has errors, don't submit
+        if (fieldErrors.newMax) {
+            return;
+        }
+        
+        // Additional validation for positive number
+        if (formData.newMax <= 0) {
+            fieldErrors.newMax = true;
+            return;
+        }
+        
         loading = true;
         error = null;
         success = null;
         
         try {
-            if (!formData.newMax || formData.newMax <= 0) {
-                throw new Error("New maximum must be a positive number");
-            }
 
             await resetProvider();
 
@@ -43,6 +67,8 @@
             
             // Reset form
             formData.newMax = null;
+            fieldErrors.newMax = false;
+            attempted = false;
             success = 'Maximum shares updated successfully';
             
             await loadContractTzkt();
@@ -70,7 +96,7 @@
     {success}
     submitLabel="Update Maximum"
     {onCancel}
-    disabled={!formData.newMax}
+    disabled={false}
 >
     <FormField
         label="New Maximum"
@@ -79,6 +105,7 @@
         bind:value={formData.newMax}
         placeholder="Enter new maximum number of shares"
         required
+        error={fieldErrors.newMax && attempted ? "New maximum is required and must be positive" : null}
         helpText="The new maximum number of shares that can exist for this company"
     />
 </BaseForm>

@@ -34,7 +34,7 @@
 <div class="base-form">
     <h3 class="form-title">{title}</h3>
     
-    <form onsubmit={onSubmit}>
+    <form on:submit={onSubmit}>
         {#if error}
             <FormMessage type="error" message={error} />
         {/if}
@@ -54,6 +54,7 @@
             {cancelLabel}
             {onCancel}
             {fullWidth}
+            {onSubmit}
         />
     </form>
 </div>

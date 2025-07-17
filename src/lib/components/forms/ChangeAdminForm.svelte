@@ -20,17 +20,35 @@
     let loading = $state(false);
     let error = $state<string | null>(null);
     let success = $state<string | null>(null);
+    let fieldErrors = $state({
+        newAdminAddress: false
+    });
+    let attempted = $state(false);
+    
+    // Clear field errors when user starts typing
+    $effect(() => {
+        if (formData.newAdminAddress && formData.newAdminAddress.trim()) {
+            fieldErrors.newAdminAddress = false;
+        }
+    });
     
     async function handleSubmit(event: Event) {
         event.preventDefault();
+        attempted = true;
+        
+        // Validate fields and highlight errors
+        fieldErrors.newAdminAddress = !formData.newAdminAddress || !formData.newAdminAddress.trim();
+        
+        // If any field has errors, don't submit
+        if (fieldErrors.newAdminAddress) {
+            return;
+        }
+        
         loading = true;
         error = null;
         success = null;
         
         try {
-            if (!formData.newAdminAddress.trim()) {
-                throw new Error("New admin address is required");
-            }
 
             await resetProvider();
 
@@ -43,6 +61,8 @@
             
             // Reset form
             formData.newAdminAddress = '';
+            fieldErrors.newAdminAddress = false;
+            attempted = false;
             success = 'Admin changed successfully';
             
             await loadContractTzkt();
@@ -70,7 +90,7 @@
     {success}
     submitLabel="Change Admin"
     {onCancel}
-    disabled={!formData.newAdminAddress.trim()}
+    disabled={false}
 >
     <FormField
         label="New Admin Address"
@@ -79,6 +99,7 @@
         bind:value={formData.newAdminAddress}
         placeholder="Enter new admin wallet address"
         required
+        error={fieldErrors.newAdminAddress && attempted ? "Admin address is required" : null}
         helpText="The Tezos address that will become the new contract administrator"
     />
 </BaseForm>

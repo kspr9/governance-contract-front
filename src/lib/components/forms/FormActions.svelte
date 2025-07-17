@@ -8,6 +8,7 @@
         cancelLabel?: string;
         onCancel?: () => void;
         fullWidth?: boolean;
+        onSubmit?: (event: Event) => void | Promise<void>;
     }
 
     let { 
@@ -16,7 +17,8 @@
         submitLabel = 'Submit', 
         cancelLabel = 'Cancel',
         onCancel,
-        fullWidth = false
+        fullWidth = false,
+        onSubmit
     }: Props = $props();
 </script>
 
@@ -33,9 +35,14 @@
     {/if}
     
     <button 
-        type="submit" 
+        type="button" 
         class="btn-primary {fullWidth ? 'btn-full' : ''}"
         disabled={disabled || loading}
+        onclick={(e) => {
+            if (onSubmit) {
+                onSubmit(e);
+            }
+        }}
     >
         {#if loading}
             <LoadingDots />

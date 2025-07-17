@@ -20,17 +20,41 @@
     let loading = $state(false);
     let error = $state<string | null>(null);
     let success = $state<string | null>(null);
+    let fieldErrors = $state({
+        amount: false
+    });
+    let attempted = $state(false);
+    
+    // Clear field errors when user starts typing
+    $effect(() => {
+        if (formData.amount) {
+            fieldErrors.amount = false;
+        }
+    });
     
     async function handleSubmit(event: Event) {
         event.preventDefault();
+        attempted = true;
+        
+        // Validate fields and highlight errors
+        fieldErrors.amount = !formData.amount;
+        
+        // If any field has errors, don't submit
+        if (fieldErrors.amount) {
+            return;
+        }
+        
+        // Additional validation for positive number
+        if (formData.amount <= 0) {
+            fieldErrors.amount = true;
+            return;
+        }
+        
         loading = true;
         error = null;
         success = null;
         
         try {
-            if (!formData.amount || formData.amount <= 0) {
-                throw new Error("Amount must be a positive number");
-            }
 
             await resetProvider();
 
@@ -43,6 +67,8 @@
             
             // Reset form
             formData.amount = null;
+            fieldErrors.amount = false;
+            attempted = false;
             success = 'Shares minted successfully';
             
             await loadContractTzkt();
@@ -70,7 +96,7 @@
     {success}
     submitLabel="Mint Shares"
     {onCancel}
-    disabled={!formData.amount}
+    disabled={false}
 >
     <FormField
         label="Amount"
@@ -79,6 +105,7 @@
         bind:value={formData.amount}
         placeholder="Enter number of shares to mint"
         required
+        error={fieldErrors.amount && attempted ? "Amount is required and must be positive" : null}
         helpText="Number of new shares to mint to the treasury pool"
     />
 </BaseForm>

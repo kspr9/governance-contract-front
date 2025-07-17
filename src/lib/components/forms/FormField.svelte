@@ -37,8 +37,7 @@
         {required}
         {disabled}
         bind:value
-        class="input {error ? 'border-destructive' : ''}"
-        class:disabled
+        class="input {error ? 'border-destructive' : ''} {disabled ? 'disabled' : ''}"
     />
     
     {#if helpText}
