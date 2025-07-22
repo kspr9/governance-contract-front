@@ -14,7 +14,7 @@
             type="text"
             class="search-input" 
             bind:value={contractInput} 
-            placeholder="Tokenized Company Contract Address" 
+            placeholder="Tokenized Company Registry Address" 
         />
         <button 
             type="submit"

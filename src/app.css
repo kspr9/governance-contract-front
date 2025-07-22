@@ -96,6 +96,12 @@
    DESIGN SYSTEM COMPONENTS
    ============================================================================= */
 
+/* Navbar Components */
+.navbar {
+  background: var(--primary);
+  font-family: var(--font-family-primary);
+}
+
 /* Card Components */
 .card {
   background: var(--card);
@@ -244,6 +250,11 @@
 }
 
 /* Button Size Variants */
+.btn-xs {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  min-width: auto;
+}
 .btn-sm {
   font-size: 0.875rem;
   padding: 0.5rem 1rem;
@@ -266,7 +277,7 @@
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 3px;
+  padding: 2px;
   gap: 4px;
 }
 
@@ -424,6 +435,9 @@
 }
 .btn-collapse:hover {
   background: var(--muted);
+}
+.btn-collapse:focus {
+  outline: none;
 }
 
 /* =============================================================================

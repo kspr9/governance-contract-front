@@ -3,15 +3,17 @@
     import FormField from './FormField.svelte';
     import { contractInstance } from '../../stores/contractStore.svelte';
     import { resetProvider } from '../../config/beaconConfig';
-    import { loadContractTzkt } from '../../utils/contractLoader';
+    import { contractState } from '../../stores/contractStore.svelte';
     import { toastStore } from '../../stores/toastStore.svelte';
     
     interface Props {
         onSuccess?: () => void;
         onCancel?: () => void;
+        handleLoadContract: (address: string) => Promise<void>;
+        open?: boolean;
     }
 
-    let { onSuccess, onCancel }: Props = $props();
+    let { onSuccess, onCancel, handleLoadContract, open= $bindable() }: Props = $props();
     
     let formData = $state({
         amount: '',
@@ -20,7 +22,6 @@
     
     let loading = $state(false);
     let error = $state<string | null>(null);
-    let success = $state<string | null>(null);
     let fieldErrors = $state({
         amount: false,
         ownerAddress: false
@@ -56,7 +57,6 @@
         
         loading = true;
         error = null;
-        success = null;
         
         try {
             // Validate amount is a number
@@ -80,9 +80,8 @@
             formData = { amount: '', ownerAddress: '' };
             fieldErrors = { amount: false, ownerAddress: false };
             attempted = false;
-            success = 'Shares allocated successfully';
             
-            await loadContractTzkt();
+            await handleLoadContract($contractState.contractAddress || '');
             toastStore.add('success', 'Shares allocated successfully');
             
             if (onSuccess) {
@@ -99,10 +98,11 @@
 
 <BaseForm
     title="Allocate Shares"
+    tooltip="Allocate shares from treasury to specific addresses"
+    bind:open
     onSubmit={handleSubmit}
     {loading}
     {error}
-    {success}
     submitLabel="Allocate Shares"
     {onCancel}
     disabled={false}

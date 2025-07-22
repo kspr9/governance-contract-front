@@ -3,15 +3,17 @@
     import FormField from './FormField.svelte';
     import { contractInstance } from '../../stores/contractStore.svelte';
     import { resetProvider } from '../../config/beaconConfig';
-    import { loadContractTzkt } from '../../utils/contractLoader';
+    import { contractState } from '../../stores/contractStore.svelte';
     import { toastStore } from '../../stores/toastStore.svelte';
     
     interface Props {
         onSuccess?: () => void;
         onCancel?: () => void;
+        handleLoadContract: (address: string) => Promise<void>;
+        open?: boolean;
     }
 
-    let { onSuccess, onCancel }: Props = $props();
+    let { onSuccess, onCancel, handleLoadContract, open= $bindable() }: Props = $props();
     
     let formData = $state({
         newMax: null as number | null
@@ -19,7 +21,6 @@
     
     let loading = $state(false);
     let error = $state<string | null>(null);
-    let success = $state<string | null>(null);
     let fieldErrors = $state({
         newMax: false
     });
@@ -45,14 +46,13 @@
         }
         
         // Additional validation for positive number
-        if (formData.newMax <= 0) {
+        if (formData.newMax !== null && formData.newMax <= 0) {
             fieldErrors.newMax = true;
             return;
         }
         
         loading = true;
         error = null;
-        success = null;
         
         try {
 
@@ -69,9 +69,8 @@
             formData.newMax = null;
             fieldErrors.newMax = false;
             attempted = false;
-            success = 'Maximum shares updated successfully';
             
-            await loadContractTzkt();
+            await handleLoadContract($contractState.contractAddress || '');
             toastStore.add('success', 'Maximum shares updated successfully', result.hash);
             
             if (onSuccess) {
@@ -90,10 +89,11 @@
 
 <BaseForm
     title="Change Maximum Shares"
+    tooltip="Update the maximum number of shares allowed"
+    bind:open
     onSubmit={handleSubmit}
     {loading}
     {error}
-    {success}
     submitLabel="Update Maximum"
     {onCancel}
     disabled={false}

@@ -73,8 +73,8 @@
     
     .section-title {
         font-size: 1.125rem;
-        font-weight: 600;
-        color: var(--primary);
+        font-weight: 500;
+        color: var(--foreground);
     }
     
     .toggle-icon {
@@ -83,7 +83,7 @@
     }
     
     .section-content {
-        padding: 0 1.5rem 1.5rem;
+        padding: 1rem 1.5rem 1.5rem;
         border-top: 1px solid var(--border);
     }
 </style>

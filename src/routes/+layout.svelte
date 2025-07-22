@@ -3,7 +3,7 @@
 
   import { browser } from '$app/environment';
   import { onMount } from 'svelte';
-  import miracapLogo from '../assets/Miracap_logo_white.png';
+  import miracapLogo from '../assets/logo.svg';
   import { terminology } from '$lib/utils/terminology';
 
   // Import our new shared store
@@ -27,7 +27,7 @@
 
 <main class="min-h-screen bg-[color:var(--background)] grid grid-rows-[auto_1fr]">
   <!-- Sticky Navbar -->
-  <div class="sticky top-0 z-50 bg-blue-600 text-white p-4 shadow-md">
+  <div class="sticky top-0 z-50 navbar p-4 shadow-md">
     <div class="max-w-5xl mx-auto">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">

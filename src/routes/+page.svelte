@@ -72,7 +72,7 @@
     <!-- Hero Content -->
     <div class="relative z-10 max-w-4xl mx-auto px-4 text-center text-white w-full">
       {#if !$contractState.isLoaded}
-        <h1 class="text-4xl md:text-5xl font-bold mb-8">
+        <h1 class="text-4xl md:text-3xl font-bold mb-8">
           Search for a Company Share Register
         </h1>
         

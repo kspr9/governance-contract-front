@@ -3,15 +3,17 @@
     import FormField from './FormField.svelte';
     import { contractInstance } from '../../stores/contractStore.svelte';
     import { resetProvider } from '../../config/beaconConfig';
-    import { loadContractTzkt } from '../../utils/contractLoader';
+    import { contractState } from '../../stores/contractStore.svelte';
     import { toastStore } from '../../stores/toastStore.svelte';
     
     interface Props {
         onSuccess?: () => void;
         onCancel?: () => void;
+        handleLoadContract: (address: string) => Promise<void>;
+        open?: boolean;
     }
 
-    let { onSuccess, onCancel }: Props = $props();
+    let { onSuccess, onCancel, handleLoadContract, open= $bindable() }: Props = $props();
     
     let formData = $state({
         newAdminAddress: ''
@@ -19,7 +21,6 @@
     
     let loading = $state(false);
     let error = $state<string | null>(null);
-    let success = $state<string | null>(null);
     let fieldErrors = $state({
         newAdminAddress: false
     });
@@ -46,7 +47,6 @@
         
         loading = true;
         error = null;
-        success = null;
         
         try {
 
@@ -63,9 +63,8 @@
             formData.newAdminAddress = '';
             fieldErrors.newAdminAddress = false;
             attempted = false;
-            success = 'Admin changed successfully';
             
-            await loadContractTzkt();
+            await handleLoadContract($contractState.contractAddress || '');
             toastStore.add('success', 'Admin changed successfully', result.hash);
             
             if (onSuccess) {
@@ -84,10 +83,11 @@
 
 <BaseForm
     title="Change Admin"
+    tooltip="Transfer admin rights to another address"
+    bind:open
     onSubmit={handleSubmit}
     {loading}
     {error}
-    {success}
     submitLabel="Change Admin"
     {onCancel}
     disabled={false}

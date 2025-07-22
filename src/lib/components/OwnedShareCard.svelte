@@ -5,6 +5,7 @@
     import { transferHeldShares } from '../utils/contractActions';
     import { terminology } from '../utils/terminology';
     import HelpTip from './HelpTip.svelte';
+    import { toastStore } from '../stores/toastStore.svelte';
 
     let { ticket, maxSharesCache, maxSharesLoading, handleLoadContract } = $props<{
         ticket: TzktTicket;
@@ -22,8 +23,6 @@
     let loadingState = $state(false);
     let errorState = $state<string | null>(null);
     let txHash = $state<string | null>(null);
-    let successMessage = $state<string | null>(null);
-    let showSuccessMessage = $state(false);
 
     async function handleTransfer(event: Event) {
         event.preventDefault();
@@ -33,8 +32,6 @@
         loadingState = true;
         errorState = null;
         txHash = null;
-        successMessage = null;
-        showSuccessMessage = false;
         
         try {
             const result = await transferHeldShares({
@@ -43,17 +40,16 @@
                 share: ticket.address
             });
             
-            // Set transaction hash and success message
+            // Set transaction hash and show success toast
             txHash = result;
-            successMessage = `Successfully transferred ${amount} shares to ${destination}`;
-            showSuccessMessage = true;
+            toastStore.add('success', `Successfully transferred ${amount} shares to ${destination}`, result);
             
             // Reset form and close after a delay
             setTimeout(() => {
                 transferForm = { destination: '', amount: '' };
                 openTransferCard = false;
                 handleLoadContract($contractState.contractAddress || '');
-            }, 5000); // Increased to 5 seconds to give more time to read
+            }, 2000); // Reduced to 2 seconds since toast handles the success message
         } catch (err) {
             console.error('Transfer failed:', err);
             errorState = err instanceof Error ? err.message : 'Failed to transfer shares';
@@ -63,34 +59,23 @@
     }
 </script>
 
-<div class="bg-[color:var(--card)] rounded-[var(--radius)] shadow-md p-5 flex flex-col gap-3 border border-[color:var(--border)]">
-    <div class="grid grid-cols-2 gap-4 mt-2">
-        <div class="flex flex-col items-stretch">
+<div class="owned-share-card bg-[color:var(--card)] rounded-[var(--radius)] shadow-md p-5 flex flex-col gap-3 border border-[color:var(--border)]">
+    <!-- 4-column layout: Registry Number | Share Register | Number of Shares | Transfer Button -->
+    <div class="grid gap-4 items-center overflow-hidden card-grid">
+        <!-- Column 1: Registry Number -->
+        <div class="flex flex-col">
             <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.REGISTRY_NUMBER}</span>
             <span class="text-base font-semibold text-[color:var(--foreground)]">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
         </div>
-        <div class="flex flex-col items-center">
-            <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.AMOUNT}</span>
-            <span class="text-lg font-bold text-[color:var(--primary)]">
-                {ticket.amount}
-                {#if maxSharesLoading[ticket.address]}
-                    <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ ...</span>
-                {:else if maxSharesCache[ticket.address]}
-                    <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
-                {:else}
-                    <span class="text-xs text-[color:var(--muted-foreground)] ml-2">/ ?</span>
-                {/if}
-            </span>
-        </div>
-    </div>
-    <div class="flex items-start justify-between">
-        <div>
-            <div class="text-xs text-[color:var(--muted-foreground)] font-semibold flex items-center">
+        
+        <!-- Column 2: Share Register -->
+        <div class="flex flex-col">
+            <div class="text-xs text-[color:var(--muted-foreground)] font-semibold flex items-center gap-1">
                 {terminology.ISSUING_CONTRACT}
                 <HelpTip text="The share register where these shares were issued" />
             </div>
             <button 
-                class="font-mono text-sm break-all text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline" 
+                class="font-mono text-sm text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left truncate" 
                 title="Load this contract" 
                 onclick={() => { 
                     $contractState.contractAddress = ticket.address; 
@@ -100,17 +85,37 @@
                 {ticket.address}
             </button>
         </div>
-        <button 
-            class={(openTransferCard ? 'btn-secondary p-2' : 'btn-primary') + ' flex items-center gap-1 mt-1'}
-            title="Transfer" 
-            onclick={() => { openTransferCard = !openTransferCard; }}
-        >
-            <svg class={"w-5 h-5 " + (openTransferCard ? 'text-[color:var(--primary)]' : 'text-[color:var(--primary-foreground)]')} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-            </svg>
-            <span class="text-xs">{terminology.TRANSFER_SHARES}</span>
-        </button>
+        
+        <!-- Column 3: Number of Shares -->
+        <div class="flex flex-col">
+            <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.AMOUNT}</span>
+            <span class="text-lg font-bold text-[color:var(--foreground)]">
+                <span class="font-bold">{ticket.amount}</span>
+                {#if maxSharesLoading[ticket.address]}
+                    <span class="text-[color:var(--muted-foreground)] ml-2">/ ...</span>
+                {:else if maxSharesCache[ticket.address]}
+                    <span class="text-[color:var(--muted-foreground)] ml-2">/ {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
+                {:else}
+                    <span class="text-[color:var(--muted-foreground)] ml-2">/ ?</span>
+                {/if}
+            </span>
+        </div>
+        
+        <!-- Column 4: Transfer Button -->
+        <div class="flex justify-end">
+            <button 
+                class={(openTransferCard ? 'btn-secondary' : 'btn-primary') + ' flex items-center gap-2'}
+                title={terminology.TRANSFER_SHARES}
+                onclick={() => { openTransferCard = !openTransferCard; }}
+            >
+                <span class="text-sm hidden lg:inline">{terminology.TRANSFER_SHARES}</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4l4-4m-4 4l4 4"/>
+                </svg>
+            </button>
+        </div>
     </div>
+
     {#if openTransferCard}
         <form class="mt-2 flex flex-col gap-2" onsubmit={handleTransfer}>
             <input
@@ -128,29 +133,6 @@
                 disabled={loadingState}
             />
             
-            {#if showSuccessMessage && successMessage}
-                <div class="bg-[color:var(--primary)]/10 p-3 rounded-md space-y-2">
-                    <div class="text-[color:var(--primary)] flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        <span>{successMessage}</span>
-                    </div>
-                    {#if txHash}
-                        <a 
-                            href={`https://tzkt.io/${txHash}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            class="text-xs text-[color:var(--primary)] hover:underline block"
-                        >
-                            View transaction on TzKT
-                        </a>
-                    {/if}
-                    <div class="text-xs text-[color:var(--muted-foreground)]">
-                        This form will close in a few seconds...
-                    </div>
-                </div>
-            {/if}
 
             {#if errorState}
                 <div class="bg-[color:var(--destructive)]/10 p-3 rounded-md flex items-center gap-2">
@@ -174,4 +156,15 @@
             </button>
         </form>
     {/if}
-</div> 
+</div>
+
+<style>
+  /* Easy column width adjustments - modify these values to change column widths */
+  .card-grid {
+    --col-1-width: 15%;  /* Registry Number */
+    --col-2-width: 40%;  /* Share Register */
+    --col-3-width: 20%;  /* Number of Shares */
+    --col-4-width: 25%;  /* Transfer Button */
+    grid-template-columns: var(--col-1-width) var(--col-2-width) var(--col-3-width) var(--col-4-width);
+  }
+</style> 

@@ -11,6 +11,7 @@
   import { terminology } from '../utils/terminology';
   import HelpTip from './HelpTip.svelte';
   import CollapsibleSection from './shared/CollapsibleSection.svelte';
+  import { contractInstance } from '../stores/contractStore.svelte';
   
   let { 
     maxSharesCache,
@@ -32,9 +33,51 @@
   let showLedger = $state(true);
   let showUnclaimed = $state(false);
   let showClaimants = $state(false);
+  let showDistributeForm = $state(false);
+
+  let destinationAddress = $state('');
+  let loadingAddress = $state<string | null>(null);
+  let error = $state<string | null>(null);
+  let hasEligibleClaimants = $derived(shareLedgerState.eligibleClaimants.length > 0);
+  //let eligibleClaimants = $derived(() => hasEligibleClaimants);
+
+  // Debug effect to log the state
+  $effect(() => {
+    
+  });
+
+  // Refactored: Accept address as argument
+  /**
+   * Distributes shares to the given address by calling the contract entrypoint.
+   * Shows loading, error, and success states.
+   */
+  async function handleClaimSharesDirect(address: string) {
+    if (!hasEligibleClaimants) return;
+    loadingAddress = address;
+    error = null;
+    try {
+      const { resetProvider } = await import('../config/beaconConfig');
+      const { toastStore } = await import('../stores/toastStore.svelte');
+      await resetProvider();
+      const contract = $contractInstance;
+      if (!contract) throw new Error('Contract instance not found');
+      console.log('ContractState.address:', $contractState.contractAddress);
+      console.log('ContractInstance:', contract);
+      console.log('Address param:', address);
+      console.log('Param object:', { destination_address: address });
+      const operation = await contract.methods.claim_shares_direct(address).send();
+      const result = await operation.confirmation(2);
+      await handleLoadContract($contractState.contractAddress || '');
+      toastStore.add('success', 'Direct claim of shares successful', result.hash);
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Failed to claim shares directly';
+    } finally {
+      loadingAddress = null;
+    }
+  }
 </script>
 
-<div class="space-y-4">
+<div class="space-y-4 mb-8">
   <!-- Share Ledger / Cap Table -->
   <CollapsibleSection title="{terminology.SHARE_LEDGER}" tooltip="{terminology.HELP_SHARE_REGISTER}" bind:open={showLedger}>
     <table class="w-full border-collapse text-sm table-fixed">
@@ -46,10 +89,10 @@
       </colgroup>
       <thead>
         <tr class="table-header">
-          <th class="text-left p-2">Name</th>
-          <th class="text-left p-2">{terminology.REGISTRY_NUMBER}</th>
-          <th class="text-left p-2">Wallet Address</th>
-          <th class="text-right p-2">Owned Shares</th>
+          <th class="font-semibold text-left text-[color:var(--muted-foreground)] p-2">NAME</th>
+          <th class="font-semibold text-left text-[color:var(--muted-foreground)] ml-2">{terminology.REGISTRY_NUMBER}</th>
+          <th class="font-semibold text-left text-[color:var(--muted-foreground)] p-2">REGISTER ADDRESS</th>
+          <th class="font-semibold text-right text-[color:var(--muted-foreground)] p-2">OWNED SHARES</th>
         </tr>
       </thead>
       <tbody>
@@ -85,11 +128,11 @@
                   -
                 {/if}
               </td>
-              <td class="text-left p-2">
+              <td class="text-left p-2)">
                 {#if maxSharesLoading[address]}
                   <LoadingDots />
                 {:else if registryNumber}
-                  {registryNumber}
+                  <span class="text-[color:var(--muted-foreground)] ml-2">{registryNumber}</span>
                 {:else}
                   -
                 {/if}
@@ -132,7 +175,7 @@
 
   <!-- Treasury Shares Card -->
   <CollapsibleSection title="{terminology.TREASURY_SHARES}" tooltip="Shares that have been created but not yet allocated to shareholders" bind:open={showUnclaimed}>
-    <table class="w-full border-collapse text-sm">
+    <table class="w-full border-collapse text-sm table-fixed">
       <thead>
         <tr class="table-header">
           <th class="text-left p-2">Issuer</th>
@@ -158,11 +201,15 @@
 
   <!-- Eligible Claimants Card -->
   <CollapsibleSection title="{terminology.ELIGIBLE_CLAIMANTS}" tooltip="Shareholders who have been allocated shares but haven't claimed them yet" bind:open={showClaimants}>
-    <table class="w-full border-collapse text-sm">
+    <table class="w-full border-collapse text-sm table-fixed">
+      <colgroup>
+        <col style="width: 70%;" />
+        <col style="width: 30%;" />
+      </colgroup>
       <thead>
         <tr class="table-header">
           <th class="text-left p-2">Address</th>
-          <th class="text-right p-2">Entitled Shares</th>
+          <th class="text-center p-2">Entitled Shares</th>
         </tr>
       </thead>
       <tbody>
@@ -184,21 +231,49 @@
                   {address}
                 {/if}
               </td>
-              <td class="text-right p-2">{shares}</td>
+              <td class="text-right p-2">
+                <div class="flex items-center justify-end gap-2">
+                  <span>{shares}</span>
+                  <button
+                    class="btn-sm"
+                    disabled={loadingAddress === address}
+                    onclick={() => handleClaimSharesDirect(address)}
+                    title="Distribute shares to this address"
+                  >
+                    {#if loadingAddress === address}
+                      Sending <LoadingDots />
+                    {:else}
+                      Distribute Shares
+                    {/if}
+                  </button>
+                </div>
+              </td>
             </tr>
           {/each}
         {:else}
           <tr class="table-row">
-            <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="2">No pending allocations</td>
+            <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="3">No pending allocations</td>
           </tr>
         {/if}
       </tbody>
     </table>
+    {#if error}
+      <div class="text-[color:var(--destructive)] mt-2">{error}</div>
+    {/if}
   </CollapsibleSection>
 </div>
 
 <style>
   .zebra-stripe {
     background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .table-header {
+    font-weight: 400;
+    font-size: 0.85rem;
+  }
+
+  .muted {
+    color: var(--muted-foreground);
   }
 </style>

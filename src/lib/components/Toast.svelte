@@ -4,7 +4,7 @@
     import { cubicOut } from 'svelte/easing';
 
     const getToastClasses = (type: 'success' | 'error' | 'info') => {
-        const baseClasses = 'card p-4 mb-2 flex items-start justify-between';
+        const baseClasses = 'card p-4 flex items-start justify-between';
         switch (type) {
             case 'success':
                 return `${baseClasses} border-l-4 border-[color:var(--primary)] bg-[color:var(--card)] text-[color:var(--primary)]`;
@@ -15,21 +15,9 @@
         }
     };
 
-    // Track the last clicked button position
-    let lastClickedButton: HTMLElement | null = null;
-
-    // Subscribe to click events on buttons
-    if (typeof window !== 'undefined') {
-        window.addEventListener('click', (e) => {
-            const target = e.target as HTMLElement;
-            if (target.tagName === 'BUTTON') {
-                lastClickedButton = target;
-            }
-        });
-    }
 </script>
 
-<div class="fixed z-50 w-96" style="top: {lastClickedButton ? lastClickedButton.getBoundingClientRect().top + window.scrollY + 40 : 16}px; right: 16px;">
+<div class="fixed bottom-4 right-4 z-50 w-96 space-y-2">
     {#each $toastStore as toast (toast.id)}
         <div 
             class={getToastClasses(toast.type)}

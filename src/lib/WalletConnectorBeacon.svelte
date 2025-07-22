@@ -2,6 +2,9 @@
     import { onMount } from 'svelte';
     import { beaconState, walletStore } from './stores/beaconStore.svelte';
     import { Tezos, wallet, connectWallet, disconnectWallet, getActiveAccount, getWalletBalance } from './config/beaconConfig';
+    import tezosLogo from '../assets/Tezos.svg';
+    import { Wallet } from 'lucide-svelte';
+    import { ChevronDown } from 'lucide-svelte';
 
     interface Props {
         navbarMode?: boolean;
@@ -68,14 +71,10 @@
     <div class="flex items-center gap-3">
         <!-- Tezos Network Dropdown -->
         <div class="relative group">
-            <button class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full transition-colors duration-200">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
+            <button class="flex items-center gap-3 border border-white/100 bg-[color:var(--accent)] group-hover:bg-white text-white group-hover:text-[color:var(--primary)] pl-1 pr-2 py-1 rounded-full transition-colors duration-200">
+                <img src={tezosLogo} alt="Tezos" class="w-6 h-6" />            
                 <span class="text-sm font-medium">Tezos</span>
-                <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
+                <ChevronDown class="w-4 h-4 text-white group-hover:text-[color:var(--primary)] transition-colors transition-transform group-hover:rotate-180" />
             </button>
             <!-- Dropdown menu would go here -->
         </div>
@@ -83,16 +82,12 @@
         {#if beaconState.isConnected}
             <!-- Wallet Address Dropdown -->
             <div class="relative group">
-                <button class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full transition-colors duration-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                    </svg>
-                    <span class="text-sm font-mono" title={beaconState.address}>
+                <button class="flex items-center gap-3 border-white hover:border-white bg-white group-hover:bg-[color:var(--accent)] px-4 py-1 pt-1.5 pb-1.5 rounded-full transition-colors duration-200">
+                    <Wallet size={22} strokeWidth={2} class="text-[color:var(--primary)] group-hover:text-white transition-colors" />
+                    <span class="text-sm text-[color:var(--primary)] group-hover:text-white transition-colors" title={beaconState.address}>
                         {getShortAddress(beaconState.address)}
                     </span>
-                    <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
+                    <ChevronDown class="w-4 h-4 text-[color:var(--primary)] group-hover:text-white group-hover:rotate-180 transition-colors transition-transform" />
                 </button>
                 <!-- Dropdown menu -->
                 <div class="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">

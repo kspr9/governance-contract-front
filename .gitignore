@@ -15,3 +15,8 @@ CLAUDE.md
 LAYOUT_APPROACHES.md
 figma.svelte
 src/assets/fonts.zip
+src/assets/example_contract.py
+.svelte-kit/** */
+repomix-output.md
+PHASE3_CODE_ORGANIZATION.md
+package-lock.json

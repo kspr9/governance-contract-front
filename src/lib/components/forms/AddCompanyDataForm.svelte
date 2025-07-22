@@ -3,15 +3,17 @@
     import FormField from './FormField.svelte';
     import { contractInstance } from '../../stores/contractStore.svelte';
     import { resetProvider } from '../../config/beaconConfig';
-    import { loadContractTzkt } from '../../utils/contractLoader';
+    import { contractState } from '../../stores/contractStore.svelte';
     import { toastStore } from '../../stores/toastStore.svelte';
     
     interface Props {
         onSuccess?: () => void;
         onCancel?: () => void;
+        handleLoadContract: (address: string) => Promise<void>;
+        open?: boolean;
     }
 
-    let { onSuccess, onCancel }: Props = $props();
+    let { onSuccess, onCancel, handleLoadContract, open= $bindable() }: Props = $props();
     
     let formData = $state({
         maxShares: null as number | null,
@@ -20,7 +22,6 @@
     
     let loading = $state(false);
     let error = $state<string | null>(null);
-    let success = $state<string | null>(null);
     let fieldErrors = $state({
         maxShares: false,
         registryNumber: false
@@ -54,19 +55,18 @@
         }
         
         // Additional validation for positive numbers
-        if (formData.maxShares <= 0) {
+        if (formData.maxShares !== null && formData.maxShares <= 0) {
             fieldErrors.maxShares = true;
             return;
         }
         
-        if (formData.registryNumber <= 0) {
+        if (formData.registryNumber !== null && formData.registryNumber <= 0) {
             fieldErrors.registryNumber = true;
             return;
         }
         
         loading = true;
         error = null;
-        success = null;
         
         try {
 
@@ -84,9 +84,8 @@
             formData = { maxShares: null, registryNumber: null };
             fieldErrors = { maxShares: false, registryNumber: false };
             attempted = false;
-            success = 'Company data added successfully';
             
-            await loadContractTzkt();
+            await handleLoadContract($contractState.contractAddress || '');
             toastStore.add('success', 'Company data added successfully', result.hash);
             
             if (onSuccess) {
@@ -105,10 +104,11 @@
 
 <BaseForm
     title="Add Company Data"
+    tooltip="Add company registry information to the contract"
+    bind:open
     onSubmit={handleSubmit}
     {loading}
     {error}
-    {success}
     submitLabel="Add Company Data"
     {onCancel}
     disabled={false}

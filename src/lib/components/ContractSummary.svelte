@@ -21,13 +21,24 @@
     companyDataError: string | null;
     handleLoadContract: (address: string) => Promise<void>;
   } = $props();
+
+  // Computed values for share metrics
+  let totalClaimedShares = $derived(() => {
+    if (!tzktStorageData.share_ledger) return 0;
+    return Object.values(tzktStorageData.share_ledger).reduce((sum, amount) => sum + Number(amount), 0);
+  });
+
+  let totalUnclaimedShares = $derived(() => {
+    if (!tzktStorageData.unclaimed_share_pool) return 0;
+    return Object.values(tzktStorageData.unclaimed_share_pool).reduce((sum, ticket) => sum + Number(ticket.amount), 0);
+  });
 </script>
 
 {#if tzktStorageData.admin_address !== null}
-<div class="rounded-lg shadow p-0 border border-[color:var(--border)] bg-[color:var(--card)]">
-  <div class="px-6 py-4 flex items-center justify-between border-b border-[color:var(--border)]">
+<div class="rounded-lg shadow p-0 border border-[color:var(--border)] bg-[color:var(--card)] relative">
+  <div class="px-6 py-4 flex items-start justify-between border-b border-[color:var(--border)]">
     <div>
-      <div class="font-bold text-xl text-[color:var(--primary)]">
+      <div class="font-bold text-2xl text-[color:var(--primary)]">
         {#if companyDataLoading}
           Loading company data<LoadingDots />
         {:else if companyData}
@@ -37,14 +48,18 @@
         {/if}
       </div>
       {#if companyData}
-        <div class="text-sm text-[color:var(--muted-foreground)]">
-          {terminology.REGISTRY_NUMBER}: {tzktStorageData.registry_number}
-          {#if companyData.status}
-            • Status: {companyData.status}
-          {/if}
+        {#if companyData.status}
+          <div class="text-sm text-[color:var(--muted-foreground)] mt-1">
+            Status: <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+              {companyData.status}
+            </span>
+          </div>
+        {/if}
+        <div class="text-sm text-[color:var(--muted-foreground)] mt-1">
+          {terminology.REGISTRY_NUMBER_SMALL}: {tzktStorageData.registry_number}
         </div>
         {#if companyData.address}
-          <div class="text-sm text-[color:var(--muted-foreground)]">
+          <div class="text-sm text-[color:var(--muted-foreground)] mt-1">
             {companyData.address}
           </div>
         {/if}
@@ -55,16 +70,7 @@
         </div>
       {/if}
     </div>
-  </div>
-  <div class="px-6 py-4">
-    <div class="text-sm text-[color:var(--muted-foreground)]">Company Share Register address</div>
-    <div class="flex items-center gap-2 mb-4">
-      <div
-        class="flex-1 p-2 rounded font-mono text-sm cursor-default select-all text-[color:var(--foreground)]"
-        style="min-width:0;"
-      >
-        {$contractState.contractAddress}
-      </div>
+    <div class="flex items-center gap-2 mt-1">
       <button
         class="btn-icon"
         title={terminology.RELOAD_CONTRACT}
@@ -76,7 +82,7 @@
         </svg>
       </button>
       <a
-        class="btn-icon ml-1"
+        class="btn-icon"
         href={`https://better-call.dev/mainnet/${$contractState.contractAddress}/operations`}
         target="_blank"
         rel="noopener noreferrer"
@@ -88,31 +94,56 @@
         </svg>
       </a>
     </div>
-    <div class="grid grid-cols-2 gap-4 mb-4">
+  </div>
+  <div class="px-6 py-4">
+    <div class="grid grid-cols-3 gap-4 mb-4">
+      <div>
+        <span class="text-xs text-[color:var(--muted-foreground)]">Company Share Register address</span>
+        <div class="font-mono text-sm text-[color:var(--foreground)] cursor-default select-all">{$contractState.contractAddress}</div>
+      </div>
       <div>
         <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.ADMIN_ADDRESS}</span>
         <div class="font-mono text-sm text-[color:var(--foreground)]">{tzktStorageData.admin_address}</div>
       </div>
       <div>
-        <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.REGISTRY_NUMBER}</span>
+        <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.REGISTRY_NUMBER_SMALL}</span>
         <div class="text-sm text-[color:var(--foreground)]">{tzktStorageData.registry_number || 'Not set'}</div>
       </div>
     </div>
-    <div class="flex flex-row gap-8 justify-between border-t pt-4 border-[color:var(--border)]">
-      <div class="flex-1">
-        <span class="text-xs text-[color:var(--muted-foreground)] flex items-center">
-          {terminology.MAX_SHARES}
-          <HelpTip text="The maximum number of shares this company is authorized to issue" />
-        </span>
-        <div class="text-2xl font-bold text-[color:var(--primary)]">{tzktStorageData.max_shares || 'Not set'}</div>
-      </div>
-      <div class="flex-1">
-        <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.ISSUED_SHARES}</span>
-        <div class="text-2xl font-bold text-[color:var(--primary)]">{tzktStorageData.issued_shares}</div>
-      </div>
-      <div class="flex-1">
-        <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.UNCLAIMED_SHARES}</span>
-        <div class="text-2xl font-bold text-[color:var(--primary)]">{tzktStorageData.total_allocated_shares}</div>
+    <div class="border-t pt-4 border-[color:var(--border)]">
+      <div class="grid grid-cols-5 gap-4">
+        <div class="flex flex-col p-4 rounded-lg border border-[color:var(--border)] bg-[color:var(--muted)]">
+          <span class="text-xs text-[color:var(--muted-foreground)] flex items-center">
+            {terminology.MAX_SHARES}
+            <HelpTip text="The maximum number of shares this company is authorized to issue" />
+          </span>
+          <div class="text-xl font-bold text-[color:var(--primary)]">{tzktStorageData.max_shares || 'Not set'}</div>
+        </div>
+        <div class="flex flex-col p-4 rounded-lg border border-[color:var(--border)] bg-[color:var(--muted)]">
+          <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.ISSUED_SHARES}</span>
+          <div class="text-xl font-bold text-[color:var(--primary)]">{tzktStorageData.issued_shares}</div>
+        </div>
+        <div class="flex flex-col p-4 rounded-lg border border-[color:var(--border)] bg-[color:var(--muted)]">
+          <span class="text-xs text-[color:var(--muted-foreground)] flex items-center">
+            {terminology.CLAIMED_SHARES}
+            <HelpTip text="Total number of shares that have been claimed by shareholders" />
+          </span>
+          <div class="text-xl font-bold text-[color:var(--primary)]">{totalClaimedShares()}</div>
+        </div>
+        <div class="flex flex-col p-4 rounded-lg border border-[color:var(--border)] bg-[color:var(--muted)]">
+          <span class="text-xs text-[color:var(--muted-foreground)] flex items-center">
+            {terminology.TREASURY_SHARES}
+            <HelpTip text="Shares that have been minted but not yet allocated to specific shareholders" />
+          </span>
+          <div class="text-xl font-bold text-[color:var(--primary)]">{totalUnclaimedShares()}</div>
+        </div>
+        <div class="flex flex-col p-4 rounded-lg border border-[color:var(--border)] bg-[color:var(--muted)]">
+          <span class="text-xs text-[color:var(--muted-foreground)] flex items-center">
+            {terminology.ELIGIBLE_CLAIMANTS}
+            <HelpTip text="Total shares allocated to specific addresses but not yet claimed" />
+          </span>
+          <div class="text-xl font-bold text-[color:var(--primary)]">{tzktStorageData.total_allocated_shares}</div>
+        </div>
       </div>
     </div>
   </div>

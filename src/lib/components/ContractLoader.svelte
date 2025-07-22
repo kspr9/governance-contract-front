@@ -336,7 +336,7 @@
                     />
                     
                 {:else if activeTab === 'admin'}
-                    <ContractOpsRefactored />
+                    <ContractOpsRefactored {handleLoadContract} />
                 {/if}
             {/snippet}
         </DashboardTabs>

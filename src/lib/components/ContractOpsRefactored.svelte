@@ -1,5 +1,6 @@
 <script lang="ts">
     import { contractState, contractInstance } from '../stores/contractStore.svelte';
+    import { tzktStorageData } from '../stores/tzktStorage.svelte';
     import { beaconState } from '../stores/beaconStore.svelte';
     import { Tezos, wallet, resetProvider } from '../config/beaconConfig';
     import Toast from './Toast.svelte';
@@ -14,6 +15,8 @@
     import ChangeAdminForm from './forms/ChangeAdminForm.svelte';
     import AddCompanyDataForm from './forms/AddCompanyDataForm.svelte';
     
+    let { handleLoadContract }: { handleLoadContract: (address: string) => Promise<void> } = $props();
+    
     // State for collapsible sections
     let showAdminFunctions = $state(true);
     let showUserFunctions = $state(true);
@@ -27,6 +30,13 @@
     
     // Track which user form is currently active
     let activeUserForm = $state<string | null>(null);
+    
+    // Admin authorization check
+    const isAdmin = $derived(
+        beaconState.address !== null && 
+        tzktStorageData.admin_address !== null && 
+        beaconState.address === tzktStorageData.admin_address
+    );
     
     async function connectContract() {
         try {
@@ -72,7 +82,7 @@
     }
 </script>
 
-<div class="contract-ops">
+<div class="space-y-4 mb-8">
     <Toast />
     
     {#if !beaconState.isConnected}
@@ -85,99 +95,52 @@
         </div>
     {:else}
         <!-- Admin Functions Section -->
-        {#if beaconState.isConnected}
+        {#if isAdmin}
             <CollapsibleSection 
                 title="Admin Functions"
                 bind:open={showAdminFunctions}
             >
                 <div class="admin-functions-container">
-                    <CollapsibleSection 
-                        title="Allocate Shares" 
-                        tooltip="Allocate shares from treasury to specific addresses"
-                        bind:open={showAllocateForm}
-                    >
-                        <AllocateSharesForm 
-                            onSuccess={handleFormSuccess}
-                        />
-                    </CollapsibleSection>
                     
-                    <CollapsibleSection 
-                        title="Mint Shares" 
-                        tooltip="Create new shares and add them to the treasury pool"
+                    <MintSharesForm 
                         bind:open={showMintForm}
-                    >
-                        <MintSharesForm 
-                            onSuccess={handleFormSuccess}
-                        />
-                    </CollapsibleSection>
-                    
-                    <CollapsibleSection 
-                        title="Change Max Shares" 
-                        tooltip="Update the maximum number of shares allowed"
+                        onSuccess={handleFormSuccess}
+                        {handleLoadContract}
+                    />
+                
+                    <AllocateSharesForm 
+                        bind:open={showAllocateForm}
+                        onSuccess={handleFormSuccess}
+                        {handleLoadContract}
+                    />
+
+                    <ChangeMaxSharesForm 
                         bind:open={showChangeMaxForm}
-                    >
-                        <ChangeMaxSharesForm 
-                            onSuccess={handleFormSuccess}
-                        />
-                    </CollapsibleSection>
+                        onSuccess={handleFormSuccess}
+                        {handleLoadContract}
+                    />
                     
-                    <CollapsibleSection 
-                        title="Change Admin" 
-                        tooltip="Transfer admin rights to another address"
+                    <ChangeAdminForm 
                         bind:open={showChangeAdminForm}
-                    >
-                        <ChangeAdminForm 
-                            onSuccess={handleFormSuccess}
-                        />
-                    </CollapsibleSection>
+                        onSuccess={handleFormSuccess}
+                        {handleLoadContract}
+                    />
                     
-                    <CollapsibleSection 
-                        title="Add Company Data" 
-                        tooltip="Add company registry information to the contract"
+                    <AddCompanyDataForm 
                         bind:open={showAddCompanyForm}
-                    >
-                        <AddCompanyDataForm 
-                            onSuccess={handleFormSuccess}
-                        />
-                    </CollapsibleSection>
+                        onSuccess={handleFormSuccess}
+                        {handleLoadContract}
+                    />
                 </div>
             </CollapsibleSection>
+        {:else}
+            <div class="card">
+                <p class="text-muted-foreground">You are not authorized to perform admin functions. Only the contract admin can access these features.</p>
+            </div>
         {/if}
         
         <!-- User Functions Section -->
-        <CollapsibleSection 
-            title="User Functions"
-            bind:open={showUserFunctions}
-        >
-            <div class="functions-grid">
-                <div class="function-actions">
-                    <button 
-                        class="btn-secondary"
-                        onclick={() => showUserForm('transfer')}
-                    >
-                        Transfer Shares
-                    </button>
-                    <HelpTip text="Transfer your owned shares to another address" />
-                </div>
-                
-                <div class="function-actions">
-                    <button 
-                        class="btn-secondary"
-                        onclick={() => showUserForm('claim')}
-                    >
-                        Claim Shares
-                    </button>
-                    <HelpTip text="Claim shares that have been allocated to you" />
-                </div>
-            </div>
-            
-            <!-- Active User Form -->
-            {#if activeUserForm === 'transfer'}
-                <p class="text-muted-foreground">Transfer form component coming soon...</p>
-            {:else if activeUserForm === 'claim'}
-                <p class="text-muted-foreground">Claim form component coming soon...</p>
-            {/if}
-        </CollapsibleSection>
+        <!-- Removed: Distribute Allocated Shares section and related UI -->
     {/if}
 </div>
 
@@ -191,7 +154,7 @@
     .admin-functions-container {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.2rem;
     }
     
     .function-actions {
