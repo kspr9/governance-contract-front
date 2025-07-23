@@ -1,0 +1,594 @@
+@import './assets/fonts.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================================================
+   DESIGN SYSTEM FOUNDATION
+   ============================================================================= */
+
+@layer base {
+  :root {
+    /* =============================================================================
+       COLOR SYSTEM - Light Theme Only
+       ============================================================================= */
+    
+    /* Base neutral colors following the light theme system */
+    --color-bg-dark: hsl(0 0% 90%);        /* Closest elements (cards, elevated surfaces) */
+    --color-bg: hsl(0 0% 95%);             /* Mid-level backgrounds */
+    --color-bg-light: hsl(0 0% 100%);      /* Farthest back (page background) */
+    --color-text: hsl(0 0% 5%);            /* Primary text (headings, important) */
+    --color-text-muted: hsl(0 0% 30%);     /* Secondary text (body, labels) */
+    --color-border: hsl(0 0% 80%);         /* Borders and dividers */
+    
+    /* Semantic mappings for your existing components */
+    --background: var(--color-bg);          /* Page background */
+    --card: var(--color-bg-light);         /* Card backgrounds */
+    --foreground: var(--color-text);       /* Primary text */
+    --muted: var(--color-bg-dark);         /* Muted backgrounds */
+    --muted-foreground: var(--color-text-muted); /* Muted text */
+    --border: var(--color-border);         /* General borders */
+    
+    /* Primary brand color system */
+    --primary-hue: 207;                    /* Hue for #1e88e5 */
+    --primary-sat: 81%;                    /* Saturation for #1e88e5 */
+    --primary-light: 52%;                  /* Lightness for #1e88e5 */
+    
+    --primary: hsl(var(--primary-hue) var(--primary-sat) var(--primary-light));
+    --primary-hover: hsl(var(--primary-hue) var(--primary-sat) 45%);  /* Darker for hover */
+    --primary-foreground: var(--color-bg-light);
+    
+    /* Accent color (slightly brighter blue) */
+    --accent: hsl(var(--primary-hue) 90% 60%);
+    --accent-hover: hsl(var(--primary-hue) 90% 53%);
+    --accent-foreground: var(--color-bg-light);
+    
+    /* Secondary colors */
+    --secondary: var(--color-bg-dark);
+    --secondary-hover: hsl(0 0% 85%);      /* Darker hover for light background */
+    --secondary-foreground: var(--color-text);
+    
+    /* Semantic colors */
+    --destructive: hsl(0 84% 60%);         /* Red for errors/danger */
+    --destructive-hover: hsl(0 84% 53%);
+    --destructive-foreground: var(--color-bg-light);
+    
+    --success: hsl(142 71% 45%);           /* Green for success */
+    --warning: hsl(38 92% 50%);            /* Orange for warnings */
+    --info: hsl(217 91% 60%);              /* Blue for info */
+    
+    /* Input and form elements */
+    --input: var(--color-bg-light);
+    --input-border: var(--color-border);
+    --input-border-focus: var(--primary);
+    
+    /* =============================================================================
+       SPACING SYSTEM - Consistent and Reliable
+       ============================================================================= */
+    
+    /* Base spacing unit: 0.25rem (4px) */
+    --space-0: 0;
+    --space-1: 0.25rem;    /* 4px */
+    --space-2: 0.5rem;     /* 8px */
+    --space-3: 0.75rem;    /* 12px */
+    --space-4: 1rem;       /* 16px */
+    --space-5: 1.25rem;    /* 20px */
+    --space-6: 1.5rem;     /* 24px */
+    --space-8: 2rem;       /* 32px */
+    --space-10: 2.5rem;    /* 40px */
+    --space-12: 3rem;      /* 48px */
+    --space-16: 4rem;      /* 64px */
+    --space-20: 5rem;      /* 80px */
+    
+    /* Component-specific spacing */
+    --button-padding-x: var(--space-6);
+    --button-padding-y: var(--space-3);
+    --card-padding: var(--space-6);
+    --input-padding-x: var(--space-4);
+    --input-padding-y: var(--space-3);
+    
+    /* =============================================================================
+       TYPOGRAPHY SYSTEM - Maximum 4 Sizes
+       ============================================================================= */
+    
+    --font-family: 'Euclid Circular A', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* 4 text sizes - small to large */
+    --text-sm: 0.875rem;    /* 14px - Small text, captions */
+    --text-base: 1rem;      /* 16px - Body text, standard */
+    --text-lg: 1.125rem;    /* 18px - Emphasized text */
+    --text-xl: 1.5rem;      /* 24px - Headings, titles */
+    
+    /* Line heights */
+    --leading-tight: 1.25;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    
+    /* =============================================================================
+       BORDER RADIUS SYSTEM
+       ============================================================================= */
+    
+    --radius-sm: 0.25rem;   /* 4px */
+    --radius: 0.5rem;       /* 8px - Base radius */
+    --radius-md: 0.75rem;   /* 12px */
+    --radius-lg: 1rem;      /* 16px */
+    --radius-xl: 1.5rem;    /* 24px */
+    --radius-full: 9999px;  /* Pills/circular */
+    
+    /* =============================================================================
+       SHADOWS SYSTEM
+       ============================================================================= */
+    
+    --shadow-sm: 0 1px 2px 0 hsla(0, 0%, 0%, 0.05);
+    --shadow: 0 1px 3px 0 hsla(0, 0%, 0%, 0.1), 0 1px 2px -1px hsla(0, 0%, 0%, 0.1);
+    --shadow-md: 0 4px 6px -1px hsla(0, 0%, 0%, 0.1), 0 2px 4px -2px hsla(0, 0%, 0%, 0.1);
+    --shadow-lg: 0 10px 15px -3px hsla(0, 0%, 0%, 0.1), 0 4px 6px -4px hsla(0, 0%, 0%, 0.1);
+    
+    /* =============================================================================
+       TRANSITIONS
+       ============================================================================= */
+    
+    --transition-fast: 150ms ease-out;
+    --transition-normal: 250ms ease-out;
+    --transition-slow: 350ms ease-out;
+  }
+}
+
+/* =============================================================================
+   BASE STYLES
+   ============================================================================= */
+
+@layer base {
+  * {
+    border-color: var(--border);
+    font-family: var(--font-family);
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    
+    /* Improve text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* =============================================================================
+   TYPOGRAPHY COMPONENTS
+   ============================================================================= */
+
+@layer components {
+  .text-sm {
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+  }
+  
+  .text-base {
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+  }
+  
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
+  }
+  
+  .text-xl {
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+  }
+  
+  .font-semibold {
+    font-weight: 600;
+  }
+}
+
+/* =============================================================================
+   BUTTON SYSTEM
+   ============================================================================= */
+
+@layer components {
+  .btn-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-radius: var(--radius);
+    font-size: var(--text-base);
+    font-weight: 600;
+    font-family: var(--font-family);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    min-width: fit-content;
+    white-space: nowrap;
+  }
+  
+  .btn-base:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary);
+  }
+  
+  .btn-base:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
+  /* Primary Button */
+  .btn-primary {
+    @apply btn-base;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+  
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+  
+  /* Secondary Button */
+  .btn-secondary {
+    @apply btn-base;
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+    border: 1px solid var(--border);
+  }
+  
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--secondary-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  
+  /* Accent Button */
+  .btn-accent {
+    @apply btn-base;
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+  
+  .btn-accent:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+  
+  /* Ghost Button */
+  .btn-ghost {
+    @apply btn-base;
+    background-color: transparent;
+    color: var(--foreground);
+  }
+  
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--muted);
+    color: var(--primary);
+  }
+  
+  /* Destructive Button */
+  .btn-destructive {
+    @apply btn-base;
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
+  }
+  
+  .btn-destructive:hover:not(:disabled) {
+    background-color: var(--destructive-hover);
+  }
+  
+  /* Button Sizes */
+  .btn-sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+  }
+  
+  .btn-lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--text-lg);
+  }
+  
+  .btn-full {
+    width: 100%;
+  }
+  
+  /* Icon Button */
+  .btn-icon {
+    @apply btn-base;
+    padding: var(--space-2);
+    background-color: var(--muted);
+    color: var(--muted-foreground);
+    border: 1px solid var(--border);
+  }
+  
+  .btn-icon:hover:not(:disabled) {
+    background-color: var(--card);
+    color: var(--primary);
+  }
+  
+  /* Special Buttons */
+  .btn-search {
+    @apply btn-base;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-radius: var(--radius-full);
+    padding: var(--space-1) var(--space-5);
+    font-weight: 400;
+  }
+  
+  .btn-search:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+  }
+  
+  .btn-close {
+    background: none;
+    border: none;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast);
+  }
+  
+  .btn-close:hover {
+    color: var(--primary);
+  }
+  
+  .btn-help {
+    background: none;
+    border: none;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast);
+  }
+  
+  .btn-help:hover,
+  .btn-help:focus {
+    color: var(--primary);
+    outline: none;
+  }
+  
+  .btn-collapse {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-6);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    border-radius: var(--radius);
+  }
+  
+  .btn-collapse:hover {
+    background: var(--muted);
+  }
+  
+  .btn-collapse:focus {
+    outline: none;
+  }
+}
+
+/* =============================================================================
+   CARD SYSTEM
+   ============================================================================= */
+
+@layer components {
+  .card {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    padding: var(--card-padding);
+    transition: box-shadow var(--transition-fast);
+  }
+  
+  .card:hover {
+    box-shadow: var(--shadow-md);
+  }
+  
+  .card-accent {
+    @apply card;
+    border-top: 4px solid var(--accent);
+  }
+}
+
+/* =============================================================================
+   FORM COMPONENTS
+   ============================================================================= */
+
+@layer components {
+  .input {
+    background: var(--input);
+    color: var(--foreground);
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius);
+    padding: var(--input-padding-y) var(--input-padding-x);
+    font-size: var(--text-base);
+    font-family: var(--font-family);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    width: 100%;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: var(--input-border-focus);
+    box-shadow: 0 0 0 2px hsla(var(--primary-hue), var(--primary-sat), var(--primary-light), 0.1);
+  }
+  
+  .input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .input.border-destructive,
+  .input.border-destructive:focus {
+    border-color: var(--destructive);
+    box-shadow: 0 0 0 2px hsla(0, 84%, 60%, 0.1);
+  }
+}
+
+/* =============================================================================
+   SEARCH COMPONENTS
+   ============================================================================= */
+
+@layer components {
+  .search-container {
+    display: flex;
+    max-width: 700px;
+    margin: 0 auto;
+    background-color: var(--card);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-1);
+    gap: var(--space-1);
+  }
+  
+  .search-input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-base);
+    color: var(--foreground);
+    background: transparent;
+    font-family: var(--font-family);
+  }
+  
+  .search-input::placeholder {
+    color: var(--muted-foreground);
+  }
+}
+
+/* =============================================================================
+   TABLE COMPONENTS
+   ============================================================================= */
+
+@layer components {
+  .table-header {
+    background: var(--muted);
+    color: var(--primary);
+    font-weight: 600;
+    font-size: var(--text-base);
+  }
+  
+  .table-row {
+    background: var(--card);
+    color: var(--foreground);
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+/* =============================================================================
+   LAYOUT UTILITIES
+   ============================================================================= */
+
+@layer utilities {
+  /* Spacing utilities */
+  .space-y-1 > * + * { margin-top: var(--space-1); }
+  .space-y-2 > * + * { margin-top: var(--space-2); }
+  .space-y-3 > * + * { margin-top: var(--space-3); }
+  .space-y-4 > * + * { margin-top: var(--space-4); }
+  .space-y-6 > * + * { margin-top: var(--space-6); }
+  .space-y-8 > * + * { margin-top: var(--space-8); }
+  
+  .gap-1 { gap: var(--space-1); }
+  .gap-2 { gap: var(--space-2); }
+  .gap-3 { gap: var(--space-3); }
+  .gap-4 { gap: var(--space-4); }
+  .gap-6 { gap: var(--space-6); }
+  
+  /* Padding utilities */
+  .p-1 { padding: var(--space-1); }
+  .p-2 { padding: var(--space-2); }
+  .p-3 { padding: var(--space-3); }
+  .p-4 { padding: var(--space-4); }
+  .p-6 { padding: var(--space-6); }
+  
+  /* Margin utilities */
+  .m-1 { margin: var(--space-1); }
+  .m-2 { margin: var(--space-2); }
+  .m-3 { margin: var(--space-3); }
+  .m-4 { margin: var(--space-4); }
+  .m-6 { margin: var(--space-6); }
+  
+  /* Rotation utilities */
+  .rotate-0 { transform: rotate(0deg); }
+  .rotate-90 { transform: rotate(90deg); }
+  .rotate-180 { transform: rotate(180deg); }
+  .rotate-270 { transform: rotate(270deg); }
+  
+  /* Transition utilities */
+  .transition-transform { transition: transform var(--transition-fast); }
+  .transition-colors { transition: color var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast); }
+  
+  /* Text utilities */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* =============================================================================
+   SECTION HEADERS
+   ============================================================================= */
+
+@layer components {
+  .section-header {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
+    letter-spacing: 0.01em;
+  }
+}
+
+/* =============================================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================================= */
+
+@media (max-width: 640px) {
+  .card, .card-accent {
+    padding: var(--space-4) var(--space-2);
+  }
+}
+
+/* =============================================================================
+   LEGACY BUTTON ALIASES - For Backward Compatibility
+   ============================================================================= */
+
+@layer components {
+  .btn1 { @apply btn-primary; }
+  .btn2 { @apply btn-secondary; }
+  .btn3 { @apply btn-secondary; }
+  .btn4 { @apply btn-primary btn-full; }
+  .btn5 { @apply btn-secondary btn-sm; }
+}
+
+/* =============================================================================
+   NAVBAR COMPONENT
+   ============================================================================= */
+
+@layer components {
+  .navbar {
+    background: var(--primary);
+    font-family: var(--font-family);
+  }
+}

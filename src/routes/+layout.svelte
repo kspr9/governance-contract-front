@@ -1,5 +1,5 @@
 <script lang="ts">
-  import '../app.css';
+  import '../new_app.css';
 
   import { browser } from '$app/environment';
   import { onMount } from 'svelte';
