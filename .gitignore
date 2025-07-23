@@ -20,3 +20,4 @@ src/assets/example_contract.py
 repomix-output.md
 PHASE3_CODE_ORGANIZATION.md
 package-lock.json
+pnpm-lock.yaml
