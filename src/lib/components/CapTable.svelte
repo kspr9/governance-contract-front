@@ -80,7 +80,7 @@
 <div class="space-y-4 mb-8">
   <!-- Share Ledger / Cap Table -->
   <CollapsibleSection title="{terminology.SHARE_LEDGER}" tooltip="{terminology.HELP_SHARE_REGISTER}" bind:open={showLedger}>
-    <table class="w-full border-collapse text-sm table-fixed">
+    <table class="cap-table">
       <colgroup>
         <col style="width: 25%;" />
         <col style="width: 15%;" />
@@ -88,16 +88,16 @@
         <col style="width: 25%;" />
       </colgroup>
       <thead>
-        <tr class="table-header">
-          <th class="font-semibold text-left text-(--muted-foreground) p-2">NAME</th>
-          <th class="font-semibold text-left text-(--muted-foreground) ml-2">{terminology.REGISTRY_NUMBER}</th>
-          <th class="font-semibold text-left text-(--muted-foreground) p-2">REGISTER ADDRESS</th>
-          <th class="font-semibold text-right text-(--muted-foreground) p-2">OWNED SHARES</th>
+        <tr>
+          <th>NAME</th>
+          <th>{terminology.REGISTRY_NUMBER}</th>
+          <th>WALLET ADDRESS</th>
+          <th>OWNED SHARES</th>
         </tr>
       </thead>
       <tbody>
         {#if shareLedgerState.loading}
-          <tr class="table-row">
+          <tr>
             <td class="text-center p-4" colspan="4">
               <LoadingDots />
             </td>
@@ -106,8 +106,8 @@
           {#each sortedShareLedgerEntries as [address, claimedShares], i}
             {@const registryNumber = maxSharesCache[address]?.registry_number}
             {@const nameInfo = registryNumber ? shareholderNameCache[registryNumber] : undefined}
-            <tr class="table-row" class:zebra-stripe={i % 2 !== 0}>
-              <td class="text-left p-2 truncate">
+            <tr>
+              <td>
                 {#if maxSharesLoading[address]}
                   <LoadingDots />
                 {:else if registryNumber}
@@ -117,7 +117,7 @@
                     {:else if nameInfo?.name}
                       {nameInfo.name}
                     {:else if nameInfo?.error}
-                      <span class="text-(--destructive)" title={nameInfo.error}>Error</span>
+                      <span class="text-[color:var(--destructive)]" title={nameInfo.error}>Error</span>
                     {:else}
                       -
                     {/if}
@@ -128,36 +128,34 @@
                   -
                 {/if}
               </td>
-              <td class="text-left p-2)">
+              <td>
                 {#if maxSharesLoading[address]}
                   <LoadingDots />
                 {:else if registryNumber}
-                  <span class="text-(--muted-foreground) ml-2">{registryNumber}</span>
+                  {registryNumber}
                 {:else}
                   -
                 {/if}
               </td>
-              <td class="font-mono p-2">
-                <div class="flex items-center gap-2">
-                  {#if address.startsWith("KT1")}
-                    <button 
-                      class="text-(--primary) hover:text-(--accent) hover:underline text-left"
-                      onclick={() => {
-                        $contractState.contractAddress = address;
-                        handleLoadContract(address);
-                      }}
-                    >
-                      {address}
-                    </button>
-                  {:else}
-                    <span class="truncate">{address}</span>
-                  {/if}
-                </div>
+              <td>
+                {#if address.startsWith("KT1")}
+                  <button 
+                    class="wallet-link"
+                    onclick={() => {
+                      $contractState.contractAddress = address;
+                      handleLoadContract(address);
+                    }}
+                  >
+                    {address}
+                  </button>
+                {:else}
+                  <span class="wallet-address">{address}</span>
+                {/if}
               </td>
-              <td class="text-right p-2">
-                <span>{claimedShares}</span>
+              <td class="shares-cell">
+                <span class="shares-count">{claimedShares}</span>
                 {#if tzktStorageData.max_shares && Number(tzktStorageData.max_shares) > 0}
-                  <span class="text-(--muted-foreground) ml-2">
+                  <span class="shares-percentage">
                     ({( (Number(claimedShares) / Number(tzktStorageData.max_shares)) * 100 ).toFixed(2)}%)
                   </span>
                 {/if}
@@ -165,8 +163,8 @@
             </tr>
           {/each}
         {:else}
-          <tr class="table-row">
-            <td class="text-center p-2 text-(--muted-foreground)" colspan="4">No share ledger entries</td>
+          <tr>
+            <td class="text-center p-2 text-muted" colspan="4">No share ledger entries</td>
           </tr>
         {/if}
       </tbody>
@@ -192,7 +190,7 @@
           {/each}
         {:else}
           <tr class="table-row">
-            <td class="text-center p-2 text-(--muted-foreground)" colspan="2">No unallocated shares</td>
+            <td class="text-center p-2 text-muted" colspan="2">No unallocated shares</td>
           </tr>
         {/if}
       </tbody>
@@ -219,7 +217,7 @@
               <td class="font-mono p-2">
                 {#if address.startsWith('KT1')}
                   <button 
-                    class="text-(--primary) hover:text-(--accent) hover:underline text-left"
+                    class="text-primary hover:text-[color:var(--accent)] hover:underline text-left"
                     onclick={() => {
                       $contractState.contractAddress = address;
                       handleLoadContract(address);
@@ -252,28 +250,95 @@
           {/each}
         {:else}
           <tr class="table-row">
-            <td class="text-center p-2 text-(--muted-foreground)" colspan="3">No pending allocations</td>
+            <td class="text-center p-2 text-muted" colspan="3">No pending allocations</td>
           </tr>
         {/if}
       </tbody>
     </table>
     {#if error}
-      <div class="text-(--destructive) mt-2">{error}</div>
+      <div class="text-[color:var(--destructive)] mt-2">{error}</div>
     {/if}
   </CollapsibleSection>
 </div>
 
 <style>
-  .zebra-stripe {
-    background-color: rgba(0, 0, 0, 0.1);
+  .cap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    font-family: var(--font-family);
   }
 
-  .table-header {
-    font-weight: 400;
-    font-size: 0.85rem;
+  .cap-table thead tr {
+    background-color: var(--muted);
+    border-bottom: 1px solid var(--border);
   }
 
-  .muted {
+  .cap-table th {
+    text-transform: uppercase;
+    font-size: var(--text-xs);
+    font-weight: 500;
     color: var(--muted-foreground);
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    letter-spacing: 0.1em;
+  }
+
+  .cap-table th:last-child {
+    text-align: right;
+  }
+
+  .cap-table tbody tr {
+    background-color: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cap-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .cap-table td {
+    padding: var(--space-3) var(--space-4);
+    color: var(--foreground);
+    font-size: var(--text-sm);
+  }
+
+  .cap-table td:last-child {
+    text-align: right;
+  }
+
+  .wallet-link {
+    color: var(--primary);
+    text-decoration: none;
+    background: none;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    padding: 0;
+    margin: 0;
+  }
+
+  .wallet-link:hover {
+    color: var(--accent);
+  }
+
+  .wallet-address {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--foreground);
+  }
+
+  .shares-cell {
+    text-align: right;
+  }
+
+  .shares-count {
+    font-weight: 600;
+    color: var(--muted-foreground);
+  }
+
+  .shares-percentage {
+    color: var(--color-text-muted);
+    margin-left: var(--space-2);
   }
 </style>

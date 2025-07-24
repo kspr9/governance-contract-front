@@ -10,7 +10,17 @@ const config = {
 		alias: {
 			$lib: './src/lib'
 		}
-	}
+	},
+	vitePlugin: {
+		inspector: {
+			toggleKeyCombo: 'alt-x',
+			// hold and release key to toggle inspector mode
+			holdMode: true,
+			// show or hide the inspector option
+			showToggleButton: 'always',
+			// inspector position
+			toggleButtonPos: 'bottom-right',},
+	  },
 };
 
 export default config;

@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { slide } from 'svelte/transition';
+    import { ChevronDown } from 'lucide-svelte';
     import HelpTip from '../HelpTip.svelte';
 
     interface Props {
@@ -26,29 +28,22 @@
         onclick={toggleOpen}
     >
         <div class="section-title-with-tooltip">
-            <span class="section-title">{title}</span>
+            <span class="text-heading-md">{title}</span>
             {#if tooltip}
                 <HelpTip text={tooltip} />
             {/if}
         </div>
-        <svg 
-            class="toggle-icon transition-transform {open ? 'rotate-90' : 'rotate-0'}"
-            xmlns="http://www.w3.org/2000/svg" 
-            width="20" 
-            height="20" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            stroke-width="2" 
-            stroke-linecap="round" 
-            stroke-linejoin="round"
-        >
-            <polyline points="9,18 15,12 9,6"></polyline>
-        </svg>
+        <div class="chevron-container">
+            <ChevronDown 
+                class="toggle-icon" 
+                size={16} 
+                style="transform: rotate({open ? '180deg' : '0deg'}); transition: transform 250ms ease-out;"
+            />
+        </div>
     </button>
     
     {#if open}
-        <div class="section-content">
+        <div class="section-content" transition:slide={{ duration: 250 }}>
             {@render children()}
         </div>
     {/if}
@@ -58,7 +53,7 @@
     .collapsible-section {
         background: var(--card);
         border: 1px solid var(--border);
-        border-radius: var(--radius-10);
+        border-radius: var(--radius-md);
         box-shadow: var(--shadow-sm);
         margin-bottom: 1rem;
     }
@@ -72,9 +67,23 @@
     }
     
     .section-title {
-        font-size: 1.125rem;
-        font-weight: 500;
-        color: var(--foreground);
+        @apply text-heading-md;
+    }
+    
+    .chevron-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background: var(--muted);
+        border-radius: var(--radius-sm);
+        flex-shrink: 0;
+        transition: background-color var(--transition-fast);
+    }
+    
+    .chevron-container:hover {
+        background: var(--secondary-hover);
     }
     
     .toggle-icon {

@@ -82,7 +82,7 @@
         {#if beaconState.isConnected}
             <!-- Wallet Address Dropdown -->
             <div class="relative group">
-                <button class="flex items-center gap-3 border-white hover:border-white bg-white group-hover:bg-(--accent) px-4 py-1 pt-1.5 pb-1.5 rounded-full transition-colors duration-200">
+                <button class="wallet-hover flex items-center gap-3 border-white hover:border-white bg-white group-hover:bg-(--accent) px-4 py-1 pt-1.5 pb-1.5 rounded-full transition-colors duration-200">
                     <Wallet size={22} strokeWidth={2} class="text-(--primary) group-hover:text-white transition-colors" />
                     <span class="text-sm text-(--primary) group-hover:text-white transition-colors" title={beaconState.address}>
                         {getShortAddress(beaconState.address)}
@@ -136,3 +136,14 @@
         {/if}
     </div>
 {/if}
+
+<style>
+    .wallet-hover:hover {
+        border: 1px solid var(--accent-foreground) !important;
+        background-color: var(--primary-foreground) !important;
+        color: var(--primary) !important;
+    }
+    .wallet-hover {
+        border: 1px solid var(--primary-foreground) !important;
+    }
+</style>

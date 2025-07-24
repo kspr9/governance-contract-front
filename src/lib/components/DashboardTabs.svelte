@@ -53,18 +53,16 @@
 
 <div class="w-full">
   <!-- Tab Navigation -->
-  <div class="border-b border-(--border) mb-6">
+  <div class="border-b border-[color:var(--border)] mb-6">
     <nav class="flex space-x-8" aria-label="Dashboard Tabs">
       {#each tabs as tab}
         <button
           type="button"
           class="py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center"
           class:border-[color:var(--primary)]={activeTab === tab.id}
-          class:text-[color:var(--primary)]={activeTab === tab.id}
+          class:text-primary={activeTab === tab.id}
           class:border-transparent={activeTab !== tab.id}
-          class:text-[color:var(--muted-foreground)]={activeTab !== tab.id}
-          class:hover:text-[color:var(--foreground)]={activeTab !== tab.id}
-          class:hover:border-[color:var(--border)]={activeTab !== tab.id}
+          class:text-muted={activeTab !== tab.id}
           onclick={() => handleTabClick(tab.id)}
           aria-selected={activeTab === tab.id}
           role="tab"
@@ -85,5 +83,11 @@
 <style>
   .tab-content {
     min-height: 200px;
+  }
+  
+  /* Override global button hover effect for tab buttons */
+  nav button:hover {
+    background: none !important;
+    background-color: transparent !important;
   }
 </style>

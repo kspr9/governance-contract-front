@@ -39,7 +39,7 @@ export const terminology = {
   ISSUED_SHARES: "Total Issued Shares",
   MAX_SHARES: "Maximum Authorized Shares",
   REGISTRY_NUMBER_SMALL: "Registry Number",
-  REGISTRY_NUMBER: "REGISTRY NUMBER",
+  REGISTRY_NUMBER: "Registry Number",
   ADMIN_ADDRESS: "Administrator",
   CONTRACT_ADDRESS: "Register Address",
   ISSUING_CONTRACT: "Share Register",
@@ -64,7 +64,7 @@ export const terminology = {
   TRANSACTION_HASH: "Transaction ID",
   
   // Tabs
-  TAB_WALLET: "My Shares",
+  TAB_WALLET: "Shares",
   TAB_REGISTER: "Share Register", 
   TAB_ADMIN: "Company Management",
   

@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { CloudDownload } from 'lucide-svelte';
+    
     let { handleLoadContract }: { handleLoadContract: (address: string) => Promise<void> } = $props();
     let contractInput = $state('');
 
@@ -14,23 +16,21 @@
             type="text"
             class="search-input" 
             bind:value={contractInput} 
-            placeholder="Tokenized Company Registry Address" 
+            placeholder="Tokenization Registry Address" 
         />
         <button 
             type="submit"
-            class="btn-search"
+            class="btn-search "
         >
-            <span>Search</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+            <span>Load</span>
+            <CloudDownload size={24} />
         </button>
     </form>
 </div>
 
 <style>
-    .btn-search svg {
-        stroke: white;
+    .btn-search:hover {
+        border: 1px solid var(--primary);
+        color: var(--primary);
     }
 </style> 

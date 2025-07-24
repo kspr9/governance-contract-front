@@ -6,6 +6,7 @@
     import { terminology } from '../utils/terminology';
     import HelpTip from './HelpTip.svelte';
     import { toastStore } from '../stores/toastStore.svelte';
+    import { SendHorizontal, ChevronsRight } from 'lucide-svelte';
 
     let { ticket, maxSharesCache, maxSharesLoading, handleLoadContract } = $props<{
         ticket: TzktTicket;
@@ -61,21 +62,22 @@
 
 <div class="owned-share-card bg-(--card) rounded-(--radius) shadow-md p-5 flex flex-col gap-3 border border-(--border)">
     <!-- 4-column layout: Registry Number | Share Register | Number of Shares | Transfer Button -->
-    <div class="grid gap-4 items-center overflow-hidden card-grid">
+    <div class="grid items-center overflow-hidden card-grid">
+
         <!-- Column 1: Registry Number -->
         <div class="flex flex-col">
-            <span class="text-xs text-(--muted-foreground)">{terminology.REGISTRY_NUMBER}</span>
-            <span class="text-base font-semibold text-(--foreground)">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
+            <span class="text-xs text-muted flex items-center">Registry Number</span>
+            <span class="text-muted font-semibold text-(--foreground)">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
         </div>
         
         <!-- Column 2: Share Register -->
-        <div class="flex flex-col">
-            <div class="text-xs text-(--muted-foreground) font-semibold flex items-center gap-1">
+        <div class="flex flex-col min-w-0">
+            <div class="text-xs text-muted flex items-center">
                 {terminology.ISSUING_CONTRACT}
                 <HelpTip text="The share register where these shares were issued" />
             </div>
             <button 
-                class="font-mono text-sm text-(--primary) hover:text-(--accent) hover:underline text-left truncate" 
+                class="font-mono text-sm text-(--primary) hover:none text-left truncate min-w-0 cursor-default" 
                 title="Load this contract" 
                 onclick={() => { 
                     $contractState.contractAddress = ticket.address; 
@@ -90,13 +92,13 @@
         <div class="flex flex-col">
             <span class="text-xs text-(--muted-foreground)">{terminology.AMOUNT}</span>
             <span class="text-lg font-bold text-(--foreground)">
-                <span class="font-bold">{ticket.amount}</span>
+                <span class="text-muted">{ticket.amount} /</span>
                 {#if maxSharesLoading[ticket.address]}
-                    <span class="text-(--muted-foreground) ml-2">/ ...</span>
+                    <span class="text-(--muted-foreground) ml-2"> ...</span>
                 {:else if maxSharesCache[ticket.address]}
-                    <span class="text-(--muted-foreground) ml-2">/ {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
+                    <span class="text-sm text-(--muted-foreground) ml-1"> {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
                 {:else}
-                    <span class="text-(--muted-foreground) ml-2">/ ?</span>
+                    <span class="text-(--muted-foreground) ml-2"> ?</span>
                 {/if}
             </span>
         </div>
@@ -105,34 +107,45 @@
         <div class="flex justify-end">
             <button 
                 class={(openTransferCard ? 'btn-secondary' : 'btn-primary') + ' flex items-center gap-2'}
-                title={terminology.TRANSFER_SHARES}
+                title="Transfer"
                 onclick={() => { openTransferCard = !openTransferCard; }}
             >
-                <span class="text-sm hidden lg:inline">{terminology.TRANSFER_SHARES}</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4l4-4m-4 4l4 4"/>
-                </svg>
+                <span class="text-sm">Transfer</span>
+                <SendHorizontal class="w-4 h-4" />
             </button>
         </div>
     </div>
 
     {#if openTransferCard}
         <form class="mt-2 flex flex-col gap-2" onsubmit={handleTransfer}>
-            <input
-                class="input"
-                placeholder={terminology.DESTINATION_ADDRESS}
-                bind:value={transferForm.destination}
-                disabled={loadingState}
-            />
-            <input
-                class="input"
-                placeholder={terminology.AMOUNT}
-                type="number"
-                min="1"
-                bind:value={transferForm.amount}
-                disabled={loadingState}
-            />
-            
+            <div class="flex gap-2 items-center">
+                <input
+                    class="input flex-1"
+                    placeholder="Recipient Address"
+                    bind:value={transferForm.destination}
+                    disabled={loadingState}
+                />
+                <input
+                    class="input flex-1"
+                    placeholder="Number of Shares"
+                    type="number"
+                    min="1"
+                    bind:value={transferForm.amount}
+                    disabled={loadingState}
+                />
+                <button 
+                    type="submit" 
+                    class="btn-primary flex items-center gap-2"
+                    disabled={loadingState}
+                >
+                    {#if loadingState}
+                        Transferring<LoadingDots />
+                    {:else}
+                        Complete transfer
+                        <ChevronsRight class="w-4 h-4" />
+                    {/if}
+                </button>
+            </div>
 
             {#if errorState}
                 <div class="bg-(--destructive)/10 p-3 rounded-md flex items-center gap-2">
@@ -142,29 +155,19 @@
                     <span class="text-(--destructive)">{errorState}</span>
                 </div>
             {/if}
-
-            <button 
-                type="submit" 
-                class="btn-primary"
-                disabled={loadingState}
-            >
-                {#if loadingState}
-                    Transferring<LoadingDots />
-                {:else}
-                    Transfer
-                {/if}
-            </button>
         </form>
     {/if}
 </div>
 
 <style>
-  /* Easy column width adjustments - modify these values to change column widths */
+  /* Balanced grid layout that prevents overflow */
   .card-grid {
-    --col-1-width: 15%;  /* Registry Number */
-    --col-2-width: 40%;  /* Share Register */
-    --col-3-width: 20%;  /* Number of Shares */
-    --col-4-width: 25%;  /* Transfer Button */
-    grid-template-columns: var(--col-1-width) var(--col-2-width) var(--col-3-width) var(--col-4-width);
+    grid-template-columns: minmax(120px, max-content) 1fr minmax(100px, max-content) minmax(120px, max-content);
+    min-width: 0; /* Allow columns to shrink below content size */
+    gap: 1rem; /* Add consistent spacing between columns */
+  }
+  button:hover {
+    background: none !important;
+    background-color: transparent !important;
   }
 </style> 
