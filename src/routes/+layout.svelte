@@ -25,7 +25,7 @@
   }
 </script>
 
-<main class="min-h-screen bg-[color:var(--background)] grid grid-rows-[auto_1fr]">
+<main class="min-h-screen bg-(--background) grid grid-rows-[auto_1fr]">
   <!-- Sticky Navbar -->
   <div class="sticky top-0 z-50 navbar p-4 shadow-md">
     <div class="max-w-5xl mx-auto">
@@ -44,30 +44,30 @@
 
   <div class="layout-container">
     <!-- Sidebar -->
-    <div class="sidebar {sidebarOpen ? 'w-48' : 'w-16'} md:{sidebarOpen ? 'w-48' : 'w-16'} bg-[color:var(--card)] border-r border-[color:var(--border)] transition-all duration-300 ease-in-out flex flex-col h-full overflow-hidden {sidebarOpen ? 'open' : ''}">
+    <div class="sidebar {sidebarOpen ? 'w-48' : 'w-16'} md:{sidebarOpen ? 'w-48' : 'w-16'} bg-(--card) border-r border-(--border) transition-all duration-300 ease-in-out flex flex-col h-full overflow-hidden {sidebarOpen ? 'open' : ''}">
       <nav class="{sidebarOpen ? 'p-4' : 'p-2'} space-y-2 flex-1 overflow-y-auto">
         <!-- Toggle Button at Top -->
         <button 
-          class="flex items-center {sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center px-3 py-3'} w-full rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group mb-4"
+          class="flex items-center {sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center px-3 py-3'} w-full rounded-lg hover:bg-(--muted) transition-colors text-(--foreground) group mb-4"
           onclick={toggleSidebar}
           aria-label="Toggle Sidebar"
           title="Toggle Sidebar"
         >
-          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{sidebarOpen ? 'M11 19l-7-7 7-7m8 14l-7-7 7-7' : 'M13 5l7 7-7 7M5 5l7 7-7 7'}" />
           </svg>
           <span class="{sidebarOpen ? 'block' : 'hidden'} whitespace-nowrap">Collapse</span>
         </button>
         
-        <a href="/" class="flex items-center {sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center px-3 py-3'} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group" title="Dashboard">
-          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5v4" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 5v4" /></svg>
+        <a href="/" class="flex items-center {sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center px-3 py-3'} rounded-lg hover:bg-(--muted) transition-colors text-(--foreground) group" title="Dashboard">
+          <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5v4" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 5v4" /></svg>
           <span class="{sidebarOpen ? 'block' : 'hidden'} whitespace-nowrap">Dashboard</span>
         </a>
         <!-- Other links... -->
       </nav>
       
       <button 
-        class="flex items-center gap-2 w-full px-4 py-3 rounded-lg border border-[color:var(--border)] hover:bg-[color:var(--muted)] transition-all duration-200 bg-transparent text-[color:var(--foreground)] hover:text-[color:var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[color:var(--primary)]/50 flex-shrink-0 opacity-0 hover:opacity-100 group"
+        class="flex items-center gap-2 w-full px-4 py-3 rounded-lg border border-(--border) hover:bg-(--muted) transition-all duration-200 bg-transparent text-(--foreground) hover:text-(--foreground) focus:outline-none focus:ring-2 focus:ring-(--primary)/50 shrink-0 opacity-0 hover:opacity-100 group"
         aria-label="Toggle View"
         onclick={() => showContractLoaderStore.update(value => !value)}
         style="min-width:0;"
@@ -76,7 +76,7 @@
         <span class="text-sm font-medium {sidebarOpen ? 'block' : 'hidden'}">
           {$showContractLoaderStore ? terminology.MANAGE_DEPLOYED_WALLETS : terminology.VIEW_CONTRACTS}
         </span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[color:var(--foreground)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-(--foreground)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
         </svg>
       </button>

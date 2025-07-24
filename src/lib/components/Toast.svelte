@@ -7,11 +7,11 @@
         const baseClasses = 'card p-4 flex items-start justify-between';
         switch (type) {
             case 'success':
-                return `${baseClasses} border-l-4 border-[color:var(--primary)] bg-[color:var(--card)] text-[color:var(--primary)]`;
+                return `${baseClasses} border-l-4 border-(--primary) bg-(--card) text-(--primary)`;
             case 'error':
-                return `${baseClasses} border-l-4 border-red-500 bg-[color:var(--card)] text-red-400`;
+                return `${baseClasses} border-l-4 border-red-500 bg-(--card) text-red-400`;
             case 'info':
-                return `${baseClasses} border-l-4 border-[color:var(--accent)] bg-[color:var(--card)] text-[color:var(--accent)]`;
+                return `${baseClasses} border-l-4 border-(--accent) bg-(--card) text-(--accent)`;
         }
     };
 

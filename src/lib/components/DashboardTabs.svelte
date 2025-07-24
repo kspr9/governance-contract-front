@@ -53,7 +53,7 @@
 
 <div class="w-full">
   <!-- Tab Navigation -->
-  <div class="border-b border-[color:var(--border)] mb-6">
+  <div class="border-b border-(--border) mb-6">
     <nav class="flex space-x-8" aria-label="Dashboard Tabs">
       {#each tabs as tab}
         <button

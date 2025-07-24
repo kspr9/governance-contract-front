@@ -1,451 +1,114 @@
-@import './assets/fonts.css';
-@config "../tailwind.config.ts";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
  
-@layer base {
-  /* =============================================================================
-     DESIGN TOKENS - Light Theme (Main Theme)
-     ============================================================================= */
-  :root {
-    /* Colors */
-    --background: #f8fafc;     /* Very light blue-grey background */
-    --card: #ffffff;           /* Pure white cards */
-    --primary: #1e88e5;        /* Blue primary (matches search button) */
-    --accent: #2196f3;         /* Brighter blue accent */
-    --foreground: #1e293b;     /* Dark text */
-    --muted: #f1f5f9;          /* Light grey muted backgrounds */
-    --muted-foreground: #64748b; /* Grey text */
-    --border: #e2e8f0;         /* Light border */
-    --destructive: #ef4444;    /* Red */
-    --destructive-foreground: #ffffff;
-    --success: #10b981;        /* Green */
-    --warning: #f59e0b;        /* Amber */
-    --info: #0ea5e9;           /* Sky blue */
-    
-    /* Input and interactive elements */
-    --input: #ffffff;          /* White inputs */
-    --popover: #ffffff;
-    --popover-foreground: #1e293b;
-    --primary-foreground: #ffffff;
-    --secondary: #f1f5f9;
-    --secondary-foreground: #1e293b;
-    --accent-foreground: #ffffff;
-    --ring: #2196f3;
-    
-    /* Spacing and Border Radius */
-    --radius: 0.5rem;          /* 8px base radius */
-    --radius-01: calc(var(--radius) * 0.1);
-    --radius-02: calc(var(--radius) * 0.2);
-    --radius-03: calc(var(--radius) * 0.3);
-    --radius-04: calc(var(--radius) * 0.4);
-    --radius-05: calc(var(--radius) * 0.5);
-    --radius-06: calc(var(--radius) * 0.6);
-    --radius-07: calc(var(--radius) * 0.7);
-    --radius-08: calc(var(--radius) * 0.8);
-    --radius-09: calc(var(--radius) * 0.9);
-    --radius-10: calc(var(--radius) * 1.0);
-    --radius-12: calc(var(--radius) * 1.2);
-    --radius-15: calc(var(--radius) * 1.5);
-    --radius-20: calc(var(--radius) * 2.0);
-    
-    /* Typography */
-    --font-family-primary: 'Euclid Circular A', sans-serif;
-    --font-family-secondary: 'Poppins', sans-serif;
-    
-    /* Shadows */
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  }
+@custom-variant dark (&:is(.dark *));
+ 
+:root {
+ --background: hsl(0 0% 100%) /* <- Wrap in HSL */;
+ --foreground: hsl(240 10% 3.9%);
+ --muted: hsl(240 4.8% 95.9%);
+ --muted-foreground: hsl(240 3.8% 46.1%);
+ --popover: hsl(0 0% 100%);
+ --popover-foreground: hsl(240 10% 3.9%);
+ --card: hsl(0 0% 100%);
+ --card-foreground: hsl(240 10% 3.9%);
+ --border: hsl(240 5.9% 90%);
+ --input: hsl(240 5.9% 90%);
+ --primary: hsl(240 5.9% 10%);
+ --primary-foreground: hsl(0 0% 98%);
+ --secondary: hsl(240 4.8% 95.9%);
+ --secondary-foreground: hsl(240 5.9% 10%);
+ --accent: hsl(240 4.8% 95.9%);
+ --accent-foreground: hsl(240 5.9% 10%);
+ --destructive: hsl(0 72.2% 50.6%);
+ --destructive-foreground: hsl(0 0% 98%);
+ --ring: hsl(240 10% 3.9%);
+ --sidebar: hsl(0 0% 98%);
+ --sidebar-foreground: hsl(240 5.3% 26.1%);
+ --sidebar-primary: hsl(240 5.9% 10%);
+ --sidebar-primary-foreground: hsl(0 0% 98%);
+ --sidebar-accent: hsl(240 4.8% 95.9%);
+ --sidebar-accent-foreground: hsl(240 5.9% 10%);
+ --sidebar-border: hsl(220 13% 91%);
+ --sidebar-ring: hsl(217.2 91.2% 59.8%);
+ 
+ --radius: 0.5rem;
 }
  
+.dark {
+ --background: hsl(240 10% 3.9%);
+ --foreground: hsl(0 0% 98%);
+ --muted: hsl(240 3.7% 15.9%);
+ --muted-foreground: hsl(240 5% 64.9%);
+ --popover: hsl(240 10% 3.9%);
+ --popover-foreground: hsl(0 0% 98%);
+ --card: hsl(240 10% 3.9%);
+ --card-foreground: hsl(0 0% 98%);
+ --border: hsl(240 3.7% 15.9%);
+ --input: hsl(240 3.7% 15.9%);
+ --primary: hsl(0 0% 98%);
+ --primary-foreground: hsl(240 5.9% 10%);
+ --secondary: hsl(240 3.7% 15.9%);
+ --secondary-foreground: hsl(0 0% 98%);
+ --accent: hsl(240 3.7% 15.9%);
+ --accent-foreground: hsl(0 0% 98%);
+ --destructive: hsl(0 62.8% 30.6%);
+ --destructive-foreground: hsl(0 0% 98%);
+ --ring: hsl(240 4.9% 83.9%);
+ --sidebar: hsl(240 5.9% 10%);
+ --sidebar-foreground: hsl(240 4.8% 95.9%);
+ --sidebar-primary: hsl(224.3 76.3% 48%);
+ --sidebar-primary-foreground: hsl(0 0% 100%);
+ --sidebar-accent: hsl(240 3.7% 15.9%);
+ --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+ --sidebar-border: hsl(240 3.7% 15.9%);
+ --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+ 
+@theme inline {
+ /* Radius (for rounded-*) */
+ --radius-sm: calc(var(--radius) - 4px);
+ --radius-md: calc(var(--radius) - 2px);
+ --radius-lg: var(--radius);
+ --radius-xl: calc(var(--radius) + 4px);
+ 
+ /* Colors */
+ --color-background: var(--background);
+ --color-foreground: var(--foreground);
+ --color-muted: var(--muted);
+ --color-muted-foreground: var(--muted-foreground);
+ --color-popover: var(--popover);
+ --color-popover-foreground: var(--popover-foreground);
+ --color-card: var(--card);
+ --color-card-foreground: var(--card-foreground);
+ --color-border: var(--border);
+ --color-input: var(--input);
+ --color-primary: var(--primary);
+ --color-primary-foreground: var(--primary-foreground);
+ --color-secondary: var(--secondary);
+ --color-secondary-foreground: var(--secondary-foreground);
+ --color-accent: var(--accent);
+ --color-accent-foreground: var(--accent-foreground);
+ --color-destructive: var(--destructive);
+ --color-destructive-foreground: var(--destructive-foreground);
+ --color-ring: var(--ring);
+ --color-radius: var(--radius);
+ --color-sidebar: var(--sidebar);
+ --color-sidebar-foreground: var(--sidebar-foreground);
+ --color-sidebar-primary: var(--sidebar-primary);
+ --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+ --color-sidebar-accent: var(--sidebar-accent);
+ --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+ --color-sidebar-border: var(--sidebar-border);
+ --color-sidebar-ring: var(--sidebar-ring);
+}
+ 
 @layer base {
-  * {
-    @apply border-border;
-    font-family: var(--font-family-primary);
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+ * {
+  @apply border-border;
+ }
+ 
+ body {
+  @apply bg-background text-foreground;
+ }
 }
-
-.poppins-semibold {
-  font-family: var(--font-family-secondary);
-  font-weight: 600;
-  font-style: normal;
-}
-
-.poppins-bold {
-  font-family: var(--font-family-secondary);
-  font-weight: 700;
-  font-style: normal;
-}
-
-/* =============================================================================
-   CSS HIERARCHY:
-   1. CSS Variables (design tokens) - defined in :root
-   2. Tailwind base/utilities - @tailwind directives
-   3. Design system components - .btn-*, .card-*, etc.
-   4. Component-specific styles - in individual .svelte files
-   5. NO inline styles - use classes only
-   ============================================================================= */
-
-/* =============================================================================
-   DESIGN SYSTEM COMPONENTS
-   ============================================================================= */
-
-/* Navbar Components */
-.navbar {
-  background: var(--primary);
-  font-family: var(--font-family-primary);
-}
-
-/* Card Components */
-.card {
-  background: var(--card);
-  border-radius: var(--radius-10);
-  box-shadow: var(--shadow-sm);
-  color: var(--foreground);
-  border: 1px solid var(--border);
-  padding: 1.5rem;
-  transition: box-shadow 0.2s ease;
-}
-
-.card:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.card-accent {
-  background: var(--card);
-  border-radius: var(--radius-10);
-  box-shadow: var(--shadow-sm);
-  color: var(--foreground);
-  border: 1px solid var(--border);
-  border-top: 4px solid var(--accent);
-  padding: 1.5rem;
-  transition: box-shadow 0.2s ease;
-}
-
-.card-accent:hover {
-  box-shadow: var(--shadow-md);
-}
-
-/* Button System - 3 Core Types */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  border: none;
-  border-radius: var(--radius-15);
-  font-family: var(--font-family-primary);
-  font-weight: 600;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: fit-content;
-}
-.btn-primary:hover {
-  background: #1976d2;
-  transform: translateY(-1px);
-}
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: var(--card);
-  color: var(--primary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-10);
-  font-family: var(--font-family-primary);
-  font-weight: 600;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: fit-content;
-}
-.btn-secondary:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: rgba(30, 136, 229, 0.05);
-}
-
-.btn-accent {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: var(--accent);
-  color: var(--accent-foreground);
-  border: none;
-  border-radius: var(--radius-15);
-  font-family: var(--font-family-primary);
-  font-weight: 600;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: fit-content;
-}
-.btn-accent:hover {
-  background: #1976d2;
-  transform: translateY(-1px);
-}
-.btn-accent:active {
-  transform: translateY(0);
-}
-
-/* Disabled button states */
-.btn-primary:disabled,
-.btn-secondary:disabled,
-.btn-accent:disabled,
-.btn-search:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: var(--muted);
-  color: var(--muted-foreground);
-  border-color: var(--border);
-  transform: none;
-}
-
-.btn-primary:disabled:hover,
-.btn-secondary:disabled:hover,
-.btn-accent:disabled:hover,
-.btn-search:disabled:hover {
-  background: var(--muted);
-  color: var(--muted-foreground);
-  transform: none;
-}
-
-/* Search Button - Special case for search forms */
-.btn-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  padding: 4px 20px;
-  font-family: var(--font-family-primary);
-  font-weight: 300;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  min-width: fit-content;
-  border-radius: 50px;
-}
-.btn-search:hover {
-  background: #1976d2;
-}
-
-/* Button Size Variants */
-.btn-xs {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  min-width: auto;
-}
-.btn-sm {
-  font-size: 0.875rem;
-  padding: 0.5rem 1rem;
-}
-.btn-lg {
-  font-size: 1.125rem;
-  padding: 1rem 2rem;
-}
-.btn-full {
-  width: 100%;
-}
-
-/* Search Components */
-.search-container {
-  display: flex;
-  max-width: 700px;
-  margin: 0 auto;
-  background-color: white;
-  border-radius: 50px;
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 2px;
-  gap: 4px;
-}
-
-.search-input {
-  flex-grow: 1;
-  border: none;
-  outline: none;
-  padding: 10px 16px;
-  font-size: 1rem;
-  color: #333;
-  background: transparent;
-  font-family: var(--font-family-primary);
-}
-
-.search-input::placeholder {
-  color: #999;
-}
-
-@layer components {
-  .input {
-    background: var(--input);
-    color: var(--foreground);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-05);
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    transition: box-shadow 0.2s, border-color 0.2s;
-  }
-  
-  .input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px var(--accent);
-  }
-  
-  .input.border-destructive {
-    border-color: var(--destructive) !important;
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1) !important;
-  }
-  
-  .input.border-destructive:focus {
-    border-color: var(--destructive) !important;
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
-    outline: none !important;
-  }
-  
-  /* Override any potential browser defaults */
-  input.border-destructive,
-  input.border-destructive:focus,
-  input.border-destructive:hover,
-  input.border-destructive:active {
-    border-color: #ef4444 !important;
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
-  }
-}
-
-.table-header {
-  background: var(--muted);
-  color: var(--primary);
-  font-weight: 600;
-  font-size: 1rem;
-}
-.table-row {
-  background: var(--card);
-  color: var(--foreground);
-  border-bottom: 1px solid var(--border);
-}
-.section-header {
-  color: var(--primary);
-  font-weight: 700;
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.01em;
-}
-
-/* Responsive card padding */
-@media (max-width: 640px) {
-  .card, .card-accent {
-    padding: 1rem 0.5rem;
-  }
-}
-
-/* =============================================================================
-   UTILITY CLASSES
-   ============================================================================= */
-
-/* Rotation utilities for collapsible icons */
-.rotate-0 { transform: rotate(0deg); }
-.rotate-90 { transform: rotate(90deg); }
-.rotate-180 { transform: rotate(180deg); }
-.rotate-270 { transform: rotate(270deg); }
-
-/* Transition utilities */
-.transition-transform { transition: transform 0.2s ease; }
-
-/* Min-width utilities */
-.min-w-0 { min-width: 0; }
-
-/* Specialized Button Types */
-.btn-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  background: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-05);
-  color: var(--muted-foreground);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.btn-icon:hover {
-  background: var(--card);
-  color: var(--primary);
-}
-
-.btn-close {
-  background: none;
-  border: none;
-  color: var(--muted-foreground);
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: var(--radius-05);
-  transition: color 0.2s ease;
-}
-.btn-close:hover {
-  color: var(--primary);
-}
-
-.btn-help {
-  background: none;
-  border: none;
-  color: var(--muted-foreground);
-  cursor: pointer;
-  padding: 0.125rem;
-  border-radius: var(--radius-05);
-  transition: color 0.2s ease;
-}
-.btn-help:hover, .btn-help:focus {
-  color: var(--primary);
-  outline: none;
-}
-
-.btn-collapse {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  border-radius: var(--radius-10);
-}
-.btn-collapse:hover {
-  background: var(--muted);
-}
-.btn-collapse:focus {
-  outline: none;
-}
-
-/* =============================================================================
-   DEPRECATED BUTTON ALIASES - Use btn-primary, btn-secondary, btn-accent instead
-   ============================================================================= */
-.btn1 { @apply btn-primary; }
-.btn2 { @apply btn-secondary; }
-.btn3 { @apply btn-secondary; }
-.btn4 { @apply btn-primary btn-full; }
-.btn5 { @apply btn-secondary btn-sm; }

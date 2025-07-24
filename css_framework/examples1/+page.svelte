@@ -54,7 +54,7 @@
     </Grid>
     
     <!-- CTA Section -->
-    <Card padding="xl" shadow="lg" class="bg-gradient-to-r from-blue-50 to-purple-50 text-center">
+    <Card padding="xl" shadow="lg" class="bg-linear-to-r from-blue-50 to-purple-50 text-center">
       <Stack gap="md" align="center">
         <h2 class="text-3xl font-bold">Ready to Get Started?</h2>
         <p class="text-lg text-slate-600 max-w-md">
@@ -74,7 +74,7 @@
     */
     
     /* Custom gradient that's specific to this page */
-    .bg-gradient-to-r {
+    .bg-linear-to-r {
       background: linear-gradient(
         to right, 
         var(--color-primary-50), 

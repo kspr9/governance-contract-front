@@ -378,7 +378,7 @@
     <!-- Always visible Connect to Contract section -->
     <div class="p-4">
         {#if !isAdmin}
-        <div class="p-4 text-[color:var(--muted-foreground)]">
+        <div class="p-4 text-(--muted-foreground)">
             You are not authorized admin. Only connected admin wallet can access this section.
         </div>
         {:else}
@@ -389,7 +389,7 @@
                 { $contractInstance ? "Reconnect to Contract" : "Connect to Contract" }
             </button>
             {#if $contractState.contractAddress}
-                <div class="mt-2 text-sm text-[color:var(--foreground)]">
+                <div class="mt-2 text-sm text-(--foreground)">
                     Contract Address: {$contractState.contractAddress}
                 </div>
             {/if}
@@ -399,7 +399,7 @@
 
     <!-- Provide user feedback if wallet is not connected -->
     {#if !beaconState.isConnected}
-        <div class="p-4 text-[color:var(--muted-foreground)]">
+        <div class="p-4 text-(--muted-foreground)">
             Please connect your wallet first to interact with the contract.
         </div>
     {/if}
@@ -410,15 +410,15 @@
             {#if isAdmin}
                 <button type="button" class="flex items-center justify-between w-full mb-4 cursor-pointer" onclick={toggleAdminFunctions}>
                     <div class="section-header">Admin Functions</div>
-                    <svg class="h-5 w-5 transition-transform text-[color:var(--primary)]" style="transform: rotate({showAdminFunctions ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <svg class="h-5 w-5 transition-transform text-(--primary)" style="transform: rotate({showAdminFunctions ? 90 : 0}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
                 {#if showAdminFunctions}
-                    <div class="bg-[color:var(--background)] p-4 rounded-lg space-y-6 border border-[color:var(--border)]">
+                    <div class="bg-(--background) p-4 rounded-lg space-y-6 border border-(--border)">
                         <!-- Mint Shares Form -->
                         <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleMintShares}>
                                 <h3 class="section-header">Issue new shares</h3>
-                                <div class="border-b border-[color:var(--border)] mb-4"></div>
+                                <div class="border-b border-(--border) mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
                                         type="number" 
@@ -428,7 +428,7 @@
                                         disabled={loadingStates.mintShares}
                                     />
                                     {#if errorStates.mintShares}
-                                        <div class="text-[color:var(--destructive)]">{errorStates.mintShares}</div>
+                                        <div class="text-(--destructive)">{errorStates.mintShares}</div>
                                     {/if}
                                     <div class="flex justify-end">
                                         <button 
@@ -451,7 +451,7 @@
                         <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleAllocateShares}>
                                 <h3 class="section-header">Allocate Shares to Claimant</h3>
-                                <div class="border-b border-[color:var(--border)] mb-4"></div>
+                                <div class="border-b border-(--border) mb-4"></div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input 
                                         type="number" 
@@ -469,7 +469,7 @@
                                     />
                                 </div>
                                 {#if errorStates.allocateShares}
-                                    <div class="text-[color:var(--destructive)]">{errorStates.allocateShares}</div>
+                                    <div class="text-(--destructive)">{errorStates.allocateShares}</div>
                                 {/if}
                                 <div class="flex justify-end">
                                     <button 
@@ -491,7 +491,7 @@
                         <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleDeallocateShares}>
                                 <h3 class="section-header">Deallocate Shares</h3>
-                                <div class="border-b border-[color:var(--border)] mb-4"></div>
+                                <div class="border-b border-(--border) mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
                                         type="text" 
@@ -501,7 +501,7 @@
                                         disabled={loadingStates.deallocateShares}
                                     />
                                     {#if errorStates.deallocateShares}
-                                        <div class="text-[color:var(--destructive)]">{errorStates.deallocateShares}</div>
+                                        <div class="text-(--destructive)">{errorStates.deallocateShares}</div>
                                     {/if}
                                     <div class="flex justify-end">
                                         <button 
@@ -524,7 +524,7 @@
                         <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleChangeMaxShares}>
                                 <h3 class="section-header">Change Max Shares</h3>
-                                <div class="border-b border-[color:var(--border)] mb-4"></div>
+                                <div class="border-b border-(--border) mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
                                         type="number" 
@@ -534,7 +534,7 @@
                                         disabled={loadingStates.changeMaxShares}
                                     />
                                     {#if errorStates.changeMaxShares}
-                                        <div class="text-[color:var(--destructive)]">{errorStates.changeMaxShares}</div>
+                                        <div class="text-(--destructive)">{errorStates.changeMaxShares}</div>
                                     {/if}
                                     <div class="flex justify-end">
                                         <button 
@@ -557,7 +557,7 @@
                         <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleAddCompanyData}>
                                 <h3 class="section-header">Add Company Data</h3>
-                                <div class="border-b border-[color:var(--border)] mb-4"></div>
+                                <div class="border-b border-(--border) mb-4"></div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input 
                                         type="number" 
@@ -575,7 +575,7 @@
                                     />
                                 </div>
                                 {#if errorStates.addCompanyData}
-                                    <div class="text-[color:var(--destructive)]">{errorStates.addCompanyData}</div>
+                                    <div class="text-(--destructive)">{errorStates.addCompanyData}</div>
                                 {/if}
                                 <div class="flex justify-end">
                                     <button 
@@ -597,7 +597,7 @@
                         <div class="card mb-2">
                             <form class="space-y-4" onsubmit={handleChangeAdmin}>
                                 <h3 class="section-header">Change Admin</h3>
-                                <div class="border-b border-[color:var(--border)] mb-4"></div>
+                                <div class="border-b border-(--border) mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
                                         type="text" 
@@ -607,7 +607,7 @@
                                         disabled={loadingStates.changeAdmin}
                                     />
                                     {#if errorStates.changeAdmin}
-                                        <div class="text-[color:var(--destructive)]">{errorStates.changeAdmin}</div>
+                                        <div class="text-(--destructive)">{errorStates.changeAdmin}</div>
                                     {/if}
                                     <div class="flex justify-end">
                                         <button 
@@ -634,7 +634,7 @@
                 <h3 class="section-header">Send Allocated Shares
                     <HelpTip text="Send shares that have been allocated to a designated wallet address (admin function)" />
                 </h3>
-                <div class="border-b border-[color:var(--border)] mb-4"></div>
+                <div class="border-b border-(--border) mb-4"></div>
                 <form class="space-y-3" onsubmit={(e) => handleClaimSharesDirect(e)}>
                     <input 
                         type="text" 
@@ -644,7 +644,7 @@
                         disabled={loadingStates.claimSharesDirect}
                     />
                     {#if errorStates.claimSharesDirect}
-                        <div class="text-[color:var(--destructive)]">{errorStates.claimSharesDirect}</div>
+                        <div class="text-(--destructive)">{errorStates.claimSharesDirect}</div>
                     {/if}
                     <div class="flex justify-end">
                         <button 

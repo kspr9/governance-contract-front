@@ -59,23 +59,23 @@
     }
 </script>
 
-<div class="owned-share-card bg-[color:var(--card)] rounded-[var(--radius)] shadow-md p-5 flex flex-col gap-3 border border-[color:var(--border)]">
+<div class="owned-share-card bg-(--card) rounded-(--radius) shadow-md p-5 flex flex-col gap-3 border border-(--border)">
     <!-- 4-column layout: Registry Number | Share Register | Number of Shares | Transfer Button -->
     <div class="grid gap-4 items-center overflow-hidden card-grid">
         <!-- Column 1: Registry Number -->
         <div class="flex flex-col">
-            <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.REGISTRY_NUMBER}</span>
-            <span class="text-base font-semibold text-[color:var(--foreground)]">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
+            <span class="text-xs text-(--muted-foreground)">{terminology.REGISTRY_NUMBER}</span>
+            <span class="text-base font-semibold text-(--foreground)">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
         </div>
         
         <!-- Column 2: Share Register -->
         <div class="flex flex-col">
-            <div class="text-xs text-[color:var(--muted-foreground)] font-semibold flex items-center gap-1">
+            <div class="text-xs text-(--muted-foreground) font-semibold flex items-center gap-1">
                 {terminology.ISSUING_CONTRACT}
                 <HelpTip text="The share register where these shares were issued" />
             </div>
             <button 
-                class="font-mono text-sm text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left truncate" 
+                class="font-mono text-sm text-(--primary) hover:text-(--accent) hover:underline text-left truncate" 
                 title="Load this contract" 
                 onclick={() => { 
                     $contractState.contractAddress = ticket.address; 
@@ -88,15 +88,15 @@
         
         <!-- Column 3: Number of Shares -->
         <div class="flex flex-col">
-            <span class="text-xs text-[color:var(--muted-foreground)]">{terminology.AMOUNT}</span>
-            <span class="text-lg font-bold text-[color:var(--foreground)]">
+            <span class="text-xs text-(--muted-foreground)">{terminology.AMOUNT}</span>
+            <span class="text-lg font-bold text-(--foreground)">
                 <span class="font-bold">{ticket.amount}</span>
                 {#if maxSharesLoading[ticket.address]}
-                    <span class="text-[color:var(--muted-foreground)] ml-2">/ ...</span>
+                    <span class="text-(--muted-foreground) ml-2">/ ...</span>
                 {:else if maxSharesCache[ticket.address]}
-                    <span class="text-[color:var(--muted-foreground)] ml-2">/ {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
+                    <span class="text-(--muted-foreground) ml-2">/ {maxSharesCache[ticket.address].issued_shares || maxSharesCache[ticket.address].max_shares}</span>
                 {:else}
-                    <span class="text-[color:var(--muted-foreground)] ml-2">/ ?</span>
+                    <span class="text-(--muted-foreground) ml-2">/ ?</span>
                 {/if}
             </span>
         </div>
@@ -135,11 +135,11 @@
             
 
             {#if errorState}
-                <div class="bg-[color:var(--destructive)]/10 p-3 rounded-md flex items-center gap-2">
-                    <svg class="w-5 h-5 text-[color:var(--destructive)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-(--destructive)/10 p-3 rounded-md flex items-center gap-2">
+                    <svg class="w-5 h-5 text-(--destructive)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <span class="text-[color:var(--destructive)]">{errorState}</span>
+                    <span class="text-(--destructive)">{errorState}</span>
                 </div>
             {/if}
 

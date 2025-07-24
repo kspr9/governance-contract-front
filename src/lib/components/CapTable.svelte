@@ -89,10 +89,10 @@
       </colgroup>
       <thead>
         <tr class="table-header">
-          <th class="font-semibold text-left text-[color:var(--muted-foreground)] p-2">NAME</th>
-          <th class="font-semibold text-left text-[color:var(--muted-foreground)] ml-2">{terminology.REGISTRY_NUMBER}</th>
-          <th class="font-semibold text-left text-[color:var(--muted-foreground)] p-2">REGISTER ADDRESS</th>
-          <th class="font-semibold text-right text-[color:var(--muted-foreground)] p-2">OWNED SHARES</th>
+          <th class="font-semibold text-left text-(--muted-foreground) p-2">NAME</th>
+          <th class="font-semibold text-left text-(--muted-foreground) ml-2">{terminology.REGISTRY_NUMBER}</th>
+          <th class="font-semibold text-left text-(--muted-foreground) p-2">REGISTER ADDRESS</th>
+          <th class="font-semibold text-right text-(--muted-foreground) p-2">OWNED SHARES</th>
         </tr>
       </thead>
       <tbody>
@@ -117,7 +117,7 @@
                     {:else if nameInfo?.name}
                       {nameInfo.name}
                     {:else if nameInfo?.error}
-                      <span class="text-[color:var(--destructive)]" title={nameInfo.error}>Error</span>
+                      <span class="text-(--destructive)" title={nameInfo.error}>Error</span>
                     {:else}
                       -
                     {/if}
@@ -132,7 +132,7 @@
                 {#if maxSharesLoading[address]}
                   <LoadingDots />
                 {:else if registryNumber}
-                  <span class="text-[color:var(--muted-foreground)] ml-2">{registryNumber}</span>
+                  <span class="text-(--muted-foreground) ml-2">{registryNumber}</span>
                 {:else}
                   -
                 {/if}
@@ -141,7 +141,7 @@
                 <div class="flex items-center gap-2">
                   {#if address.startsWith("KT1")}
                     <button 
-                      class="text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left"
+                      class="text-(--primary) hover:text-(--accent) hover:underline text-left"
                       onclick={() => {
                         $contractState.contractAddress = address;
                         handleLoadContract(address);
@@ -157,7 +157,7 @@
               <td class="text-right p-2">
                 <span>{claimedShares}</span>
                 {#if tzktStorageData.max_shares && Number(tzktStorageData.max_shares) > 0}
-                  <span class="text-[color:var(--muted-foreground)] ml-2">
+                  <span class="text-(--muted-foreground) ml-2">
                     ({( (Number(claimedShares) / Number(tzktStorageData.max_shares)) * 100 ).toFixed(2)}%)
                   </span>
                 {/if}
@@ -166,7 +166,7 @@
           {/each}
         {:else}
           <tr class="table-row">
-            <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="4">No share ledger entries</td>
+            <td class="text-center p-2 text-(--muted-foreground)" colspan="4">No share ledger entries</td>
           </tr>
         {/if}
       </tbody>
@@ -192,7 +192,7 @@
           {/each}
         {:else}
           <tr class="table-row">
-            <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="2">No unallocated shares</td>
+            <td class="text-center p-2 text-(--muted-foreground)" colspan="2">No unallocated shares</td>
           </tr>
         {/if}
       </tbody>
@@ -219,7 +219,7 @@
               <td class="font-mono p-2">
                 {#if address.startsWith('KT1')}
                   <button 
-                    class="text-[color:var(--primary)] hover:text-[color:var(--accent)] hover:underline text-left"
+                    class="text-(--primary) hover:text-(--accent) hover:underline text-left"
                     onclick={() => {
                       $contractState.contractAddress = address;
                       handleLoadContract(address);
@@ -252,13 +252,13 @@
           {/each}
         {:else}
           <tr class="table-row">
-            <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="3">No pending allocations</td>
+            <td class="text-center p-2 text-(--muted-foreground)" colspan="3">No pending allocations</td>
           </tr>
         {/if}
       </tbody>
     </table>
     {#if error}
-      <div class="text-[color:var(--destructive)] mt-2">{error}</div>
+      <div class="text-(--destructive) mt-2">{error}</div>
     {/if}
   </CollapsibleSection>
 </div>

@@ -71,10 +71,10 @@
     <div class="flex items-center gap-3">
         <!-- Tezos Network Dropdown -->
         <div class="relative group">
-            <button class="flex items-center gap-3 border border-white/100 bg-[color:var(--accent)] group-hover:bg-white text-white group-hover:text-[color:var(--primary)] pl-1 pr-2 py-1 rounded-full transition-colors duration-200">
+            <button class="flex items-center gap-3 border border-white bg-(--accent) group-hover:bg-white text-white group-hover:text-(--primary) pl-1 pr-2 py-1 rounded-full transition-colors duration-200">
                 <img src={tezosLogo} alt="Tezos" class="w-6 h-6" />            
                 <span class="text-sm font-medium">Tezos</span>
-                <ChevronDown class="w-4 h-4 text-white group-hover:text-[color:var(--primary)] transition-colors transition-transform group-hover:rotate-180" />
+                <ChevronDown class="w-4 h-4 text-white group-hover:text-(--primary) transition-colors transition-transform group-hover:rotate-180" />
             </button>
             <!-- Dropdown menu would go here -->
         </div>
@@ -82,12 +82,12 @@
         {#if beaconState.isConnected}
             <!-- Wallet Address Dropdown -->
             <div class="relative group">
-                <button class="flex items-center gap-3 border-white hover:border-white bg-white group-hover:bg-[color:var(--accent)] px-4 py-1 pt-1.5 pb-1.5 rounded-full transition-colors duration-200">
-                    <Wallet size={22} strokeWidth={2} class="text-[color:var(--primary)] group-hover:text-white transition-colors" />
-                    <span class="text-sm text-[color:var(--primary)] group-hover:text-white transition-colors" title={beaconState.address}>
+                <button class="flex items-center gap-3 border-white hover:border-white bg-white group-hover:bg-(--accent) px-4 py-1 pt-1.5 pb-1.5 rounded-full transition-colors duration-200">
+                    <Wallet size={22} strokeWidth={2} class="text-(--primary) group-hover:text-white transition-colors" />
+                    <span class="text-sm text-(--primary) group-hover:text-white transition-colors" title={beaconState.address}>
                         {getShortAddress(beaconState.address)}
                     </span>
-                    <ChevronDown class="w-4 h-4 text-[color:var(--primary)] group-hover:text-white group-hover:rotate-180 transition-colors transition-transform" />
+                    <ChevronDown class="w-4 h-4 text-(--primary) group-hover:text-white group-hover:rotate-180 transition-colors transition-transform" />
                 </button>
                 <!-- Dropdown menu -->
                 <div class="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
@@ -116,17 +116,17 @@
         {/if}
     </div>
 {:else}
-    <div class="w-full h-full bg-[color:var(--card)] rounded-[var(--radius)] shadow p-4 border border-[color:var(--border)]">
+    <div class="w-full h-full bg-(--card) rounded-(--radius) shadow p-4 border border-(--border)">
         {#if beaconState.isConnected}
             <div class="flex items-center justify-between mb-2">
-                <span class="font-mono text-sm truncate text-[color:var(--foreground)]" title={beaconState.address}>
+                <span class="font-mono text-sm truncate text-(--foreground)" title={beaconState.address}>
                     {getShortAddress(beaconState.address)}
                 </span>
                 <button class="btn-secondary" onclick={handleDisconnectWallet}>
                     Log out
                 </button>
             </div>
-            <div class="text-xs text-[color:var(--muted-foreground)]">Balance: {beaconState.wbalance?.toFixed(3)} {tezSym}</div>
+            <div class="text-xs text-(--muted-foreground)">Balance: {beaconState.wbalance?.toFixed(3)} {tezSym}</div>
         {:else}
             <div class="flex items-center justify-between">
                 <button class="btn-primary" onclick={handleConnectWallet} title="To interact with Share Register, connect your personal wallet.">

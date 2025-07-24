@@ -123,7 +123,7 @@
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">{terminology.ADMIN_ADDRESS}</label>
+        <label class="block text-sm font-medium text-(--muted-foreground)">{terminology.ADMIN_ADDRESS}</label>
         <input
           type="text"
           bind:value={adminAddress}
@@ -135,7 +135,7 @@
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">{terminology.MAX_SHARES}</label>
+        <label class="block text-sm font-medium text-(--muted-foreground)">{terminology.MAX_SHARES}</label>
         <input
           type="number"
           bind:value={maxShares}
@@ -147,7 +147,7 @@
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-[color:var(--muted-foreground)]">{terminology.REGISTRY_NUMBER}</label>
+        <label class="block text-sm font-medium text-(--muted-foreground)">{terminology.REGISTRY_NUMBER}</label>
         <input
           type="number"
           bind:value={registryNumber}
@@ -166,18 +166,18 @@
       </button>
     
       {#if txHash}
-        <p class="text-[color:var(--primary)]">Transaction sent! Hash: {txHash}</p>
+        <p class="text-(--primary)">Transaction sent! Hash: {txHash}</p>
       {/if}
     
       {#if errorMsg}
-        <p class="text-[color:var(--destructive)]">{errorMsg}</p>
+        <p class="text-(--destructive)">{errorMsg}</p>
       {/if}
     </form>
 
     <!-- Deployed Wallet Contracts Table -->
     <div class="mt-8 card">
       <div class="section-header mb-2">Deployed Share Registers</div>
-      <div class="text-sm text-[color:var(--muted-foreground)] mb-4">View all wallet contracts that have been deployed from the governance contract.</div>
+      <div class="text-sm text-(--muted-foreground) mb-4">View all wallet contracts that have been deployed from the governance contract.</div>
       <table class="w-full border-collapse text-sm">
         <thead>
           <tr class="table-header">
@@ -204,7 +204,7 @@
             {/each}
           {:else}
             <tr class="table-row">
-              <td class="text-center p-2 text-[color:var(--muted-foreground)]" colspan="3">No deployed contracts found</td>
+              <td class="text-center p-2 text-(--muted-foreground)" colspan="3">No deployed contracts found</td>
             </tr>
           {/if}
         </tbody>

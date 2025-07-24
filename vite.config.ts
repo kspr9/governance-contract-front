@@ -10,8 +10,8 @@ import type { Plugin } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    tailwindcss(),
     sveltekit(), 
-    //tailwindcss()
   ],
   ssr: {
     external: ['@taquito/taquito', '@taquito/beacon-wallet', '@airgap/beacon-sdk', '@airgap/beacon-blockchain-substrate']
