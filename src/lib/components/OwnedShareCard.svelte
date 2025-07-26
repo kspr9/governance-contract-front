@@ -7,6 +7,7 @@
     import HelpTip from './HelpTip.svelte';
     import { toastStore } from '../stores/toastStore.svelte';
     import { SendHorizontal, ChevronsRight } from 'lucide-svelte';
+    import { estonianRegistryCache } from '../stores/estonianRegistryCache.svelte';
 
     let { ticket, maxSharesCache, maxSharesLoading, handleLoadContract } = $props<{
         ticket: TzktTicket;
@@ -24,6 +25,11 @@
     let loadingState = $state(false);
     let errorState = $state<string | null>(null);
     let txHash = $state<string | null>(null);
+    
+    // Company name state
+    let companyName = $state<string | null>(null);
+    let companyNameLoading = $state(false);
+    let companyNameError = $state<string | null>(null);
 
     async function handleTransfer(event: Event) {
         event.preventDefault();
@@ -58,10 +64,40 @@
             loadingState = false;
         }
     }
+
+    // Effect to fetch company name when registry number is available
+    $effect(() => {
+        const registryNumber = maxSharesCache[ticket.address]?.registry_number;
+        if (registryNumber && registryNumber.length === 8) {
+            fetchCompanyName(registryNumber);
+        }
+    });
+
+    async function fetchCompanyName(registryNumber: string) {
+        companyNameLoading = true;
+        companyNameError = null;
+        
+        try {
+            const companyData = await estonianRegistryCache.getCompanyData(registryNumber);
+            
+            if (companyData && companyData.name) {
+                companyName = companyData.name;
+            } else {
+                // Check for error state in cache
+                const cacheEntry = estonianRegistryCache.getCacheEntry(registryNumber);
+                companyNameError = cacheEntry?.error || 'Company not found';
+            }
+        } catch (error) {
+            console.error(`Failed to fetch company name for ${registryNumber}:`, error);
+            companyNameError = error instanceof Error ? error.message : 'Failed to fetch company name';
+        } finally {
+            companyNameLoading = false;
+        }
+    }
 </script>
 
 <div class="owned-share-card bg-(--card) rounded-(--radius) shadow-md p-5 flex flex-col gap-3 border border-(--border)">
-    <!-- 4-column layout: Registry Number | Share Register | Number of Shares | Transfer Button -->
+    <!-- 5-column layout: Registry Number | Company Name | Share Register | Number of Shares | Transfer Button -->
     <div class="grid items-center overflow-hidden card-grid">
 
         <!-- Column 1: Registry Number -->
@@ -70,7 +106,23 @@
             <span class="text-muted font-semibold text-(--foreground)">{maxSharesCache[ticket.address]?.registry_number || 'Not set'}</span>
         </div>
         
-        <!-- Column 2: Share Register -->
+        <!-- Column 2: Company Name -->
+        <div class="flex flex-col min-w-0">
+            <span class="text-xs text-muted flex items-center">Company Name</span>
+            <div class="text-sm text-(--foreground) truncate">
+                {#if companyNameLoading}
+                    <span class="text-(--muted-foreground)">Loading<LoadingDots /></span>
+                {:else if companyNameError}
+                    <span class="text-(--muted-foreground)" title={companyNameError}>Unknown</span>
+                {:else if companyName}
+                    <span title={companyName}>{companyName}</span>
+                {:else}
+                    <span class="text-(--muted-foreground)">-</span>
+                {/if}
+            </div>
+        </div>
+        
+        <!-- Column 3: Share Register -->
         <div class="flex flex-col min-w-0">
             <div class="text-xs text-muted flex items-center">
                 {terminology.ISSUING_CONTRACT}
@@ -88,7 +140,7 @@
             </button>
         </div>
         
-        <!-- Column 3: Number of Shares -->
+        <!-- Column 4: Number of Shares -->
         <div class="flex flex-col">
             <span class="text-xs text-(--muted-foreground)">{terminology.AMOUNT}</span>
             <span class="text-lg font-bold text-(--foreground)">
@@ -103,7 +155,7 @@
             </span>
         </div>
         
-        <!-- Column 4: Transfer Button -->
+        <!-- Column 5: Transfer Button -->
         <div class="flex justify-end">
             <button 
                 class={(openTransferCard ? 'btn-secondary' : 'btn-primary') + ' flex items-center gap-2'}
@@ -142,7 +194,7 @@
                         Transferring<LoadingDots />
                     {:else}
                         Complete transfer
-                        <ChevronsRight class="w-4 h-4" />
+                        <ChevronsRight class="w-6 h-6" />
                     {/if}
                 </button>
             </div>
@@ -160,9 +212,9 @@
 </div>
 
 <style>
-  /* Balanced grid layout that prevents overflow */
+  /* Balanced 5-column grid layout that prevents overflow */
   .card-grid {
-    grid-template-columns: minmax(120px, max-content) 1fr minmax(100px, max-content) minmax(120px, max-content);
+    grid-template-columns: minmax(120px, max-content) minmax(150px, 1fr) minmax(200px, 1fr) minmax(100px, max-content) minmax(120px, max-content);
     min-width: 0; /* Allow columns to shrink below content size */
     gap: 1rem; /* Add consistent spacing between columns */
   }

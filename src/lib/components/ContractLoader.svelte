@@ -11,7 +11,7 @@
     import Toast from './Toast.svelte';
     import LoadingDots from './LoadingDots.svelte';
     import { beaconState } from "../stores/beaconStore.svelte";
-    import { fetchCompanyData } from '../utils/estonianRegistry';
+    import { estonianRegistryCache } from '../stores/estonianRegistryCache.svelte';
     import { shareLedgerStore } from '../stores/shareLedgerStore.svelte';
     import ContractSummary from './ContractSummary.svelte';
     import DashboardTabs from './DashboardTabs.svelte';
@@ -74,7 +74,7 @@
     function toggleAdminOps() { showAdminOps = !showAdminOps; }
 
     // Add state for company data
-    let companyData = $state<{ name: string; status: string; address?: string } | null>(null);
+    let companyData = $state<{ name: string; status: string; address?: string; registryCode?: string } | null>(null);
 
     // Add loading state for company data
     let companyDataLoading = $state(false);
@@ -109,27 +109,25 @@
     }
 
     /**
-     * Fetch shareholder name from Estonian Business Registry
+     * Fetch shareholder name from Estonian Business Registry via cache
      */
     async function fetchShareholderName(registryNumber: string) {
         if (!registryNumber || shareholderNameCache[registryNumber]) return;
 
+        // Set loading state in local cache
         shareholderNameCache[registryNumber] = { loading: true };
 
         try {
-            // Get credentials from environment variables
-            const username = import.meta.env.VITE_ESTONIAN_REGISTRY_USERNAME;
-            const password = import.meta.env.VITE_ESTONIAN_REGISTRY_PASSWORD;
+            // Get data from centralized registry cache
+            const companyData = await estonianRegistryCache.getCompanyData(registryNumber);
             
-            if (!username || !password) {
-                throw new Error('Estonian Business Registry credentials not configured');
-            }
-
-            const data = await fetchCompanyData(registryNumber, username, password);
-            if (data && data.name) {
-                shareholderNameCache[registryNumber] = { name: data.name, loading: false };
+            if (companyData && companyData.name) {
+                shareholderNameCache[registryNumber] = { name: companyData.name, loading: false };
             } else {
-                throw new Error('Company not found');
+                // Check for error state in cache
+                const cacheEntry = estonianRegistryCache.getCacheEntry(registryNumber);
+                const errorMessage = cacheEntry?.error || 'Company not found';
+                shareholderNameCache[registryNumber] = { error: errorMessage, loading: false };
             }
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Failed to fetch name';
@@ -167,7 +165,7 @@
     });
 
     /**
-     * Fetch company data from Estonian Business Registry
+     * Fetch company data from Estonian Business Registry via cache
      */
     async function fetchEstonianCompanyData(registryNumber: string) {
         companyDataLoading = true;
@@ -176,30 +174,24 @@
         try {
             console.log('Starting Estonian company data fetch for registry number:', registryNumber);
             
-            // Get credentials from environment variables
-            const username = import.meta.env.VITE_ESTONIAN_REGISTRY_USERNAME;
-            const password = import.meta.env.VITE_ESTONIAN_REGISTRY_PASSWORD;
-            
-            // Log credential presence (not the actual values)
-            console.log('Credentials check:', {
-                hasUsername: !!username,
-                hasPassword: !!password
-            });
-            
-            if (!username || !password) {
-                throw new Error('Estonian Business Registry credentials not configured');
-            }
-            
-            console.log('Calling fetchCompanyData...');
-            const data = await fetchCompanyData(registryNumber, username, password);
-            console.log('Received company data response:', data);
+            // Get data from centralized registry cache
+            const data = await estonianRegistryCache.getCompanyData(registryNumber);
+            console.log('Received company data response from cache:', data);
             
             if (data) {
-                companyData = data;
+                companyData = {
+                    name: data.name,
+                    registryCode: data.registryCode,
+                    status: data.status,
+                    address: data.address
+                };
                 console.log('Successfully updated company data state:', companyData);
             } else {
-                console.log('No company data returned from API');
-                companyDataError = 'Company not found';
+                // Check for error state in cache
+                const cacheEntry = estonianRegistryCache.getCacheEntry(registryNumber);
+                const errorMessage = cacheEntry?.error || 'Company not found';
+                console.log('No company data returned from cache, error:', errorMessage);
+                companyDataError = errorMessage;
             }
         } catch (error) {
             console.error('Failed to fetch company data:', error);

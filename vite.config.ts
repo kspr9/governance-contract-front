@@ -17,7 +17,6 @@ export default defineConfig({
     external: ['@taquito/taquito', '@taquito/beacon-wallet', '@airgap/beacon-sdk', '@airgap/beacon-blockchain-substrate']
   },
   define: {
-    'process.env': {},
     global: 'globalThis',
   },
   resolve: {
