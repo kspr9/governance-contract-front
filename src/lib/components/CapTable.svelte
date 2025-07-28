@@ -12,6 +12,7 @@
   import HelpTip from './HelpTip.svelte';
   import CollapsibleSection from './shared/CollapsibleSection.svelte';
   import { contractInstance } from '../stores/contractStore.svelte';
+  import { estonianRegistryCache } from '../stores/estonianRegistryCache.svelte';
   
   let { 
     maxSharesCache,
@@ -82,17 +83,17 @@
   <CollapsibleSection title="{terminology.SHARE_LEDGER}" tooltip="{terminology.HELP_SHARE_REGISTER}" bind:open={showLedger}>
     <table class="cap-table">
       <colgroup>
+        <col style="width: 20%;" />
         <col style="width: 25%;" />
-        <col style="width: 15%;" />
+        <col style="width: 20%;" />
         <col style="width: 35%;" />
-        <col style="width: 25%;" />
       </colgroup>
       <thead>
         <tr>
-          <th>NAME</th>
-          <th>{terminology.REGISTRY_NUMBER}</th>
-          <th>WALLET ADDRESS</th>
           <th>OWNED SHARES</th>
+          <th>NAME</th>
+          <th>REGISTRY NUMBER</th>
+          <th>WALLET ADDRESS</th>
         </tr>
       </thead>
       <tbody>
@@ -106,12 +107,22 @@
           {#each sortedShareLedgerEntries as [address, claimedShares], i}
             {@const registryNumber = maxSharesCache[address]?.registry_number}
             {@const nameInfo = registryNumber ? shareholderNameCache[registryNumber] : undefined}
+            {@const cacheEntry = registryNumber ? estonianRegistryCache.getCacheEntry(registryNumber) : undefined}
+            {@const isCompany = registryNumber && estonianRegistryCache.shouldFetchCompanyName(registryNumber)}
             <tr>
+              <td class="shares-cell">
+                <span class="shares-count">{claimedShares}</span>
+                {#if tzktStorageData.max_shares && Number(tzktStorageData.max_shares) > 0}
+                  <span class="shares-percentage">
+                    ({( (Number(claimedShares) / Number(tzktStorageData.max_shares)) * 100 ).toFixed(2)}%)
+                  </span>
+                {/if}
+              </td>
               <td>
                 {#if maxSharesLoading[address]}
                   <LoadingDots />
                 {:else if registryNumber}
-                  {#if registryNumber.length === 8}
+                  {#if isCompany}
                     {#if nameInfo?.loading}
                       <LoadingDots />
                     {:else if nameInfo?.name}
@@ -150,14 +161,6 @@
                   </button>
                 {:else}
                   <span class="wallet-address">{address}</span>
-                {/if}
-              </td>
-              <td class="shares-cell">
-                <span class="shares-count">{claimedShares}</span>
-                {#if tzktStorageData.max_shares && Number(tzktStorageData.max_shares) > 0}
-                  <span class="shares-percentage">
-                    ({( (Number(claimedShares) / Number(tzktStorageData.max_shares)) * 100 ).toFixed(2)}%)
-                  </span>
                 {/if}
               </td>
             </tr>
@@ -284,8 +287,8 @@
     letter-spacing: 0.1em;
   }
 
-  .cap-table th:last-child {
-    text-align: right;
+  .cap-table th:first-child {
+    text-align: left;
   }
 
   .cap-table tbody tr {
@@ -303,8 +306,8 @@
     font-size: var(--text-sm);
   }
 
-  .cap-table td:last-child {
-    text-align: right;
+  .cap-table td:first-child {
+    text-align: left;
   }
 
   .wallet-link {
@@ -329,7 +332,7 @@
   }
 
   .shares-cell {
-    text-align: right;
+    text-align: left;
   }
 
   .shares-count {

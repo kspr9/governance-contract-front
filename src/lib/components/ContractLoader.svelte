@@ -118,13 +118,13 @@
         shareholderNameCache[registryNumber] = { loading: true };
 
         try {
-            // Get data from centralized registry cache
+            // Get data from centralized registry cache (now properly awaits)
             const companyData = await estonianRegistryCache.getCompanyData(registryNumber);
             
             if (companyData && companyData.name) {
                 shareholderNameCache[registryNumber] = { name: companyData.name, loading: false };
             } else {
-                // Check for error state in cache
+                // Only set error after cache operation completes
                 const cacheEntry = estonianRegistryCache.getCacheEntry(registryNumber);
                 const errorMessage = cacheEntry?.error || 'Company not found';
                 shareholderNameCache[registryNumber] = { error: errorMessage, loading: false };
@@ -157,7 +157,7 @@
         for (const [address, _] of shareLedgerState.shareLedger) {
             if (address.startsWith('KT1') && maxSharesCache[address]?.registry_number) {
                 const registryNumber = maxSharesCache[address].registry_number;
-                if (registryNumber && registryNumber.length === 8) {
+                if (registryNumber && estonianRegistryCache.shouldFetchCompanyName(registryNumber)) {
                     fetchShareholderName(registryNumber);
                 }
             }
@@ -170,11 +170,12 @@
     async function fetchEstonianCompanyData(registryNumber: string) {
         companyDataLoading = true;
         companyDataError = null;
+        companyData = null; // Reset previous data
         
         try {
             console.log('Starting Estonian company data fetch for registry number:', registryNumber);
             
-            // Get data from centralized registry cache
+            // Get data from centralized registry cache (now properly awaits)
             const data = await estonianRegistryCache.getCompanyData(registryNumber);
             console.log('Received company data response from cache:', data);
             
@@ -185,9 +186,10 @@
                     status: data.status,
                     address: data.address
                 };
+                companyDataError = null; // Clear any previous errors
                 console.log('Successfully updated company data state:', companyData);
             } else {
-                // Check for error state in cache
+                // Only set error after cache operation completes
                 const cacheEntry = estonianRegistryCache.getCacheEntry(registryNumber);
                 const errorMessage = cacheEntry?.error || 'Company not found';
                 console.log('No company data returned from cache, error:', errorMessage);

@@ -115,7 +115,8 @@ export const GET: RequestHandler = async ({ params }) => {
             status: companyData.staatus_tekstina,
             address: companyData.evaadressid?.aadress_ads__ads_normaliseeritud_taisaadress,
             registryNumber,
-            success: true
+            success: true,
+            isMock: false
         });
     } catch (error) {
         console.error('Failed to fetch company data:', error);

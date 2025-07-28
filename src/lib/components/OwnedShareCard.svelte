@@ -68,7 +68,7 @@
     // Effect to fetch company name when registry number is available
     $effect(() => {
         const registryNumber = maxSharesCache[ticket.address]?.registry_number;
-        if (registryNumber && registryNumber.length === 8) {
+        if (registryNumber && estonianRegistryCache.shouldFetchCompanyName(registryNumber)) {
             fetchCompanyName(registryNumber);
         }
     });
@@ -76,14 +76,17 @@
     async function fetchCompanyName(registryNumber: string) {
         companyNameLoading = true;
         companyNameError = null;
+        companyName = null; // Reset previous data
         
         try {
+            // Get data from centralized registry cache (now properly awaits)
             const companyData = await estonianRegistryCache.getCompanyData(registryNumber);
             
             if (companyData && companyData.name) {
                 companyName = companyData.name;
+                companyNameError = null; // Clear any previous errors
             } else {
-                // Check for error state in cache
+                // Only set error after cache operation completes
                 const cacheEntry = estonianRegistryCache.getCacheEntry(registryNumber);
                 companyNameError = cacheEntry?.error || 'Company not found';
             }
