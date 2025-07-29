@@ -2,6 +2,7 @@
     import FormActions from './FormActions.svelte';
     import FormMessage from './FormMessage.svelte';
     import HelpTip from '../HelpTip.svelte';
+    import { ChevronDown } from 'lucide-svelte';
     
     interface Props {
         title: string;
@@ -55,20 +56,9 @@
                 <HelpTip text={tooltip} />
             {/if}
         </div>
-        <svg 
-            class="toggle-icon transition-transform {open ? 'rotate-90' : 'rotate-0'}"
-            xmlns="http://www.w3.org/2000/svg" 
-            width="20" 
-            height="20" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            stroke-width="2" 
-            stroke-linecap="round" 
-            stroke-linejoin="round"
-        >
-            <polyline points="9,18 15,12 9,6"></polyline>
-        </svg>
+        <div class="chevron-container">
+            <ChevronDown class="w-5 h-5 toggle-icon chevron-rotate {open ? 'chevron-open' : ''}" />
+        </div>
     </button>
     
     {#if open}
@@ -119,7 +109,7 @@
     }
     
     .form-header:hover {
-        background: var(--muted);
+        /* Remove background color change on hover */
     }
     
     .form-header:focus {
@@ -139,9 +129,30 @@
         margin: 0;
     }
     
+    .chevron-container {
+        background: var(--muted);
+        border-radius: 6px;
+        padding: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
     .toggle-icon {
         color: var(--muted-foreground);
         flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+    }
+    
+    /* Use :global() to ensure Svelte doesn't scope this away */
+    :global(.chevron-rotate) {
+        transition: transform var(--transition-fast);
+    }
+    
+    /* Rotate chevron when form is open */
+    :global(.chevron-open) {
+        transform: rotate(180deg);
     }
     
     .form-content-container {

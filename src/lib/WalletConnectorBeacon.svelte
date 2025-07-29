@@ -71,10 +71,10 @@
     <div class="flex items-center gap-3">
         <!-- Tezos Network Dropdown -->
         <div class="relative group">
-            <button class="flex items-center gap-3 border border-white bg-(--accent) group-hover:bg-white text-white group-hover:text-(--primary) pl-1 pr-2 py-1 rounded-full transition-colors duration-200">
+            <button class="flex items-center gap-3 border border-white bg-(--primary) group-hover:bg-(var(--color-bg-light)) text-white group-hover:text-(--primary) pl-1 pr-2 py-1 rounded-full transition-colors duration-200">
                 <img src={tezosLogo} alt="Tezos" class="w-6 h-6" />            
                 <span class="text-sm font-medium">Tezos</span>
-                <ChevronDown class="w-4 h-4 text-white group-hover:text-(--primary) transition-colors transition-transform group-hover:rotate-180" />
+                <ChevronDown class="w-4 h-4 text-white group-hover:text-(--primary) chevron-rotate" />
             </button>
             <!-- Dropdown menu would go here -->
         </div>
@@ -82,12 +82,12 @@
         {#if beaconState.isConnected}
             <!-- Wallet Address Dropdown -->
             <div class="relative group">
-                <button class="wallet-hover flex items-center gap-3 border-white hover:border-white bg-white group-hover:bg-(--accent) px-4 py-1 pt-1.5 pb-1.5 rounded-full transition-colors duration-200">
-                    <Wallet size={22} strokeWidth={2} class="text-(--primary) group-hover:text-white transition-colors" />
-                    <span class="text-sm text-(--primary) group-hover:text-white transition-colors" title={beaconState.address}>
+                <button class="flex items-center gap-3 wallet-hover border border-white bg-white group-hover:bg-(--primary) text-(--primary) group-hover:text-white px-4 py-1 rounded-full transition-colors duration-200">
+                    <Wallet size={22} strokeWidth={2} class="w-6 h-6 transition-colors" />
+                    <span class="text-sm font-medium transition-colors" title={beaconState.address}>
                         {getShortAddress(beaconState.address)}
                     </span>
-                    <ChevronDown class="w-4 h-4 text-(--primary) group-hover:text-white group-hover:rotate-180 transition-colors transition-transform" />
+                    <ChevronDown class="w-4 h-4 chevron-rotate" />
                 </button>
                 <!-- Dropdown menu -->
                 <div class="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
@@ -100,7 +100,7 @@
                             class="w-full text-sm text-red-600 hover:text-red-700 font-medium py-2 px-3 rounded-md hover:bg-red-50 transition-colors"
                             onclick={handleDisconnectWallet}
                         >
-                            Disconnect Wallet
+                            Log Out
                         </button>
                     </div>
                 </div>
@@ -108,14 +108,17 @@
         {:else}
             <!-- Connect Wallet Button -->
             <button 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200"
+                class="flex items-center gap-3 border border-white bg-(--primary) hover:bg-(var(--color-bg-light)) text-white hover:text-(--primary) px-4 py-1 rounded-full transition-colors duration-200"
                 onclick={handleConnectWallet}
             >
-                Connect Wallet
+                <Wallet size={22} strokeWidth={2} class="w-6 h-6" />
+                <span class="text-sm font-medium">Log In</span>
             </button>
         {/if}
     </div>
 {:else}
+    <!-- Card mode: Standalone wallet component for use within page content -->
+    <!-- This preserves the original component usage before it was moved to navbar -->
     <div class="w-full h-full bg-(--card) rounded-(--radius) shadow p-4 border border-(--border)">
         {#if beaconState.isConnected}
             <div class="flex items-center justify-between mb-2">
@@ -130,7 +133,7 @@
         {:else}
             <div class="flex items-center justify-between">
                 <button class="btn-primary" onclick={handleConnectWallet} title="To interact with Share Register, connect your personal wallet.">
-                    Connect Wallet
+                    Log In
                 </button>
             </div>
         {/if}
@@ -140,10 +143,19 @@
 <style>
     .wallet-hover:hover {
         border: 1px solid var(--accent-foreground) !important;
-        background-color: var(--primary-foreground) !important;
-        color: var(--primary) !important;
+        background-color: var(--primary) !important;
+        color: var(--dark-bg-text-light) !important;
     }
     .wallet-hover {
         border: 1px solid var(--primary-foreground) !important;
+    }
+    
+    /* Use :global() to ensure Svelte doesn't scope this away */
+    :global(.chevron-rotate) {
+        transition: transform var(--transition-fast);
+    }
+    
+    .group:hover :global(.chevron-rotate) {
+        transform: rotate(180deg);
     }
 </style>

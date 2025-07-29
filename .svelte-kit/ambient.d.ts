@@ -28,6 +28,8 @@
 declare module '$env/static/private' {
 	export const VITE_ESTONIAN_REGISTRY_USERNAME: string;
 	export const VITE_ESTONIAN_REGISTRY_PASSWORD: string;
+	export const ESTONIAN_REGISTRY_USERNAME: string;
+	export const ESTONIAN_REGISTRY_PASSWORD: string;
 	export const USER: string;
 	export const npm_config_user_agent: string;
 	export const GIT_ASKPASS: string;
@@ -122,6 +124,8 @@ declare module '$env/dynamic/private' {
 	export const env: {
 		VITE_ESTONIAN_REGISTRY_USERNAME: string;
 		VITE_ESTONIAN_REGISTRY_PASSWORD: string;
+		ESTONIAN_REGISTRY_USERNAME: string;
+		ESTONIAN_REGISTRY_PASSWORD: string;
 		USER: string;
 		npm_config_user_agent: string;
 		GIT_ASKPASS: string;

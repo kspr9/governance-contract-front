@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { CloudDownload } from 'lucide-svelte';
+    import { Search } from 'lucide-svelte';
     
     let { handleLoadContract }: { handleLoadContract: (address: string) => Promise<void> } = $props();
     let contractInput = $state('');
@@ -16,21 +16,22 @@
             type="text"
             class="search-input" 
             bind:value={contractInput} 
-            placeholder="Tokenization Registry Address" 
+            placeholder="Tokenized Company Contract Address" 
         />
         <button 
             type="submit"
-            class="btn-search "
+            class="btn-search"
         >
-            <span>Load</span>
-            <CloudDownload size={24} />
+            <Search size={24} />
         </button>
     </form>
 </div>
 
 <style>
     .btn-search:hover {
-        border: 1px solid var(--primary);
-        color: var(--primary);
+        background-color: var(--dark-bg-text-light) !important;
+        border: 2px solid var(--accent-hover) !important;
+       
     }
+
 </style> 

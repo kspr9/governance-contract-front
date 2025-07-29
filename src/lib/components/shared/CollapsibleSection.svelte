@@ -82,13 +82,16 @@
         transition: background-color var(--transition-fast);
     }
     
-    .chevron-container:hover {
-        background: var(--secondary-hover);
-    }
     
-    .toggle-icon {
+    
+    :global(.toggle-icon) {
         color: var(--muted-foreground);
         flex-shrink: 0;
+        transition: color var(--transition-fast);
+    }
+    
+    .btn-collapse:hover :global(.toggle-icon) {
+        color: var(--accent);
     }
     
     .section-content {

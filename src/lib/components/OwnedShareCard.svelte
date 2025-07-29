@@ -31,6 +31,17 @@
     let companyNameLoading = $state(false);
     let companyNameError = $state<string | null>(null);
 
+    // Reset form state when loaded contract changes to prevent state persistence
+    $effect(() => {
+        $contractState.contractAddress;
+        // Reset all form-related state when contract context changes
+        transferForm = { destination: '', amount: '' };
+        //openTransferCard = false;
+        errorState = null;
+        txHash = null;
+        loadingState = false;
+    });
+
     async function handleTransfer(event: Event) {
         event.preventDefault();
         const { destination, amount } = transferForm;

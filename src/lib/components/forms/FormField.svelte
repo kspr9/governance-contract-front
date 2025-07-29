@@ -54,13 +54,14 @@
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
     }
     
     .form-label {
-        font-weight: 600;
+        font-weight: 500;
         font-size: 0.875rem;
         color: var(--foreground);
+        padding-top: 0.5rem;
     }
     
     .form-help {

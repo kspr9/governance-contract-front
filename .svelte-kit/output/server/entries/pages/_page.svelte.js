@@ -1,90 +1,197 @@
-import { f as attr, c as pop, p as push, h as attr_class, e as escape_html, i as stringify } from "../../chunks/index2.js";
-import { NetworkType, BeaconEvent } from "@airgap/beacon-sdk";
-import { BeaconWallet } from "@taquito/beacon-wallet";
-import { TezosToolkit } from "@taquito/taquito";
+import { Q as sanitize_props, R as rest_props, S as fallback, T as ensure_array_like, U as spread_attributes, V as clsx, W as element, K as slot, X as bind_props, E as pop, A as push, Y as spread_props, F as attr, J as store_get, G as attr_class, N as stringify, M as unsubscribe_stores } from "../../chunks/index.js";
+import { s as showContractLoaderStore } from "../../chunks/uiStore.js";
 import "clsx";
-import { w as writable } from "../../chunks/index.js";
-const walletStore = writable(null);
-const rpcUrl_mainnet = "https://rpc.tzkt.io/mainnet";
-const SELECTED_RPC_URL = rpcUrl_mainnet;
-const Tezos = new TezosToolkit(SELECTED_RPC_URL);
-const wallet = new BeaconWallet({
-  name: "Tokenshare Beacon Wallet",
-  preferredNetwork: NetworkType.MAINNET
-});
-Tezos.setWalletProvider(wallet);
-walletStore.set(wallet);
-wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, async (account) => {
-  console.log(`${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `, account?.address);
-  if (account) {
-    account.address;
-    await getWalletBalance(account.address);
-  }
-});
-async function getWalletBalance(address) {
-  const balance = await Tezos.tz.getBalance(address);
-  return balance.toNumber() / 1e6;
-}
-function createToastStore() {
-  const { subscribe, update } = writable([]);
-  let nextId = 0;
-  return {
-    subscribe,
-    add: (type, message, operationHash) => {
-      const id = nextId++;
-      update((toasts) => [
-        ...toasts,
-        { id, type, message, operationHash }
-      ]);
-      setTimeout(
-        () => {
-          update((toasts) => toasts.filter((t) => t.id !== id));
-        },
-        5e3
-      );
-    },
-    remove: (id) => {
-      update((toasts) => toasts.filter((t) => t.id !== id));
-    }
-  };
-}
-createToastStore();
-const terminology = {
-  MANAGE_DEPLOYED_WALLETS: "Manage Deployed Registers"
+import { w as writable } from "../../chunks/index2.js";
+/**
+ * @license lucide-svelte v0.525.0 - ISC
+ *
+ * ISC License
+ * 
+ * Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part of Feather (MIT). All other copyright (c) for Lucide are held by Lucide Contributors 2022.
+ * 
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * 
+ */
+const defaultAttributes = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: 24,
+  height: 24,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  "stroke-width": 2,
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round"
 };
-function LoadContractForm($$payload, $$props) {
+function Icon($$payload, $$props) {
+  const $$sanitized_props = sanitize_props($$props);
+  const $$restProps = rest_props($$sanitized_props, [
+    "name",
+    "color",
+    "size",
+    "strokeWidth",
+    "absoluteStrokeWidth",
+    "iconNode"
+  ]);
   push();
-  let contractInput = "";
-  $$payload.out += `<div class="bg-[color:var(--card)] rounded-[var(--radius)] shadow p-4 border border-[color:var(--border)] h-full"><div class="font-semibold text-lg mb-2 text-[color:var(--primary)]">Search for a Company Share Register</div> <div class="flex gap-2 mb-2"><input class="input flex-1"${attr("value", contractInput)} placeholder="Contract address"/> <button class="btn-primary">Search</button></div></div>`;
+  let name = fallback($$props["name"], void 0);
+  let color = fallback($$props["color"], "currentColor");
+  let size = fallback($$props["size"], 24);
+  let strokeWidth = fallback($$props["strokeWidth"], 2);
+  let absoluteStrokeWidth = fallback($$props["absoluteStrokeWidth"], false);
+  let iconNode = fallback($$props["iconNode"], () => [], true);
+  const mergeClasses = (...classes) => classes.filter((className, index, array) => {
+    return Boolean(className) && array.indexOf(className) === index;
+  }).join(" ");
+  const each_array = ensure_array_like(iconNode);
+  $$payload.out.push(`<svg${spread_attributes(
+    {
+      ...defaultAttributes,
+      ...$$restProps,
+      width: size,
+      height: size,
+      stroke: color,
+      "stroke-width": absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth,
+      class: clsx(mergeClasses("lucide-icon", "lucide", name ? `lucide-${name}` : "", $$sanitized_props.class))
+    },
+    null,
+    void 0,
+    void 0,
+    3
+  )}><!--[-->`);
+  for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
+    let [tag, attrs] = each_array[$$index];
+    element($$payload, tag, () => {
+      $$payload.out.push(`${spread_attributes({ ...attrs }, null, void 0, void 0, 3)}`);
+    });
+  }
+  $$payload.out.push(`<!--]--><!---->`);
+  slot($$payload, $$props, "default", {});
+  $$payload.out.push(`<!----></svg>`);
+  bind_props($$props, {
+    name,
+    color,
+    size,
+    strokeWidth,
+    absoluteStrokeWidth,
+    iconNode
+  });
   pop();
 }
+function Search($$payload, $$props) {
+  const $$sanitized_props = sanitize_props($$props);
+  /**
+   * @license lucide-svelte v0.525.0 - ISC
+   *
+   * ISC License
+   *
+   * Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part of Feather (MIT). All other copyright (c) for Lucide are held by Lucide Contributors 2022.
+   *
+   * Permission to use, copy, modify, and/or distribute this software for any
+   * purpose with or without fee is hereby granted, provided that the above
+   * copyright notice and this permission notice appear in all copies.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+   * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+   * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+   * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+   * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+   * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+   * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+   *
+   */
+  const iconNode = [
+    ["path", { "d": "m21 21-4.34-4.34" }],
+    ["circle", { "cx": "11", "cy": "11", "r": "8" }]
+  ];
+  Icon($$payload, spread_props([
+    { name: "search" },
+    $$sanitized_props,
+    {
+      /**
+       * @component @name Search
+       * @description Lucide SVG icon component, renders SVG Element with children.
+       *
+       * @preview ![img](data:image/svg+xml;base64,PHN2ZyAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogIHdpZHRoPSIyNCIKICBoZWlnaHQ9IjI0IgogIHZpZXdCb3g9IjAgMCAyNCAyNCIKICBmaWxsPSJub25lIgogIHN0cm9rZT0iIzAwMCIgc3R5bGU9ImJhY2tncm91bmQtY29sb3I6ICNmZmY7IGJvcmRlci1yYWRpdXM6IDJweCIKICBzdHJva2Utd2lkdGg9IjIiCiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogIHN0cm9rZS1saW5lam9pbj0icm91bmQiCj4KICA8cGF0aCBkPSJtMjEgMjEtNC4zNC00LjM0IiAvPgogIDxjaXJjbGUgY3g9IjExIiBjeT0iMTEiIHI9IjgiIC8+Cjwvc3ZnPgo=) - https://lucide.dev/icons/search
+       * @see https://lucide.dev/guide/packages/lucide-svelte - Documentation
+       *
+       * @param {Object} props - Lucide icons props and any valid SVG attribute
+       * @returns {FunctionalComponent} Svelte component
+       *
+       */
+      iconNode,
+      children: ($$payload2) => {
+        $$payload2.out.push(`<!---->`);
+        slot($$payload2, $$props, "default", {});
+        $$payload2.out.push(`<!---->`);
+      },
+      $$slots: { default: true }
+    }
+  ]));
+}
+function LoadContractForm($$payload, $$props) {
+  push();
+  let { handleLoadContract } = $$props;
+  let contractInput = "";
+  $$payload.out.push(`<div class="w-full"><form class="search-container svelte-1985pg1"><input type="text" class="search-input"${attr("value", contractInput)} placeholder="Tokenization Registry Address"/> <button type="submit" class="btn-search svelte-1985pg1">`);
+  Search($$payload, { size: 24 });
+  $$payload.out.push(`<!----></button></form></div>`);
+  pop();
+}
+const blockImage = "/_app/immutable/assets/block.7gKAvlSv.png";
+const registerLogo = "/_app/immutable/assets/2riregister-logo.B0lxYOD2.png";
+const contractState = writable({ contractAddress: null, isLoaded: false });
 function _page($$payload, $$props) {
   push();
-  $$payload.out += `<main class="min-h-screen bg-[color:var(--background)]"><div class="sticky top-0 z-50 bg-[color:var(--primary)] text-white p-4 shadow-md"><div class="max-w-5xl mx-auto"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><img src="./src/assets/Miracap_logo_white.png" alt="Miracap Logo" class="h-8"/></div> <div class="flex items-center ml-auto">`;
-  {
-    $$payload.out += "<!--[!-->";
+  var $$store_subs;
+  async function handleLoadContract(address) {
   }
-  $$payload.out += `<!--]--></div></div></div></div> <div class="flex"><div${attr_class(`${stringify("w-16")} md:${stringify("w-16")} fixed md:static top-[72px] md:top-0 left-0 z-40 min-h-screen bg-[color:var(--card)] border-r border-[color:var(--border)] transition-all duration-300 ease-in-out overflow-hidden flex flex-col`)}><div class="flex items-center justify-between p-4 border-b border-[color:var(--border)] md:hidden"><span${attr_class(`poppins-semibold text-lg text-[color:var(--primary)] ${stringify("hidden")}`)}>Menu</span> <button${attr_class(`p-2 rounded-lg hover:bg-[color:var(--muted)] transition-colors ${stringify("hidden")}`, "svelte-aipy8y")} aria-label="Close Sidebar"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div> <nav${attr_class(`${stringify("p-2")} space-y-2 flex-1`)}><button${attr_class(`flex items-center ${stringify("justify-center px-3 py-3")} w-full rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group mb-4`, "svelte-aipy8y")} aria-label="Toggle Sidebar" title="Toggle Sidebar"><svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"${attr("d", "M13 5l7 7-7 7M5 5l7 7-7 7")}></path></svg> <span${attr_class(`${stringify("hidden")} whitespace-nowrap`)}>Collapse</span></button> <a href="#"${attr_class(`flex items-center ${stringify("justify-center px-3 py-3")} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group`)} title="Dashboard"><svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5v4"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 5v4"></path></svg> <span${attr_class(`${stringify("hidden")} whitespace-nowrap`)}>Dashboard</span></a> <a href="#"${attr_class(`flex items-center ${stringify("justify-center px-3 py-3")} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group`)} title="Contracts"><svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> <span${attr_class(`${stringify("hidden")} whitespace-nowrap`)}>Contracts</span></a> <a href="#"${attr_class(`flex items-center ${stringify("justify-center px-3 py-3")} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group`)} title="Wallets"><svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> <span${attr_class(`${stringify("hidden")} whitespace-nowrap`)}>Wallets</span></a> <a href="#"${attr_class(`flex items-center ${stringify("justify-center px-3 py-3")} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group`)} title="Companies"><svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg> <span${attr_class(`${stringify("hidden")} whitespace-nowrap`)}>Companies</span></a> <a href="#"${attr_class(`flex items-center ${stringify("justify-center px-3 py-3")} rounded-lg hover:bg-[color:var(--muted)] transition-colors text-[color:var(--foreground)] group`)} title="Settings"><svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> <span${attr_class(`${stringify("hidden")} whitespace-nowrap`)}>Settings</span></a></nav> <button class="flex items-center gap-2 w-full px-4 py-3 rounded-lg border border-white/20 hover:bg-white/10 transition-colors bg-transparent text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 mt-auto svelte-aipy8y" aria-label="Toggle View" style="min-width:0;"><span${attr_class(`text-sm font-medium ${stringify("hidden")}`)}>${escape_html(terminology.MANAGE_DEPLOYED_WALLETS)}</span> <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg></button></div> `;
-  {
-    $$payload.out += "<!--[!-->";
-  }
-  $$payload.out += `<!--]--> <div class="flex-1"><div class="max-w-5xl mx-auto p-4 space-y-4">`;
-  {
-    $$payload.out += "<!--[-->";
-    $$payload.out += `<div>`;
-    LoadContractForm($$payload);
-    $$payload.out += `<!----></div>`;
-  }
-  $$payload.out += `<!--]--> `;
-  {
-    $$payload.out += "<!--[-->";
-    $$payload.out += `<div>`;
-    {
-      $$payload.out += "<!--[!-->";
+  if (store_get($$store_subs ??= {}, "$showContractLoaderStore", showContractLoaderStore)) {
+    $$payload.out.push("<!--[-->");
+    $$payload.out.push(`<div${attr_class(`hero-section relative ${stringify(!store_get($$store_subs ??= {}, "$contractState", contractState).isLoaded ? "min-h-[35vh]" : "min-h-[160px]")} flex items-center justify-center`, "svelte-19yw9w8")}><div class="absolute inset-0 bg-cover bg-center bg-no-repeat hero-bg svelte-19yw9w8"></div> <div class="relative z-10 max-w-4xl mx-auto px-4 text-center text-white w-full">`);
+    if (!store_get($$store_subs ??= {}, "$contractState", contractState).isLoaded) {
+      $$payload.out.push("<!--[-->");
+      $$payload.out.push(`<h1 class="text-4xl md:text-3xl font-bold mb-8">Load Tokenized Share Register</h1> <div class="max-w-4xl mx-auto mb-8 w-full">`);
+      LoadContractForm($$payload, { handleLoadContract });
+      $$payload.out.push(`<!----></div> <div class="text-lg md:text-xl space-y-2"><p>It is possible to make inquires about all legal persons.</p> <p>A contractual client has even more functionalities.</p></div>`);
+    } else {
+      $$payload.out.push("<!--[!-->");
+      $$payload.out.push(`<div class="max-w-4xl mx-auto mb-8 w-full">`);
+      LoadContractForm($$payload, { handleLoadContract });
+      $$payload.out.push(`<!----></div>`);
     }
-    $$payload.out += `<!--]--></div>`;
+    $$payload.out.push(`<!--]--></div></div> `);
+    {
+      $$payload.out.push("<!--[!-->");
+    }
+    $$payload.out.push(`<!--]--> `);
+    if (!store_get($$store_subs ??= {}, "$contractState", contractState).isLoaded) {
+      $$payload.out.push("<!--[-->");
+      $$payload.out.push(`<div class="bg-white py-12"><div class="max-w-5xl mx-auto px-4"><div class="text-center mb-8"><h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Tokenized equity that actually means ownership</h2> <p class="text-xl text-gray-600">Legally compliant and officially registered on the Estonian Business Register.</p></div> <div class="max-w-5xl mx-auto"><div class="bg-gray-50 rounded-xl p-12 shadow-sm"><div class="flex items-center justify-center space-x-16"><div class="text-center"><h3 class="font-normal text-gray-900 text-xl">RWA Tokenization</h3> <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center"><img${attr("src", blockImage)} alt="RWA Tokenization" class="w-full h-full object-contain"/></div></div> <div class="flex items-center"><div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg></div></div> <div class="text-center"><h3 class="font-normal text-gray-900 text-xl">Estonian Business Register</h3> <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center"><img${attr("src", registerLogo)} alt="Estonian Business Register" class="w-full h-full object-contain"/></div></div></div></div></div></div></div>`);
+    } else {
+      $$payload.out.push("<!--[!-->");
+    }
+    $$payload.out.push(`<!--]-->`);
+  } else {
+    $$payload.out.push("<!--[!-->");
+    $$payload.out.push(`<div class="max-w-5xl mx-auto p-4 space-y-4"><div class="card">`);
+    {
+      $$payload.out.push("<!--[!-->");
+    }
+    $$payload.out.push(`<!--]--></div></div>`);
   }
-  $$payload.out += `<!--]--></div></div></div></main>`;
+  $$payload.out.push(`<!--]-->`);
+  if ($$store_subs) unsubscribe_stores($$store_subs);
   pop();
 }
 export {

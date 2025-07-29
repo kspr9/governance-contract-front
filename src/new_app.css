@@ -53,8 +53,8 @@
     --primary-foreground: hsl(var(--primary-hue) var(--primary-sat) 55%);
     
     /* Text colors for dark/blue backgrounds */
-    --primary-foreground-light: hsl(0 0% 95%);   /* Light text for dark backgrounds */
-    --primary-foreground-muted: hsl(0 0% 70%);   /* Muted text for dark backgrounds */
+    --dark-bg-text-light: hsl(0 0% 95%);   /* Light text for dark backgrounds */
+    --dark-bg-text-muted: hsl(0 0% 70%);   /* Muted text for dark backgrounds */
     
     /* Accent color (slightly brighter blue) */
     --accent: hsl(var(--primary-hue) 90% 60%);
@@ -188,6 +188,16 @@
   color: var(--primary-foreground);
   line-height: var(--leading-tight);
   letter-spacing: -0.025em;
+}
+
+@utility text-heading-lg-light {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--accent-foreground);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.025em;
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 @utility text-heading-md {
@@ -373,6 +383,18 @@
     border-color var(--transition-fast);
 }
 
+@utility transition-all {
+  transition: all var(--transition-fast);
+}
+
+@utility transition-transform-colors {
+  transition:
+    transform var(--transition-fast),
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
 /* =============================================================================
    COMPONENT CLASSES - Multi-Property, Can Use Hover States
    ============================================================================= */
@@ -425,7 +447,7 @@
     min-width: fit-content;
     white-space: nowrap;
     background-color: var(--primary);
-    color: var(--primary-foreground-light);
+    color: var(--dark-bg-text-light);
   }
 
   .btn-primary:focus-visible {
@@ -465,7 +487,7 @@
     min-width: fit-content;
     white-space: nowrap;
     background-color: var(--secondary);
-    color: var(--secondary-foreground);
+    color: var(--primary-foreground);
   }
 
   .btn-secondary:focus-visible {
@@ -637,14 +659,14 @@
     font-size: var(--text-base);
     font-weight: 400;
     font-family: var(--font-family);
-    border: none;
+    border: 2px solid transparent;
     cursor: pointer;
     text-decoration: none;
     transition: all var(--transition-fast);
     min-width: fit-content;
     white-space: nowrap;
     background-color: var(--primary);
-    color: var(--primary-foreground-light);
+    color: var(--dark-bg-text-light);
   }
 
   .btn-search:focus-visible {
@@ -658,8 +680,11 @@
     pointer-events: none;
   }
 
-  .btn-search:hover:not(:disabled) {
+  .btn-search:hover {
     background-color: var(--primary-hover);
+    border: 2px solid var(--primary);
+    color: var(--primary);
+
   }
 
   .btn-close {

@@ -1,73 +1,80 @@
 import { json } from "@sveltejs/kit";
-var define_process_env_default = {};
+const ESTONIAN_REGISTRY_USERNAME = "kaspar.pae";
+const ESTONIAN_REGISTRY_PASSWORD = "Unfounded8-Spyglass4-Dyslexia9-Yo-yo8-Reverse4";
 const GET = async ({ params }) => {
   const { registryNumber } = params;
   if (!registryNumber) {
     return json({ error: "Registry number is required" }, { status: 400 });
   }
-  const username = define_process_env_default.ESTONIAN_REGISTRY_USERNAME;
-  const password = define_process_env_default.ESTONIAN_REGISTRY_PASSWORD;
-  if (!username || !password) {
-    return json({ error: "Registry credentials not configured" }, { status: 500 });
-  }
+  const username = ESTONIAN_REGISTRY_USERNAME;
+  const password = ESTONIAN_REGISTRY_PASSWORD;
   try {
-    const soapBody = `<?xml version="1.0" encoding="UTF-8"?>
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
-                         xmlns:xro="http://x-road.eu/xsd/xroad.xsd" 
-                         xmlns:id="http://x-road.eu/xsd/identifiers" 
-                         xmlns:item="http://arireg.x-road.eu/producer">
-            <soapenv:Header>
-                <xro:protocolVersion>4.0</xro:protocolVersion>
-                <xro:id>1</xro:id>
-                <xro:userId>miracap</xro:userId>
-                <xro:client id:objectType="SUBSYSTEM">
-                    <id:xRoadInstance>EE</id:xRoadInstance>
-                    <id:memberClass>COM</id:memberClass>
-                    <id:memberCode>10560025</id:memberCode>
-                    <id:subsystemCode>genericconsumer</id:subsystemCode>
-                </xro:client>
-                <xro:service id:objectType="SERVICE">
-                    <id:xRoadInstance>EE</id:xRoadInstance>
-                    <id:memberClass>GOV</id:memberClass>
-                    <id:memberCode>70000310</id:memberCode>
-                    <id:subsystemCode>arireg</id:subsystemCode>
-                    <id:serviceCode>detailandmed</id:serviceCode>
-                    <id:serviceVersion>v1</id:serviceVersion>
-                </xro:service>
-            </soapenv:Header>
-            <soapenv:Body>
-                <item:detailandmed>
-                    <item:keha>
-                        <item:ettevotja_kood>${registryNumber}</item:ettevotja_kood>
-                    </item:keha>
-                </item:detailandmed>
-            </soapenv:Body>
-        </soapenv:Envelope>`;
+    console.log("Fetching company data for registry number:", registryNumber);
+    const soapRequest = `<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:iden="http://x-road.eu/xsd/identifiers" xmlns:prod="http://arireg.x-road.eu/producer/" xmlns:xro="http://x-road.eu/xsd/xroad.xsd">
+    <soapenv:Body>
+        <prod:lihtandmed_v2>
+            <prod:language>eng</prod:language> 
+            <prod:keha>
+                <prod:ariregister_kasutajanimi>${username}</prod:ariregister_kasutajanimi>
+                <prod:ariregister_parool>${password}</prod:ariregister_parool>
+                <prod:ariregistri_kood>${registryNumber}</prod:ariregistri_kood>
+                <prod:ariregister_valjundi_formaat>json</prod:ariregister_valjundi_formaat>
+            </prod:keha>
+        </prod:lihtandmed_v2>
+    </soapenv:Body>
+</soapenv:Envelope>`;
+    console.log("Making API request to Estonian Business Registry...");
     const response = await fetch("https://ariregxmlv6.rik.ee/", {
       method: "POST",
       headers: {
-        "Content-Type": "text/xml; charset=utf-8",
-        "SOAPAction": "",
-        "Authorization": `Basic ${Buffer.from(`${username}:${password}`).toString("base64")}`
+        "Content-Type": "text/xml;charset=UTF-8",
+        "SOAPAction": ""
       },
-      body: soapBody
+      body: soapRequest
     });
+    console.log("Response status:", response.status);
     if (!response.ok) {
-      throw new Error(`Registry API request failed: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const xmlResponse = await response.text();
-    const nameMatch = xmlResponse.match(/<item:nimi>([^<]+)<\/item:nimi>/);
-    const companyName = nameMatch ? nameMatch[1] : null;
+    const responseText = await response.text();
+    const jsonMatch = responseText.match(/\{"keha":.*\}/s);
+    if (!jsonMatch) {
+      console.error("Could not find JSON data in response");
+      return json({
+        error: "Invalid response format",
+        registryNumber,
+        success: false
+      }, { status: 500 });
+    }
+    const jsonData = JSON.parse(jsonMatch[0]);
+    console.log("Parsed JSON data:", jsonData);
+    if (!jsonData.keha?.ettevotjad?.item?.[0]) {
+      console.log("No company data found in response");
+      return json({
+        error: "Company not found",
+        registryNumber,
+        success: false
+      }, { status: 404 });
+    }
+    const companyData = jsonData.keha.ettevotjad.item[0];
+    console.log("Company data:", companyData);
     return json({
+      name: companyData.evnimi,
+      registryCode: companyData.ariregistri_kood.toString(),
+      status: companyData.staatus_tekstina,
+      address: companyData.evaadressid?.aadress_ads__ads_normaliseeritud_taisaadress,
       registryNumber,
-      companyName,
-      success: !!companyName
+      success: true,
+      isMock: false
     });
   } catch (error) {
-    console.error("Estonian Registry API error:", error);
+    console.error("Failed to fetch company data:", error);
+    console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace available");
     return json({
       error: "Failed to fetch company information",
-      registryNumber
+      registryNumber,
+      success: false
     }, { status: 500 });
   }
 };
