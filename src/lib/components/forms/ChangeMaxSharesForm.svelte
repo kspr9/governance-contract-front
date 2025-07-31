@@ -101,7 +101,9 @@
     <FormField
         label="New Maximum"
         id="change-max"
-        type="number"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]+"
         bind:value={formData.newMax}
         placeholder="Enter new maximum number of shares"
         required

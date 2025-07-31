@@ -137,7 +137,9 @@
         <!-- svelte-ignore a11y_label_has_associated_control -->
         <label class="block text-sm font-medium text-(--muted-foreground)">{terminology.MAX_SHARES}</label>
         <input
-          type="number"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]+"
           bind:value={maxShares}
           placeholder="Maximum Shares"
           class="input mt-1 block w-full"
@@ -149,7 +151,9 @@
         <!-- svelte-ignore a11y_label_has_associated_control -->
         <label class="block text-sm font-medium text-(--muted-foreground)">{terminology.REGISTRY_NUMBER}</label>
         <input
-          type="number"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]+"
           bind:value={registryNumber}
           placeholder="Registry Number"
           class="input mt-1 block w-full"

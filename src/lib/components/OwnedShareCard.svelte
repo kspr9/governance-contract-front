@@ -194,7 +194,9 @@
                 <input
                     class="input flex-1"
                     placeholder="Number of Shares"
-                    type="number"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]+"
                     min="1"
                     bind:value={transferForm.amount}
                     disabled={loadingState}

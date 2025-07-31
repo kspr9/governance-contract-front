@@ -1,115 +1,121 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   import { onMount } from 'svelte';
-  
+  import { FileDigit } from 'lucide-svelte';
+  import { crossfade } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
+
   import LoadContractForm from '$lib/components/LoadContractForm.svelte';
   import backgroundImage from '../assets/background.jpg';
   import blockImage from '../assets/RWA.svg';
   import registerLogo from '../assets/businessRegisterRound.svg';
   import arrowsIcon from '../assets/arrows.svg';
 
-  // Import our new shared store
   import { showContractLoaderStore } from '$lib/stores/uiStore';
   import { contractState } from '$lib/stores/contractStore.svelte';
 
-  // These components are specific to this page, so their imports are here.
-  let ContractLoader: any;
-  let CreateCompany: any;
-  let contractStateInstance: any;
-  
+  let ContractLoader = $state<any>(null);
+  let CreateCompany = $state<any>(null);
+
   onMount(async () => {
     if (browser) {
-      const [
-        { default: ContractLoaderComponent },
-        { default: CreateCompanyComponent },
-        { contractState: cs }
-      ] = await Promise.all([
+      const [{ default: ContractLoaderComponent }, { default: CreateCompanyComponent }] = await Promise.all([
         import('$lib/components/ContractLoader.svelte'),
-        import('$lib/CreateCompany.svelte'),
-        import('$lib/stores/contractStore.svelte')
+        import('$lib/CreateCompany.svelte')
       ]);
-      
       ContractLoader = ContractLoaderComponent;
       CreateCompany = CreateCompanyComponent;
-      contractStateInstance = cs;
     }
   });
 
-  // REMOVED: Local state and toggle function are no longer needed.
-  // let showContractLoader = true;
-  // function handleToggle() { ... }
-
-  let contractLoaderRef: any;
+  let contractLoaderRef: any = $state(null);
+  const testContractAddress = "KT1Wpmwa141oc9SHbhRK6Yn8UqAcFduSAJZg";
 
   function handleViewContract(contractAddress: string) {
-    // Instead of calling a local function, we now directly set the store's value.
     showContractLoaderStore.set(true);
-
-    if (contractStateInstance) {
-      contractStateInstance.update((state: any) => ({ ...state, contractAddress }));
+    if (contractLoaderRef) {
+        contractLoaderRef.handleLoadContract(contractAddress);
     }
-    setTimeout(() => {
-      contractLoaderRef?.handleLoadContract(contractAddress);
-    });
   }
 
   async function handleLoadContract(address: string) {
     if (contractLoaderRef) {
       await contractLoaderRef.handleLoadContract(address);
+    } else {
+      console.error('ContractLoader ref not available');
     }
+  }
+
+  // Custom transition for sliding content up behind the background
+  function slideUpBehind(node: HTMLElement, params: any) {
+    return {
+      duration: 800, // Slower animation
+      easing: quintOut,
+      css: (t: number) => `
+        transform: translateY(${(1 - t) * -100}vh);
+        opacity: ${t};
+      `
+    };
+  }
+
+  function slideDownFrom(node: HTMLElement, params: any) {
+    return {
+      duration: 800,
+      easing: quintOut,
+      css: (t: number) => `
+        position: absolute;
+        top: -4rem;
+        max-width: 64rem;
+        left: 0%;
+        margin: 0 auto;
+        padding: 0 1rem;
+        width: 100%;
+        transform: translateY(${(1 - t) * 100}vh);
+        opacity: ${t};
+      `
+    };
   }
 </script>
 
-<!-- 
-  The markup now uses the store's value directly.
-  The '$' prefix makes the component react to any changes in the store.
--->
+<!-- Always render ContractLoader but hide it visually until needed -->
+<div style="display: none;">
+  {#if browser && ContractLoader}
+    <ContractLoader bind:this={contractLoaderRef} />
+  {/if}
+</div>
+
 {#if $showContractLoaderStore}
-  <!-- Hero Section with Background -->
-  <div class="hero-section relative {!$contractState.isLoaded ? 'min-h-[28vh]' : 'min-h-[160px]'} flex items-center justify-center">
-    <!-- Background Image -->
-    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat hero-bg"></div>
-    
-    <!-- Contract Loader Content -->
-    <div class="relative z-10 max-w-4xl mx-auto px-4 text-center text-white w-full">
+  <!-- LoadContrcatForm with Background -->
+  <div class="load-contract-form-section" class:loaded={$contractState.isLoaded}>
+    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat hero-bg">      
+    </div>
+    <div class="relative z-10 max-w-4xl mx-auto px-4 text-center text-white w-full loadContractForm">
       {#if !$contractState.isLoaded}
         <h1 class="text-4xl md:text-3xl font-medium mb-8">
-          Load Tokenized Share Register
+          Tokenized Share Register
         </h1>
-        
-        <!-- Search Form -->
-        <div class="max-w-xl mx-auto mb-8 w-full">
-          <LoadContractForm {handleLoadContract} />
-        </div>
-        
-        <!-- Additional Information -->
+      {/if}
+      
+      <div class="max-w-xl mx-auto w-full mb-8">
+        <LoadContractForm {handleLoadContract} />
+      </div>
+      
+      {#if !$contractState.isLoaded}
         <div class="text-sm md:text-base space-y-0.1">
           <p>It is possible to make inquires about all legal persons.</p>
           <p>A contractual client has even more functionalities.</p>
         </div>
-      {:else}
-        <!-- Compact search form when contract is loaded -->
-        <div class="max-w-xl mx-auto mb-8 w-full">
-          <LoadContractForm {handleLoadContract} />
-        </div>
       {/if}
     </div>
+    
   </div>
 
-  <!-- Contract Loader Section - positioned to overlap hero when contract is loaded -->
-  {#if browser && ContractLoader}
-    <div class="max-w-5xl mx-auto px-4 {!$contractState.isLoaded ? '' : '-mt-16 relative z-20'}">
-        <svelte:component this={ContractLoader} bind:this={contractLoaderRef} />
-    </div>
-  {/if}
-
-  <!-- Main Content Section - only show when no contract is loaded -->
-  {#if !$contractState.isLoaded}
-    <div style="background-color: var(--background)" class="py-8">
-      <div class="max-w-4xl mx-auto px-4">
-        <!-- Combined hero text and feature diagram container -->
+  <!-- Content Section -->
+  <div class="content-section">
+    {#if !$contractState.isLoaded}
+      <!-- Hero Content (initial state) - slides up behind background when transitioning -->
+      <div class="hero-content" out:slideUpBehind|local={{}}>
         <div style="background-color: var(--card)" class="rounded-xl p-12 shadow-sm">
-          <!-- Hero Text Section -->
           <div class="text-center">
             <h2 class="text-4xl md:text-5xl font-medium mb-4" style="color: var(--primary)">
               Tokenized equity that actually means ownership
@@ -124,9 +130,7 @@
             </p>
           </div>
 
-          <!-- Feature Diagram -->
           <div class="flex items-center justify-center space-x-8 pt-10">
-            <!-- RWA Tokenization Card -->
             <div class="feature-card" style="background-color: var(--muted)">
               <h3 class="font-semibold text-xl mb-4" style="color: var(--foreground)">RWA Tokenization</h3>
               <div class="w-36 h-36 mx-auto flex items-center justify-center">
@@ -134,14 +138,12 @@
               </div>
             </div>
             
-            <!-- Connection Arrow -->
             <div class="flex items-center">
               <div class="w-12 h-12 flex items-center justify-center">
                 <img src={arrowsIcon} alt="Connection arrows" class="w-full h-full object-contain" />
               </div>
             </div>
             
-            <!-- Estonian Business Register Card -->
             <div class="feature-card" style="background-color: var(--muted)">
               <h3 class="font-semibold text-xl mb-4" style="color: var(--foreground)">Estonian Business Register</h3>
               <div class="w-36 h-36 mx-auto flex items-center justify-center">
@@ -151,27 +153,86 @@
           </div>
         </div>
       </div>
-    </div>
-  {/if}
-  {:else}
-    <div class="max-w-5xl mx-auto p-4 space-y-4">
-      <div class="card">
-        {#if browser && CreateCompany}
-          <svelte:component this={CreateCompany} onViewContract={handleViewContract} />
+    {:else}
+      <!-- Contract Loader Content (final state) - slides down from above -->
+      <div class="contract-loader-wrapper" in:slideDownFrom|local={{}}>
+        <!-- The visible ContractLoader, driven by the same (now hidden) instance -->
+        {#if browser && ContractLoader}
+          <ContractLoader />
         {/if}
       </div>
+    {/if}
+  </div>
+{:else}
+  <div class="max-w-5xl mx-auto p-4 space-y-4">
+    <div class="card">
+      {#if browser && CreateCompany}
+        <CreateCompany onViewContract={handleViewContract} />
+      {/if}
     </div>
-  {/if}
+  </div>
+{/if}
+
+<!-- Test Contract Button -->
+{#if $showContractLoaderStore}
+  <button 
+    class="fixed bottom-16 left-4 z-50 flex items-center justify-center p-2 rounded-lg border border-(--border) hover:bg-(--muted) transition-all duration-200 bg-transparent text-(--foreground) hover:text-(--foreground) focus:outline-none focus:ring-2 focus:ring-(--primary)/50 opacity-0 hover:opacity-100 group"
+    aria-label="Load Test Contract"
+    onclick={() => handleLoadContract(testContractAddress)}
+    title="Load Test Contract: {testContractAddress}"
+  >
+    <FileDigit class="h-5 w-5 text-(--foreground)" />
+  </button>
+{/if}
 
 <style>
-  .hero-section {
+  .load-contract-form-section {
     background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: min-height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 28vh;
   }
   
+  .load-contract-form-section.loaded {
+    min-height: 160px;
+  }
+  
+  .loadContractForm {
+    z-index: 20;
+  }
+
   .hero-bg {
     background-image: url('../assets/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 5;
   }
+
+
+  .content-section {
+    position: relative;
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .hero-content {
+    padding: 2rem 0;
+    margin-top: 0;
+    position: relative;
+    z-index: auto; /* Behind the hero-bg (which has z-index from its parent at z-10) */
+  }
+  
+  .contract-loader-wrapper {
+    margin-top: -4rem; /* Pulls the contract loader up closer to header */
+    position: relative;
+    z-index: 10; /* Above everything when it slides in */
+  }
+
   .feature-card {
     text-align: center;
     padding: 1rem;

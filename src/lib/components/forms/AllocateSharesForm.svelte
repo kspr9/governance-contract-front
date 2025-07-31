@@ -110,7 +110,9 @@
     <FormField
         label="Amount"
         id="allocate-amount"
-        type="number"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]+"
         bind:value={formData.amount}
         placeholder="Enter number of shares to allocate"
         required

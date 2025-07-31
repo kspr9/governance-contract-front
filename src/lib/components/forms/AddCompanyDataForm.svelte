@@ -116,7 +116,9 @@
     <FormField
         label="Maximum Shares"
         id="company-max-shares"
-        type="number"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]+"
         bind:value={formData.maxShares}
         placeholder="Enter maximum number of shares"
         required
@@ -127,7 +129,9 @@
     <FormField
         label="Registry Number"
         id="company-registry"
-        type="number"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]+"
         bind:value={formData.registryNumber}
         placeholder="Enter Estonian business registry number"
         required

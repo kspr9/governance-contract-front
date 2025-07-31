@@ -101,7 +101,9 @@
     <FormField
         label="Amount"
         id="mint-amount"
-        type="number"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]+"
         bind:value={formData.amount}
         placeholder="Enter number of shares to mint"
         required

@@ -421,7 +421,9 @@
                                 <div class="border-b border-(--border) mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
-                                        type="number" 
+                                        type="text" 
+                                        inputmode="numeric" 
+                                        pattern="[0-9]+" 
                                         bind:value={adminForms.mintShares.amount}
                                         placeholder="Amount to Issue"
                                         class="input w-full"
@@ -454,7 +456,9 @@
                                 <div class="border-b border-(--border) mb-4"></div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input 
-                                        type="number" 
+                                        type="text" 
+                                        inputmode="numeric" 
+                                        pattern="[0-9]+" 
                                         bind:value={adminForms.allocateShares.amount}
                                         placeholder="Amount"
                                         class="input w-full"
@@ -527,7 +531,9 @@
                                 <div class="border-b border-(--border) mb-4"></div>
                                 <div class="flex flex-col gap-3">
                                     <input 
-                                        type="number" 
+                                        type="text" 
+                                        inputmode="numeric" 
+                                        pattern="[0-9]+" 
                                         bind:value={adminForms.changeMaxShares.newMax}
                                         placeholder="New Maximum Shares"
                                         class="input w-full"
@@ -560,14 +566,18 @@
                                 <div class="border-b border-(--border) mb-4"></div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input 
-                                        type="number" 
+                                        type="text" 
+                                        inputmode="numeric" 
+                                        pattern="[0-9]+" 
                                         bind:value={adminForms.addCompanyData.maxShares}
                                         placeholder="Max Shares"
                                         class="input w-full"
                                         disabled={loadingStates.addCompanyData}
                                     />
                                     <input 
-                                        type="number" 
+                                        type="text" 
+                                        inputmode="numeric" 
+                                        pattern="[0-9]+" 
                                         bind:value={adminForms.addCompanyData.registryNumber}
                                         placeholder="Registry Number"
                                         class="input w-full"
