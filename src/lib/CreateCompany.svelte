@@ -2,18 +2,34 @@
     import { Tezos, resetProvider, wallet } from './config/beaconConfig';
     import { beaconState } from './stores/beaconStore.svelte';
     import { contractInstance, contractState } from './stores/contractStore.svelte';
+    import { governanceStorageData } from './stores/governanceStorage.svelte';
+    import { loadGovernanceContractTzkt } from './utils/governanceLoader';
+    import { loadContractTzkt } from './utils/contractLoader';
+    import { onMount } from 'svelte';
+    import { terminology } from './utils/terminology';
+    import HelpTip from './components/HelpTip.svelte';
 
-    let adminAddress: string = "";
-    let maxShares: string = "";
-    let registryNumber: string = "";
+    // Accept the callback function as a prop
+    interface Props {
+        onViewContract: (contractAddress: string) => void;
+    }
+    
+    let { onViewContract }: Props = $props();
+
+    let adminAddress: string = $state("");
+    let maxShares: string = $state("");
+    let registryNumber: string = $state("");
 
     // States for handling the transaction
-    let isLoading = false;
-    let txHash = "";
-    let errorMsg = "";
+    let isLoading = $state(false);
+    let txHash = $state("");
+    let errorMsg = $state("");
 
     // The target contract address that holds the create_company entrypoint
-    const governanceContractAddress: string = "KT1RceKkBayRFiFHGjTKumVR6weePNfWbZ3s";
+    const governanceContractAddress: string = "KT1DoyveycFuAXcNwRvGJy4VGGsSiskdCcU1";
+
+    // test-governance on mainnet
+    //const governanceContractAddress: string = "KT1A68pp2xWMSbyvVmC63oJreW6RAfotCVNE";
 
     async function handleCreateCompany(event: Event) {
         event.preventDefault();
@@ -41,7 +57,7 @@
             await resetProvider();
             // Call the create_company entrypoint
             // Using methodsObject to call the entrypoint by name with the proper parameters.
-            const op = await governanceContract.methodsObject.default({
+            const op = await governanceContract.methodsObject.create_company_wallet({
                 companyID: registryNumberNat,
                 shares: maxSharesNat,
                 admin: adminAddress
@@ -50,6 +66,8 @@
             // Wait for confirmation
             await op.confirmation(2);
             txHash = op.opHash;
+            // Reload governance contract storage after successful creation
+            await loadGovernanceContractTzkt(governanceContractAddress);
         } catch (error: any) {
             console.error("Error creating company:", error);
             errorMsg = error.message;
@@ -85,64 +103,117 @@
         }
     }
 
+    function handleViewContract(contractAddress: string) {
+        // Call the parent function to switch views and set the contract address
+        onViewContract(contractAddress);
+    }
+
+    // Load governance contract storage on mount
+    onMount(() => {
+        loadGovernanceContractTzkt(governanceContractAddress);
+    });
+
 </script>
 <div class="container mx-auto p-4">
     
-    <form onsubmit={handleCreateCompany} class="space-y-4 p-4 border rounded">
-      <h2 class="text-2xl font-bold">Create a Company</h2>
+    <form onsubmit={handleCreateCompany} class="space-y-4 p-4 border rounded card">
+      <h2 class="section-header">{terminology.CREATE_SHARE_WALLET}
+        <HelpTip text="Create a new digital share register for a company" />
+      </h2>
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-gray-700">Company Admin Address</label>
+        <label class="block text-sm font-medium text-(--muted-foreground)">{terminology.ADMIN_ADDRESS}</label>
         <input
           type="text"
           bind:value={adminAddress}
           placeholder="Admin Address"
-          class="mt-1 block w-full p-2 border rounded"
+          class="input mt-1 block w-full"
           required
         />
       </div>
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-gray-700">Max Shares</label>
+        <label class="block text-sm font-medium text-(--muted-foreground)">{terminology.MAX_SHARES}</label>
         <input
-          type="number"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]+"
           bind:value={maxShares}
           placeholder="Maximum Shares"
-          class="mt-1 block w-full p-2 border rounded"
+          class="input mt-1 block w-full"
           required
         />
       </div>
     
       <div>
         <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="block text-sm font-medium text-gray-700">Registry Number</label>
+        <label class="block text-sm font-medium text-(--muted-foreground)">{terminology.REGISTRY_NUMBER}</label>
         <input
-          type="number"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]+"
           bind:value={registryNumber}
           placeholder="Registry Number"
-          class="mt-1 block w-full p-2 border rounded"
+          class="input mt-1 block w-full"
           required
         />
       </div>
     
-      <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600" disabled={isLoading}>
+      <button type="submit" class="btn-primary" disabled={isLoading}>
         {#if isLoading}
           Sending...
         {:else}
-          Create a Company
+          Deploy new Company Share Register
         {/if}
       </button>
     
       {#if txHash}
-        <p class="text-green-600">Transaction sent! Hash: {txHash}</p>
+        <p class="text-(--primary)">Transaction sent! Hash: {txHash}</p>
       {/if}
     
       {#if errorMsg}
-        <p class="text-red-600">{errorMsg}</p>
+        <p class="text-(--destructive)">{errorMsg}</p>
       {/if}
     </form>
+
+    <!-- Deployed Wallet Contracts Table -->
+    <div class="mt-8 card">
+      <div class="section-header mb-2">Deployed Share Registers</div>
+      <div class="text-sm text-(--muted-foreground) mb-4">View all wallet contracts that have been deployed from the governance contract.</div>
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr class="table-header">
+            <th class="text-left p-2">Registry Number</th>
+            <th class="text-left p-2">Contract Address</th>
+            <th class="text-left p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#if governanceStorageData.deployedContracts && Object.keys(governanceStorageData.deployedContracts).length > 0}
+            {#each Object.entries(governanceStorageData.deployedContracts) as [registry, address]}
+              <tr class="table-row">
+                <td class="p-2">{registry}</td>
+                <td class="font-mono p-2">{address}</td>
+                <td class="p-2">
+                  <button 
+                    class="btn-secondary px-3 py-1 text-xs"
+                    onclick={() => handleViewContract(address)}
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+            {/each}
+          {:else}
+            <tr class="table-row">
+              <td class="text-center p-2 text-(--muted-foreground)" colspan="3">No deployed contracts found</td>
+            </tr>
+          {/if}
+        </tbody>
+      </table>
+    </div>
 </div>
 
 <style>

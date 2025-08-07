@@ -9,51 +9,48 @@ interface TzktTicket {
 }
 
 interface TzktStorageData {
-    owners_map: Record<string, string>;
-    issued_unclaimed_shares2: Record<string, TzktTicket>;
-    share_balances: Record<string, TzktTicket>;
-    active_share_ledger: Record<string, string>;
+    eligible_claimants_map: Record<string, string>;
+    unclaimed_share_pool: Record<string, TzktTicket>;
+    held_external_shares: Record<string, TzktTicket>;
+    share_ledger: Record<string, string>;
     max_shares: string;
     admin_address: string;
     issued_shares: string;
-    allocated_shares: string;
-    all_shares_issued: boolean;
+    total_allocated_shares: string;
     registry_number?: string;
 }
 
-// Updated ContractEntries includes active ledger entries
 interface ContractEntries {
-    ownersMapEntries: [string, string][];
-    unclaimedSharesEntries: [string, TzktTicket][];
-    shareBalancesEntries: [string, TzktTicket][];
-    activeLedgerEntries: [string, string][];
+    eligibleClaimantsEntries: [string, string][];
+    unclaimedSharePoolEntries: [string, TzktTicket][];
+    heldExternalSharesEntries: [string, TzktTicket][];
+    shareLedgerEntries: [string, string][];
 }
 
 export async function loadContractTzkt(): Promise<ContractEntries> {
     try {
-        const response = await fetch(`https://api.ghostnet.tzkt.io/v1/contracts/${get(contractState).contractAddress}/storage`);
+        const response = await fetch(`https://api.mainnet.tzkt.io/v1/contracts/${get(contractState).contractAddress}/storage`);
         const data = await response.json() as TzktStorageData;
         
         // Update the global storage with the new data
         Object.assign(tzktStorageData, data);
 
         const entries: ContractEntries = {
-            ownersMapEntries: Object.entries(data.owners_map ?? {}),
-            unclaimedSharesEntries: Object.entries(data.issued_unclaimed_shares2 ?? {}),
-            shareBalancesEntries: Object.entries(data.share_balances ?? {}),
-            activeLedgerEntries: Object.entries(data.active_share_ledger ?? {})
+            eligibleClaimantsEntries: Object.entries(data.eligible_claimants_map ?? {}),
+            unclaimedSharePoolEntries: Object.entries(data.unclaimed_share_pool ?? {}),
+            heldExternalSharesEntries: Object.entries(data.held_external_shares ?? {}),
+            shareLedgerEntries: Object.entries(data.share_ledger ?? {})
         };
 
         console.log('TzKT Storage Data:', {
             max_shares: data.max_shares,
             admin_address: data.admin_address,
             issued_shares: data.issued_shares,
-            allocated_shares: data.allocated_shares,
-            all_shares_issued: data.all_shares_issued,
-            owners_map: entries.ownersMapEntries,
-            unclaimed: entries.unclaimedSharesEntries,
-            balances: entries.shareBalancesEntries,
-            activeLedger: entries.activeLedgerEntries
+            total_allocated_shares: data.total_allocated_shares,
+            eligible_claimants_map: entries.eligibleClaimantsEntries,
+            unclaimed_share_pool: entries.unclaimedSharePoolEntries,
+            held_external_shares: entries.heldExternalSharesEntries,
+            share_ledger: entries.shareLedgerEntries
         });
 
         return entries;

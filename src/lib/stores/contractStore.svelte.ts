@@ -1,14 +1,16 @@
 import { writable } from 'svelte/store';
-import { TezosToolkit } from '@taquito/taquito';
-
 
 interface ContractState {
     contractAddress: string | null;
+    isLoaded: boolean;
 }
 
 export const contractState = writable<ContractState>({
-    contractAddress: null
+    contractAddress: null,
+    isLoaded: false
 });
 
-export const contractInstance = writable<any>(null);
+// Using any type to avoid SSR import issues with @taquito/taquito
+export const contractInstance = writable<any>(null); 
+
 

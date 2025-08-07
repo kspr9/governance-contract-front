@@ -1,16 +1,13 @@
-import { NetworkType } from '@airgap/beacon-sdk';
-import { BeaconWallet } from '@taquito/beacon-wallet';
 import { writable } from 'svelte/store';
 
-
-export const walletStore = writable<BeaconWallet | null>(null);
-
+// Using any type to avoid SSR import issues with blockchain libraries
+export const walletStore = writable<any>(null);
 
 interface BeaconState {
     address: string | null;
     wbalance: number | null;
     isConnected: boolean;
-    network: NetworkType;
+    network: any; // Was NetworkType, using any to avoid SSR imports
     error: string | null;
 }
 
@@ -18,7 +15,7 @@ export const beaconState = $state<BeaconState>({
     address: null,
     wbalance: null,
     isConnected: false,
-    network: NetworkType.GHOSTNET,
+    network: null,
     error: null
 });
 

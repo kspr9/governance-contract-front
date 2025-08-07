@@ -1,27 +1,67 @@
+import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import tailwindcss from '@tailwindcss/vite';
 import path from "path";
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
+import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill'
+import rollupNodePolyFill from 'rollup-plugin-node-polyfills'
+import type { Plugin } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [svelte()],
-  css: {
-    postcss: './postcss.config.js',
+  plugins: [
+    tailwindcss(),
+    sveltekit(), 
+  ],
+  ssr: {
+    external: ['@taquito/taquito', '@taquito/beacon-wallet', '@airgap/beacon-sdk', '@airgap/beacon-blockchain-substrate']
+  },
+  define: {
+    global: 'globalThis',
   },
   resolve: {
     alias: {
-      $lib: path.resolve("./src/lib"),
-      buffer: 'buffer/',
+      buffer: 'buffer',
       stream: 'stream-browserify',
-      util: 'util/',
+      crypto: 'crypto-browserify',
+      process: 'process/browser',
+      util: 'util',
       events: 'events',
     },
   },
-  optimizeDeps: {
-    include: ['buffer', 'events', 'util', 'stream-browserify']
+  css: {
+    postcss: './postcss.config.js',
   },
-  define: {
-    'process.env': {},
-    global: {},
-  }
+  optimizeDeps: {
+    esbuildOptions: {
+      // Node.js global to browser globalThis for esbuild
+      define: {
+        global: 'globalThis',
+      },
+      // Enable esbuild polyfill plugins for Node.js globals and modules.
+      plugins: [
+        NodeGlobalsPolyfillPlugin({
+          process: true,
+          buffer: true,
+        }),
+        NodeModulesPolyfillPlugin(),
+      ],
+    },
+    include: [
+      '@taquito/beacon-wallet',
+      '@airgap/beacon-dapp',
+      'buffer', 
+      'events', 
+      'util', 
+      'stream-browserify',
+      'crypto-browserify'
+    ]
+  },
+  build: {
+    rollupOptions: {
+      plugins: [
+        rollupNodePolyFill() as Plugin,
+      ],
+    },
+  },
 })

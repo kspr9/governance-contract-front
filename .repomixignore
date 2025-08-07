@@ -1,2 +1,11 @@
-docs/
-src/assets/
+src/assets
+repomix-output.xml
+.svelte-kit/
+.claude/
+.cursor/
+node_modules/
+styleguide.md
+LAYOUT_APPROACHES.md
+figma.svelte
+src/lib/components/ContractOps.svelte
+PHASE3_CODE_ORGANIZATION.md

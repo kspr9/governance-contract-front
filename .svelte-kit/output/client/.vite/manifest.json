@@ -1,0 +1,335 @@
+{
+  ".svelte-kit/generated/client-optimized/app.js": {
+    "file": "_app/immutable/entry/app.c8ZFYbtr.js",
+    "name": "entry/app",
+    "src": ".svelte-kit/generated/client-optimized/app.js",
+    "isEntry": true,
+    "imports": [
+      "_AIt528uS.js",
+      "_CUmzwEjM.js",
+      "_Bzak7iHL.js",
+      "_CuJMLKj1.js",
+      "_BG7SOyfb.js"
+    ],
+    "dynamicImports": [
+      ".svelte-kit/generated/client-optimized/nodes/0.js",
+      ".svelte-kit/generated/client-optimized/nodes/1.js",
+      ".svelte-kit/generated/client-optimized/nodes/2.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/0.js": {
+    "file": "_app/immutable/nodes/0.DjQ6ZFL5.js",
+    "name": "nodes/0",
+    "src": ".svelte-kit/generated/client-optimized/nodes/0.js",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_AIt528uS.js",
+      "_Bzak7iHL.js",
+      "_0-2uNqwM.js",
+      "_CUmzwEjM.js",
+      "_B79_7rn0.js",
+      "_BXOtlsz2.js"
+    ],
+    "dynamicImports": [
+      "src/lib/WalletConnectorBeacon.svelte"
+    ],
+    "css": [
+      "_app/immutable/assets/0.Otr2tyL6.css"
+    ],
+    "assets": [
+      "_app/immutable/assets/logo.B03p7w5F.svg",
+      "_app/immutable/assets/Font-Regular.T-_DMr_t.woff2",
+      "_app/immutable/assets/Font-Italic.C8ZvkRbj.woff2",
+      "_app/immutable/assets/Font-Light.DDIwqzd5.woff2",
+      "_app/immutable/assets/Font-LightItalic.C2UHQoS3.woff2",
+      "_app/immutable/assets/Font-Medium.CtZ4WgR-.woff2",
+      "_app/immutable/assets/Font-MediumItalic.rr8gaU7_.woff2",
+      "_app/immutable/assets/Font-SemiBold.BbPuWii0.woff2",
+      "_app/immutable/assets/Font-SemiBoldItalic.CGzgirw1.woff2",
+      "_app/immutable/assets/Font-Bold.PyRFLtrs.woff2",
+      "_app/immutable/assets/Font-BoldItalic.CCHdrxRg.woff2"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/1.js": {
+    "file": "_app/immutable/nodes/1.B7JudOWH.js",
+    "name": "nodes/1",
+    "src": ".svelte-kit/generated/client-optimized/nodes/1.js",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_Bzak7iHL.js",
+      "_0-2uNqwM.js",
+      "_CUmzwEjM.js",
+      "_CVtnd7NH.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/2.js": {
+    "file": "_app/immutable/nodes/2.Z5_75f83.js",
+    "name": "nodes/2",
+    "src": ".svelte-kit/generated/client-optimized/nodes/2.js",
+    "isEntry": true,
+    "imports": [
+      "_D2vhXz3w.js"
+    ]
+  },
+  "_0-2uNqwM.js": {
+    "file": "_app/immutable/chunks/0-2uNqwM.js",
+    "name": "legacy",
+    "imports": [
+      "_CUmzwEjM.js"
+    ]
+  },
+  "_2.DRC448cF.css": {
+    "file": "_app/immutable/assets/2.DRC448cF.css",
+    "src": "_2.DRC448cF.css"
+  },
+  "_AIt528uS.js": {
+    "file": "_app/immutable/chunks/AIt528uS.js",
+    "name": "preload-helper",
+    "imports": [
+      "_CUmzwEjM.js"
+    ]
+  },
+  "_B79_7rn0.js": {
+    "file": "_app/immutable/chunks/B79_7rn0.js",
+    "name": "uiStore",
+    "imports": [
+      "_CUmzwEjM.js"
+    ]
+  },
+  "_BG7SOyfb.js": {
+    "file": "_app/immutable/chunks/BG7SOyfb.js",
+    "name": "props",
+    "imports": [
+      "_CUmzwEjM.js",
+      "_AIt528uS.js"
+    ]
+  },
+  "_BXOtlsz2.js": {
+    "file": "_app/immutable/chunks/BXOtlsz2.js",
+    "name": "terminology"
+  },
+  "_BYXg54TK.js": {
+    "file": "_app/immutable/chunks/BYXg54TK.js",
+    "name": "beaconConfig",
+    "isDynamicEntry": true,
+    "imports": [
+      "_Bv5Dzk5n.js",
+      "_CUmzwEjM.js"
+    ]
+  },
+  "_Bv5Dzk5n.js": {
+    "file": "_app/immutable/chunks/Bv5Dzk5n.js",
+    "name": "index"
+  },
+  "_Bzak7iHL.js": {
+    "file": "_app/immutable/chunks/Bzak7iHL.js",
+    "name": "disclose-version"
+  },
+  "_CUmzwEjM.js": {
+    "file": "_app/immutable/chunks/CUmzwEjM.js",
+    "name": "index-client"
+  },
+  "_CVtnd7NH.js": {
+    "file": "_app/immutable/chunks/CVtnd7NH.js",
+    "name": "entry",
+    "imports": [
+      "_CUmzwEjM.js",
+      "_Bv5Dzk5n.js"
+    ]
+  },
+  "_CbYpNqif.js": {
+    "file": "_app/immutable/chunks/CbYpNqif.js",
+    "name": "chevron-down",
+    "imports": [
+      "_Bzak7iHL.js",
+      "_0-2uNqwM.js",
+      "_CUmzwEjM.js",
+      "_B79_7rn0.js",
+      "_BG7SOyfb.js",
+      "_komQGZa0.js"
+    ]
+  },
+  "_CreateCompany.Hnohgsc-.css": {
+    "file": "_app/immutable/assets/CreateCompany.Hnohgsc-.css",
+    "src": "_CreateCompany.Hnohgsc-.css"
+  },
+  "_CuJMLKj1.js": {
+    "file": "_app/immutable/chunks/CuJMLKj1.js",
+    "name": "this",
+    "imports": [
+      "_CUmzwEjM.js"
+    ]
+  },
+  "_D2vhXz3w.js": {
+    "file": "_app/immutable/chunks/D2vhXz3w.js",
+    "name": "2",
+    "isDynamicEntry": true,
+    "imports": [
+      "_AIt528uS.js",
+      "_Bzak7iHL.js",
+      "_0-2uNqwM.js",
+      "_CUmzwEjM.js",
+      "_B79_7rn0.js",
+      "_CuJMLKj1.js",
+      "_BG7SOyfb.js",
+      "_komQGZa0.js"
+    ],
+    "dynamicImports": [
+      "src/lib/components/ContractLoader.svelte",
+      "_DGaGp340.js"
+    ],
+    "css": [
+      "_app/immutable/assets/2.DRC448cF.css"
+    ],
+    "assets": [
+      "_app/immutable/assets/block.7gKAvlSv.png",
+      "_app/immutable/assets/2riregister-logo.B0lxYOD2.png",
+      "_app/immutable/assets/background.BGkVWlO8.jpg"
+    ]
+  },
+  "_DGaGp340.js": {
+    "file": "_app/immutable/chunks/DGaGp340.js",
+    "name": "CreateCompany",
+    "isDynamicEntry": true,
+    "imports": [
+      "_Bzak7iHL.js",
+      "_CUmzwEjM.js",
+      "_AIt528uS.js",
+      "_komQGZa0.js",
+      "_B79_7rn0.js",
+      "_D2vhXz3w.js",
+      "_BYXg54TK.js",
+      "_BXOtlsz2.js",
+      "_BG7SOyfb.js"
+    ],
+    "css": [
+      "_app/immutable/assets/CreateCompany.Hnohgsc-.css"
+    ]
+  },
+  "_komQGZa0.js": {
+    "file": "_app/immutable/chunks/komQGZa0.js",
+    "name": "Icon",
+    "imports": [
+      "_Bzak7iHL.js",
+      "_0-2uNqwM.js",
+      "_CUmzwEjM.js",
+      "_B79_7rn0.js",
+      "_BG7SOyfb.js"
+    ]
+  },
+  "node_modules/.pnpm/@sveltejs+kit@2.25.2_@sveltejs+vite-plugin-svelte@5.1.1_svelte@5.36.13_vite@6.3.5_@type_92c6157f6e9eaeff73c671ddcd354e5f/node_modules/@sveltejs/kit/src/runtime/client/entry.js": {
+    "file": "_app/immutable/entry/start.IeR04KCg.js",
+    "name": "entry/start",
+    "src": "node_modules/.pnpm/@sveltejs+kit@2.25.2_@sveltejs+vite-plugin-svelte@5.1.1_svelte@5.36.13_vite@6.3.5_@type_92c6157f6e9eaeff73c671ddcd354e5f/node_modules/@sveltejs/kit/src/runtime/client/entry.js",
+    "isEntry": true,
+    "imports": [
+      "_CVtnd7NH.js"
+    ]
+  },
+  "src/assets/2riregister-logo.png": {
+    "file": "_app/immutable/assets/2riregister-logo.B0lxYOD2.png",
+    "src": "src/assets/2riregister-logo.png"
+  },
+  "src/assets/background.jpg": {
+    "file": "_app/immutable/assets/background.BGkVWlO8.jpg",
+    "src": "src/assets/background.jpg"
+  },
+  "src/assets/block.png": {
+    "file": "_app/immutable/assets/block.7gKAvlSv.png",
+    "src": "src/assets/block.png"
+  },
+  "src/assets/fonts/Font-Bold.woff2": {
+    "file": "_app/immutable/assets/Font-Bold.PyRFLtrs.woff2",
+    "src": "src/assets/fonts/Font-Bold.woff2"
+  },
+  "src/assets/fonts/Font-BoldItalic.woff2": {
+    "file": "_app/immutable/assets/Font-BoldItalic.CCHdrxRg.woff2",
+    "src": "src/assets/fonts/Font-BoldItalic.woff2"
+  },
+  "src/assets/fonts/Font-Italic.woff2": {
+    "file": "_app/immutable/assets/Font-Italic.C8ZvkRbj.woff2",
+    "src": "src/assets/fonts/Font-Italic.woff2"
+  },
+  "src/assets/fonts/Font-Light.woff2": {
+    "file": "_app/immutable/assets/Font-Light.DDIwqzd5.woff2",
+    "src": "src/assets/fonts/Font-Light.woff2"
+  },
+  "src/assets/fonts/Font-LightItalic.woff2": {
+    "file": "_app/immutable/assets/Font-LightItalic.C2UHQoS3.woff2",
+    "src": "src/assets/fonts/Font-LightItalic.woff2"
+  },
+  "src/assets/fonts/Font-Medium.woff2": {
+    "file": "_app/immutable/assets/Font-Medium.CtZ4WgR-.woff2",
+    "src": "src/assets/fonts/Font-Medium.woff2"
+  },
+  "src/assets/fonts/Font-MediumItalic.woff2": {
+    "file": "_app/immutable/assets/Font-MediumItalic.rr8gaU7_.woff2",
+    "src": "src/assets/fonts/Font-MediumItalic.woff2"
+  },
+  "src/assets/fonts/Font-Regular.woff2": {
+    "file": "_app/immutable/assets/Font-Regular.T-_DMr_t.woff2",
+    "src": "src/assets/fonts/Font-Regular.woff2"
+  },
+  "src/assets/fonts/Font-SemiBold.woff2": {
+    "file": "_app/immutable/assets/Font-SemiBold.BbPuWii0.woff2",
+    "src": "src/assets/fonts/Font-SemiBold.woff2"
+  },
+  "src/assets/fonts/Font-SemiBoldItalic.woff2": {
+    "file": "_app/immutable/assets/Font-SemiBoldItalic.CGzgirw1.woff2",
+    "src": "src/assets/fonts/Font-SemiBoldItalic.woff2"
+  },
+  "src/assets/logo.svg": {
+    "file": "_app/immutable/assets/logo.B03p7w5F.svg",
+    "src": "src/assets/logo.svg"
+  },
+  "src/lib/WalletConnectorBeacon.svelte": {
+    "file": "_app/immutable/chunks/5XXCEysR.js",
+    "name": "WalletConnectorBeacon",
+    "src": "src/lib/WalletConnectorBeacon.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_Bzak7iHL.js",
+      "_CUmzwEjM.js",
+      "_AIt528uS.js",
+      "_B79_7rn0.js",
+      "_BG7SOyfb.js",
+      "_BYXg54TK.js",
+      "_CbYpNqif.js",
+      "_0-2uNqwM.js",
+      "_komQGZa0.js"
+    ],
+    "css": [
+      "_app/immutable/assets/WalletConnectorBeacon.DjBnbVDu.css"
+    ]
+  },
+  "src/lib/components/ContractLoader.svelte": {
+    "file": "_app/immutable/chunks/Z_1Qihvt.js",
+    "name": "ContractLoader",
+    "src": "src/lib/components/ContractLoader.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "_AIt528uS.js",
+      "_Bzak7iHL.js",
+      "_CUmzwEjM.js",
+      "_D2vhXz3w.js",
+      "_DGaGp340.js",
+      "_BYXg54TK.js",
+      "_0-2uNqwM.js",
+      "_komQGZa0.js",
+      "_B79_7rn0.js",
+      "_BG7SOyfb.js",
+      "_CbYpNqif.js",
+      "_BXOtlsz2.js",
+      "_CuJMLKj1.js"
+    ],
+    "dynamicImports": [
+      "_BYXg54TK.js",
+      "_BYXg54TK.js"
+    ],
+    "css": [
+      "_app/immutable/assets/ContractLoader.BXy4Ng0E.css"
+    ]
+  }
+}

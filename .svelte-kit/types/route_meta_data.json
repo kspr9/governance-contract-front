@@ -1,0 +1,12 @@
+{
+	"/": [],
+	"/api/contract/[address]/operations": [
+		"src/routes/api/contract/[address]/operations/+server.ts"
+	],
+	"/api/contract/[address]/storage": [
+		"src/routes/api/contract/[address]/storage/+server.ts"
+	],
+	"/api/registry/[registryNumber]": [
+		"src/routes/api/registry/[registryNumber]/+server.ts"
+	]
+}

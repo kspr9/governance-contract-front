@@ -1,183 +1,161 @@
 <script lang="ts">
-    import { onMount, onDestroy } from 'svelte';
-    import { get } from 'svelte/store';
-    import { BeaconEvent, SigningType } from '@airgap/beacon-sdk';
+    import { onMount } from 'svelte';
     import { beaconState, walletStore } from './stores/beaconStore.svelte';
-    import { Tezos, wallet } from './config/beaconConfig';
+    import { Tezos, wallet, connectWallet, disconnectWallet, getActiveAccount, getWalletBalance } from './config/beaconConfig';
+    import tezosLogo from '../assets/Tezos.svg';
+    import { Wallet } from 'lucide-svelte';
+    import { ChevronDown } from 'lucide-svelte';
+
+    interface Props {
+        navbarMode?: boolean;
+    }
+
+    let { navbarMode = false }: Props = $props();
 
     export const tezSym: string = 'ꜩ';
 
-    
+    // Helper to shorten address
+    function getShortAddress(address: string | null | undefined): string {
+        if (!address || address.length < 8) return address || '';
+        return `${address.slice(0, 3)}...${address.slice(-4)}`;
+    }
 
-    //export const beaconDAppClient = getBeaconDAppClient();
-
+    // On mount, check for existing connection
     onMount(async () => {
-        // Check for existing connection first, don't prompt if already connected
-        if (await checkExistingConnection()) {
-            return;
-        } else {
-            beaconState.isConnected = false;
-        }
-    });
-
-    onDestroy(() => {
         try {
-            disconnectWallet();
-        } catch (error) {
-            console.error("Failed to disconnect wallet:", error);
-        }
-    });
-
-
-    export async function connectWallet() {
-        beaconState.error = null;
-
-        if (beaconState.isConnected) {
-            console.log("Already connected");
-            return;
-        }
-
-        Tezos.setWalletProvider(wallet);
-
-        wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, (account) => {
-            // An active account has been set
-            //console.log(`${BeaconEvent.ACTIVE_ACCOUNT_SET} triggered: `, account);
-            
-            if (!account) {
-                return;
-            }
-            
-            beaconState.address = account.address;
-            beaconState.isConnected = true;
-        });
-        try {
-            console.log("Connecting to wallet...");
-            const activeAccount = wallet
-            
-            console.log("Requesting permissions...");
-            const permissions = await activeAccount.client.requestPermissions();
-            console.log("Got permissions for:", permissions.address);
-            try {
-                await activeAccount.client.requestSignPayload({
-                    signingType: SigningType.RAW,
-                    //payload: "05010000004254657a6f73205369676e6564204d6573736167653a207465737455726c20323032332d30322d30385431303a33363a31382e3435345a2048656c6c6f20576f726c64",
-                    payload: "This is SPARTA",
-
-                })
-                .then((response) => {
-                    console.log("Signature:", response.signature);
-                });
-                // Setting beaconState values
+            const account = await getActiveAccount();
+            if (account) {
+                beaconState.address = account.address;
                 beaconState.isConnected = true;
-                beaconState.address = await activeAccount.getPKH();
-                beaconState.wbalance = await getWalletBalance(beaconState.address);
-                beaconState.isConnected = true;
-                
-                // Saving the Wallet instance to the store
-                walletStore.set(activeAccount);
-                
-                console.log("Connected to wallet:", beaconState.address);
-
-            } catch (err: any) {
-                // The request was rejected
-                disconnectWallet();
-            }
-
-        } catch (error) {
-            console.error("Connection error:", error);
-            disconnectWallet();
-            beaconState.error = error instanceof Error ? error.message : "Failed to connect wallet";
-        }
-
-        
-        
-    }
-
-    export async function disconnectWallet() {
-        console.log("Disconnecting wallet...");
-        Tezos.setWalletProvider(wallet);
-        try {
-            await wallet.client.clearActiveAccount();
-            await wallet.disconnect();
-
-            walletStore.set(null);
-            
-            console.log("Wallet disconnected");
-            beaconState.address = null;
-            beaconState.isConnected = false;
-            beaconState.error = null;
-            
-            
-        } catch (error) {
-            console.error("Disconnection error:", error);
-            beaconState.error = error instanceof Error ? error.message : "Failed to disconnect wallet";
-        }
-    }
-
-    export async function checkExistingConnection() {
-        try {
-            console.log("Checking existing connection...");
-            const activeAccount = await wallet.client.getActiveAccount();
-            if (activeAccount) {
-                beaconState.address = activeAccount.address;
-                beaconState.isConnected = true;
-                console.log("Found existing connection:", activeAccount.address);
-                beaconState.wbalance = await getWalletBalance(beaconState.address);
-
-                return true;
+                beaconState.wbalance = await getWalletBalance(account.address);
             } else {
-                console.log("No existing connection found during onMount");
-                return false;
+                beaconState.isConnected = false;
+                beaconState.address = null;
+                beaconState.wbalance = null;
             }
         } catch (error) {
-            console.error("Error checking existing connection:", error);
-            beaconState.error = error instanceof Error ? error.message : "Failed to check wallet connection";
+            beaconState.error = error instanceof Error ? error.message : 'Failed to check wallet connection';
         }
-        return false;
+    });
+
+    // Connect wallet handler
+    async function handleConnectWallet() {
+        beaconState.error = null;
+        try {
+            const permissions = await connectWallet();
+            beaconState.isConnected = true;
+            beaconState.address = permissions.address;
+            beaconState.wbalance = await getWalletBalance(permissions.address);
+            walletStore.set(wallet);
+        } catch (error) {
+            beaconState.error = error instanceof Error ? error.message : 'Failed to connect wallet';
+            beaconState.isConnected = false;
+        }
     }
 
-    // get balance
-    export async function getWalletBalance(address: string) {
-        const balance = await Tezos.tz.getBalance(address);
-        beaconState.wbalance =  balance.toNumber() / 1000000;
-        console.log("Balance:", balance.toNumber() / 1000000);
-        return balance.toNumber() / 1000000;
+    // Disconnect wallet handler
+    async function handleDisconnectWallet() {
+        try {
+            await disconnectWallet();
+            beaconState.isConnected = false;
+            beaconState.address = null;
+            beaconState.wbalance = null;
+            beaconState.error = null;
+        } catch (error) {
+            beaconState.error = error instanceof Error ? error.message : 'Failed to disconnect wallet';
+        }
     }
-
 </script>
 
-<div class="container mx-auto p-4 bg-gray-100 rounded-md">
-    <h2 class="text-2xl font-bold mb-4">Wallet Information</h2>
-    {#if beaconState.error}
-        <div class="p-4 mb-4 bg-red-100 text-red-700 rounded-lg">
-            {beaconState.error}
-        </div>
-    {/if}
-
-    {#if beaconState.isConnected}
-        <div class="grid grid-cols-5 gap-4">
-            <div class="col-span-4">
-                <span class="font-semibold">Address:</span>
-                <span class="font-mono">{beaconState.address}</span> 
-            </div>
-            <div class="flex justify-end">
-                <span class="font-semibold">Balance:</span>
-                <span>{beaconState.wbalance} {tezSym}</span>
-            </div>
-            
-            <button 
-                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onclick={disconnectWallet}
-            >
-                Disconnect
+{#if navbarMode}
+    <div class="flex items-center gap-3">
+        <!-- Tezos Network Dropdown -->
+        <div class="relative group">
+            <button class="flex items-center gap-3 border border-white bg-(--primary) group-hover:bg-(var(--color-bg-light)) text-white group-hover:text-(--primary) pl-1 pr-2 py-1 rounded-full transition-colors duration-200">
+                <img src={tezosLogo} alt="Tezos" class="w-6 h-6" />            
+                <span class="text-sm font-medium">Tezos</span>
+                <ChevronDown class="w-4 h-4 text-white group-hover:text-(--primary) chevron-rotate" />
             </button>
+            <!-- Dropdown menu would go here -->
         </div>
-    {:else}
-        <button 
-            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            onclick={connectWallet}
-        >
-            Connect Wallet
-        </button>
-    {/if}
-</div>
+
+        {#if beaconState.isConnected}
+            <!-- Wallet Address Dropdown -->
+            <div class="relative group">
+                <button class="flex items-center gap-3 wallet-hover border border-white bg-white group-hover:bg-(--primary) text-(--primary) group-hover:text-white px-4 py-1 rounded-full transition-colors duration-200">
+                    <Wallet size={22} strokeWidth={2} class="w-6 h-6 transition-colors" />
+                    <span class="text-sm font-medium transition-colors" title={beaconState.address}>
+                        {getShortAddress(beaconState.address)}
+                    </span>
+                    <ChevronDown class="w-4 h-4 chevron-rotate" />
+                </button>
+                <!-- Dropdown menu -->
+                <div class="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div class="p-4">
+                        <div class="text-sm text-gray-600 mb-2">Wallet Address</div>
+                        <div class="font-mono text-sm text-gray-900 mb-3 break-all">{beaconState.address}</div>
+                        <div class="text-sm text-gray-600 mb-2">Balance</div>
+                        <div class="text-sm font-medium text-gray-900 mb-4">{beaconState.wbalance?.toFixed(3)} {tezSym}</div>
+                        <button 
+                            class="w-full text-sm text-red-600 hover:text-red-700 font-medium py-2 px-3 rounded-md hover:bg-red-50 transition-colors"
+                            onclick={handleDisconnectWallet}
+                        >
+                            Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {:else}
+            <!-- Connect Wallet Button -->
+            <button 
+                class="flex items-center gap-3 border border-white bg-(--primary) hover:bg-(var(--color-bg-light)) text-white hover:text-(--primary) px-4 py-1 rounded-full transition-colors duration-200"
+                onclick={handleConnectWallet}
+            >
+                <Wallet size={22} strokeWidth={2} class="w-6 h-6" />
+                <span class="text-sm font-medium">Log In</span>
+            </button>
+        {/if}
+    </div>
+{:else}
+    <!-- Card mode: Standalone wallet component for use within page content -->
+    <!-- This preserves the original component usage before it was moved to navbar -->
+    <div class="w-full h-full bg-(--card) rounded-(--radius) shadow p-4 border border-(--border)">
+        {#if beaconState.isConnected}
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-sm truncate text-(--foreground)" title={beaconState.address}>
+                    {getShortAddress(beaconState.address)}
+                </span>
+                <button class="btn-secondary" onclick={handleDisconnectWallet}>
+                    Log out
+                </button>
+            </div>
+            <div class="text-xs text-(--muted-foreground)">Balance: {beaconState.wbalance?.toFixed(3)} {tezSym}</div>
+        {:else}
+            <div class="flex items-center justify-between">
+                <button class="btn-primary" onclick={handleConnectWallet} title="To interact with Share Register, connect your personal wallet.">
+                    Log In
+                </button>
+            </div>
+        {/if}
+    </div>
+{/if}
+
+<style>
+    .wallet-hover:hover {
+        border: 1px solid var(--accent-foreground) !important;
+        background-color: var(--primary) !important;
+        color: var(--dark-bg-text-light) !important;
+    }
+    .wallet-hover {
+        border: 1px solid var(--primary-foreground) !important;
+    }
+    
+    /* Use :global() to ensure Svelte doesn't scope this away */
+    :global(.chevron-rotate) {
+        transition: transform var(--transition-fast);
+    }
+    
+    .group:hover :global(.chevron-rotate) {
+        transform: rotate(180deg);
+    }
+</style>
