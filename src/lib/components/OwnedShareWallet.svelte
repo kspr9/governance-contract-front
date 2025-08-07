@@ -83,7 +83,7 @@
   <!-- Portfolio Section -->
   <CollapsibleSection title="{terminology.HELD_SHARES}" tooltip="Shares you own from various companies" bind:open={showPortfolio}>
     
-    <div class="space-y-4">
+    <div class="space-y-4 mx-0">
       {#if shareLedgerState.heldExternalShares.length > 0}
         {#each shareLedgerState.heldExternalShares as [_, ticket] (ticket.address)}
           <OwnedShareCard
@@ -137,7 +137,7 @@
   
   {#if !beaconState.isConnected}
     <div class="p-4 text-(--muted-foreground) bg-(--muted)/10 rounded-lg text-center">
-      Please connect your wallet to claim shares.
+      
     </div>
   {/if}
 </div>

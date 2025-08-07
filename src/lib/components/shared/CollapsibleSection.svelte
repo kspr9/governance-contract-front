@@ -95,7 +95,7 @@
     }
     
     .section-content {
-        padding: 1rem 1.5rem 1.5rem;
+        padding: 1rem 1rem 1.5rem;
         border-top: 1px solid var(--border);
     }
 </style>

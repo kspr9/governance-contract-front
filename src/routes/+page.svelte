@@ -102,7 +102,7 @@
       
       {#if !$contractState.isLoaded}
         <div class="text-sm md:text-base space-y-0.1">
-          <p>It is possible to make inquires about all legal persons.</p>
+          <p>To get a tokenized share register, contact us.</p>
           <p>A contractual client has even more functionalities.</p>
         </div>
       {/if}

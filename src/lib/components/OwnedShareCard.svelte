@@ -110,7 +110,7 @@
     }
 </script>
 
-<div class="owned-share-card bg-(--card) rounded-(--radius) shadow-md p-5 flex flex-col gap-3 border border-(--border)">
+<div class="owned-share-card bg-(--card) rounded-(--radius) shadow-md py-5 px-3 flex flex-col gap-3 border border-(--border)">
     <!-- 5-column layout: Registry Number | Company Name | Share Register | Number of Shares | Transfer Button -->
     <div class="grid items-center overflow-hidden card-grid">
 
@@ -158,7 +158,7 @@
         <div class="flex flex-col">
             <span class="text-xs text-(--muted-foreground)">{terminology.AMOUNT}</span>
             <span class="text-lg font-bold text-(--foreground)">
-                <span class="text-muted">{ticket.amount} /</span>
+                <span class="text-stat">{ticket.amount} /</span>
                 {#if maxSharesLoading[ticket.address]}
                     <span class="text-(--muted-foreground) ml-2"> ...</span>
                 {:else if maxSharesCache[ticket.address]}
@@ -230,7 +230,7 @@
 <style>
   /* Balanced 5-column grid layout that prevents overflow */
   .card-grid {
-    grid-template-columns: minmax(120px, max-content) minmax(150px, 1fr) minmax(200px, 1fr) minmax(100px, max-content) minmax(120px, max-content);
+    grid-template-columns: minmax(120px, max-content) minmax(120px, 0.5fr) minmax(180px, 1fr) minmax(100px, max-content) minmax(120px, max-content);
     min-width: 0; /* Allow columns to shrink below content size */
     gap: 1rem; /* Add consistent spacing between columns */
   }
