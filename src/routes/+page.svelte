@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { FileDigit } from 'lucide-svelte';
   import { crossfade } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -31,14 +31,16 @@
   let contractLoaderRef: any = $state(null);
   const testContractAddress = "KT1Wpmwa141oc9SHbhRK6Yn8UqAcFduSAJZg";
 
-  function handleViewContract(contractAddress: string) {
+  async function handleViewContract(contractAddress: string) {
     showContractLoaderStore.set(true);
-    if (contractLoaderRef) {
-        contractLoaderRef.handleLoadContract(contractAddress);
-    }
+    // Ensure ContractLoader is mounted before invoking its method
+    if (!contractLoaderRef) await tick();
+    contractLoaderRef?.handleLoadContract(contractAddress);
   }
 
   async function handleLoadContract(address: string) {
+    // Wait a microtask in case the loader is just being shown
+    if (!contractLoaderRef) await tick();
     if (contractLoaderRef) {
       await contractLoaderRef.handleLoadContract(address);
     } else {
@@ -77,12 +79,7 @@
   }
 </script>
 
-<!-- Always render ContractLoader but hide it visually until needed -->
-<div style="display: none;">
-  {#if browser && ContractLoader}
-    <ContractLoader bind:this={contractLoaderRef} />
-  {/if}
-</div>
+<!-- Render ContractLoader only when visible -->
 
 {#if $showContractLoaderStore}
   <!-- LoadContrcatForm with Background -->
@@ -153,15 +150,14 @@
           </div>
         </div>
       </div>
-    {:else}
-      <!-- Contract Loader Content (final state) - slides down from above -->
-      <div class="contract-loader-wrapper" in:slideDownFrom|local={{}}>
-        <!-- The visible ContractLoader, driven by the same (now hidden) instance -->
-        {#if browser && ContractLoader}
-          <ContractLoader />
-        {/if}
-      </div>
     {/if}
+
+    <!-- Single ContractLoader instance, mounted always; hidden until loaded -->
+    <div class="contract-loader-wrapper" class:hidden={!$contractState.isLoaded}>
+      {#if browser && ContractLoader}
+        <ContractLoader bind:this={contractLoaderRef} />
+      {/if}
+    </div>
   </div>
 {:else}
   <div class="max-w-5xl mx-auto p-4 space-y-4">
