@@ -16,6 +16,7 @@
 
   let ContractLoader = $state<any>(null);
   let CreateCompany = $state<any>(null);
+  let isTransitioning = $state(false);
 
   onMount(async () => {
     if (browser) {
@@ -33,18 +34,34 @@
 
   async function handleViewContract(contractAddress: string) {
     showContractLoaderStore.set(true);
+    isTransitioning = true;
     // Ensure ContractLoader is mounted before invoking its method
     if (!contractLoaderRef) await tick();
-    contractLoaderRef?.handleLoadContract(contractAddress);
+    try {
+      await contractLoaderRef?.handleLoadContract(contractAddress);
+    } catch (error) {
+      // Revert transition state on failure
+      isTransitioning = false;
+      throw error;
+    }
   }
 
   async function handleLoadContract(address: string) {
+    // Start transition immediately so hero slides away and loader flies in
+    isTransitioning = true;
     // Wait a microtask in case the loader is just being shown
     if (!contractLoaderRef) await tick();
     if (contractLoaderRef) {
-      await contractLoaderRef.handleLoadContract(address);
+      try {
+        await contractLoaderRef.handleLoadContract(address);
+      } catch (err) {
+        // If loading fails, cancel the transition so hero returns
+        isTransitioning = false;
+        throw err;
+      }
     } else {
       console.error('ContractLoader ref not available');
+      isTransitioning = false;
     }
   }
 
@@ -77,6 +94,14 @@
       `
     };
   }
+
+  // Reset transition flag after contract becomes loaded,
+  // allowing future hero re-appearance on unloads
+  $effect(() => {
+    if ($contractState.isLoaded) {
+      isTransitioning = false;
+    }
+  });
 </script>
 
 <!-- Render ContractLoader only when visible -->
@@ -109,7 +134,7 @@
 
   <!-- Content Section -->
   <div class="content-section">
-    {#if !$contractState.isLoaded}
+    {#if !$contractState.isLoaded && !isTransitioning}
       <!-- Hero Content (initial state) - slides up behind background when transitioning -->
       <div class="hero-content" out:slideUpBehind|local={{}}>
         <div style="background-color: var(--card)" class="rounded-xl p-12 shadow-sm">
@@ -152,8 +177,12 @@
       </div>
     {/if}
 
-    <!-- Single ContractLoader instance, mounted always; hidden until loaded -->
-    <div class="contract-loader-wrapper" class:hidden={!$contractState.isLoaded}>
+    <!-- Single ContractLoader instance, mounted always; hidden until loaded or during entrance -->
+    <div
+      class="contract-loader-wrapper"
+      class:hidden={!($contractState.isLoaded || isTransitioning)}
+      class:entering={isTransitioning && !$contractState.isLoaded}
+    >
       {#if browser && ContractLoader}
         <ContractLoader bind:this={contractLoaderRef} />
       {/if}
@@ -227,6 +256,22 @@
     margin-top: -4rem; /* Pulls the contract loader up closer to header */
     position: relative;
     z-index: 10; /* Above everything when it slides in */
+  }
+
+  /* Entrance animation for loader while loading starts but not yet fully loaded */
+  .contract-loader-wrapper.entering {
+    animation: loaderFlyIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes loaderFlyIn {
+    from {
+      transform: translateY(100vh);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 
   .feature-card {
