@@ -17,6 +17,7 @@
   let ContractLoader = $state<any>(null);
   let CreateCompany = $state<any>(null);
   let isTransitioning = $state(false);
+  
 
   onMount(async () => {
     if (browser) {
@@ -133,7 +134,7 @@
   </div>
 
   <!-- Content Section -->
-  <div class="content-section">
+    <div class="content-section">
     {#if !$contractState.isLoaded && !isTransitioning}
       <!-- Hero Content (initial state) - slides up behind background when transitioning -->
       <div class="hero-content" out:slideUpBehind|local={{}}>
@@ -177,16 +178,14 @@
       </div>
     {/if}
 
-    <!-- Single ContractLoader instance, mounted always; hidden until loaded or during entrance -->
-    <div
-      class="contract-loader-wrapper"
-      class:hidden={!($contractState.isLoaded || isTransitioning)}
-      class:entering={isTransitioning && !$contractState.isLoaded}
-    >
-      {#if browser && ContractLoader}
-        <ContractLoader bind:this={contractLoaderRef} />
-      {/if}
-    </div>
+    <!-- Mount loader only when entering or loaded to allow in: transition -->
+    {#if $contractState.isLoaded || isTransitioning}
+      <div class="contract-loader-wrapper" in:slideDownFrom|local={{}}>
+        {#if browser && ContractLoader}
+          <ContractLoader bind:this={contractLoaderRef} />
+        {/if}
+      </div>
+    {/if}
   </div>
 {:else}
   <div class="max-w-5xl mx-auto p-4 space-y-4">
@@ -249,30 +248,24 @@
     padding: 2rem 0;
     margin-top: 0;
     position: relative;
-    z-index: auto; /* Behind the hero-bg (which has z-index from its parent at z-10) */
+    z-index: auto; /* Layer behind background; below loader entering */
+  }
+  .hero-content.leaving,
+  .hero-content:global(.svelte-outro) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
   }
   
   .contract-loader-wrapper {
     margin-top: -4rem; /* Pulls the contract loader up closer to header */
     position: relative;
-    z-index: 10; /* Above everything when it slides in */
+    z-index: 10; /* Above hero while it slides out */
   }
 
-  /* Entrance animation for loader while loading starts but not yet fully loaded */
-  .contract-loader-wrapper.entering {
-    animation: loaderFlyIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  @keyframes loaderFlyIn {
-    from {
-      transform: translateY(100vh);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
+  
 
   .feature-card {
     text-align: center;
